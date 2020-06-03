@@ -1,0 +1,405 @@
+<template>
+	<view class="wrapper">
+		<view class="header">
+			智能问诊报告
+		</view>
+		<view class="u-f-jsb user-info">
+			<text>名字：{{userInfo.name}}</text>
+			<text>性别：{{userInfo.gender=="MAN"?'男':'女'}}</text>
+			<text>年龄：{{userInfo.age}}</text>
+		</view>
+		<view class="section">
+			<view class="top">智能问诊记录</view>
+			<view class="record" :class="{'heightAuto':contentFlag}">
+				<view v-for="(item, key) in msgList" :key="key" >
+					<view class="my" :class="{'other':item.type=='question'}">
+						<view class="chat-list-content">
+							<view  class="bubble">
+								<rich-text :nodes="item.value"></rich-text>
+							</view>
+						</view>
+						<!-- 头像 -->
+						<view class="chat-list-head">
+							<image :src="item.type=='question'?'/static/healthy-mall/robot.png':avatar"></image>
+						</view>
+					</view>
+				</view>
+			</view>
+			<view class="u-f-ajc">
+				<text class="consultation-record-status" @tap="contentFlag=!contentFlag">{{contentFlag?'收起':'查看更多'}}</text>
+				<uni-icons :type="contentFlag?'arrowup':'arrowdown'" size="16" color="#03BE90"></uni-icons>
+			</view>
+		</view>
+		<view class="section">
+			<view class="top">
+				报告结论
+			</view>
+			<view class="maybe">可能患的病症</view>
+			<view class="like">您的描述与如下疾病表现较为相似，本信息仅作相关参考，不能代替任何医疗诊断结果。</view>
+			<block v-for="(item,index) in resultArr" :key="index">
+				<view class="section-mod">
+					<view class="section-mod-title">
+						{{item.result}}<text>{{Math.floor(item.rate*1000)/10}}%</text>
+					</view>
+					<view class="section-mod-tips">出现头晕等情况就需要及时就诊治疗</view>
+					<template v-if="item.recordRecommends.length>0">
+						<view class="section-mod-plan">
+							<view style="font-weight: bold;">调理方案</view>
+							<block v-for="(good, index) in item.recordRecommends" :key="index">
+								<view class="cart-item" @click="productDetail(good.productId)">
+									<view class="image-wrapper">
+										<image :src="JSON.parse(good.info.icon)[0].url" mode="aspectFill"></image>
+									</view>
+									<view class="item-right">
+										<text class="clamp title">{{good.info.name}}</text>
+										<text class="attr">{{good.info.description}}</text>
+										<view class="u-f item-right-bottom">
+											<text class="price">¥{{good.info.price/100}}</text>
+											<text class="price">x{{good.num}}</text>
+										</view>
+									</view>
+								</view>
+							</block>
+						</view>
+						<view class="u-f-ajc btn-buy" :class="{'disabled':item.recordRecommends[0].orderId}" @tap="topay(item.recordRecommends[0].orderId,item)">{{item.recordRecommends[0].orderId?'已购买':'点击购买'}}</view>
+					</template>
+				</view>
+			</block>
+		</view>
+
+	</view>
+</template>
+
+
+
+<script>
+	export default {
+		data() {
+			return {
+				msgList: [],
+				contentFlag: false,
+				id:'',
+				userInfo:{
+					name:'',
+					age:'',
+					gender:''
+				},
+				resultArr:[]
+			};
+		},
+		onLoad(e) {
+			console.log(e);
+			this.id = e.rid
+			this.getData()
+		},
+		computed: {
+			avatar() {
+				return uni.getStorageSync('userinfo').avatarPath
+			}
+		},
+		methods: {
+			getData() {
+				this.$api.znwzRecord({
+					id:this.id
+				}).then(res=>{
+					if(res.status=="OK"){
+						let data = res.data
+						this.userInfo = {
+							age:data.age,
+							gender:data.gender,
+							name:data.name
+						}
+						
+						let arr = JSON.parse(data.znwzRecordMessage.content)
+						this.msgList = arr
+						this.resultArr = data.znwzRecordResults
+						this.resultArr.forEach(item1=>{
+							item1.info = JSON.parse(item1.info)
+							if(item1.recordRecommends.length>0){
+								item1.recordRecommends.forEach(item2=>{
+									console.log(item2);
+									item2.info = JSON.parse(item2.info)
+								})
+							}
+						})
+					}
+					console.log(res);
+				}).catch(err=>{
+					console.log(err);
+				})
+			},
+			productDetail(id){
+			    uni.navigateTo({
+			        url:"/pages/health-product-detail/health-product-detail?id="+id
+			    })
+			},
+			topay(status,obj){
+				if(!status){
+					let arr = obj.recordRecommends
+					console.log(obj.id);
+					uni.removeStorageSync('community_cartList');
+					let cartList = [];
+					console.log(arr);
+					arr.forEach(item => {
+						let obj = {
+					        id:item.productId,
+					        image:JSON.parse(item.info.icon)[0].url,
+					        title:item.info.name,
+					        price:item.info.price/100,
+					        number:item.num
+					    }
+					    cartList.push(obj)
+					})
+					uni.setStorage({
+					    key: 'buylist',
+					    data: cartList,
+					    success: () => {
+					        uni.navigateTo({
+					            url: '/pages/pay/confirm/confirm?type=community&instanceId=' + obj.id
+					        })
+					    }
+					})
+				}
+			}
+		},
+	}
+</script>
+
+<style lang="scss" scoped>
+	.wrapper {
+		padding: 20rpx 25rpx;
+
+		.header {
+			text-align: center;
+			font-size: 36rpx;
+			font-weight: bold;
+		}
+
+		.user-info {
+			padding: 5rpx;
+			border-top: 1px solid #434E5E;
+			border-bottom: 1px solid #434E5E;
+		}
+
+		.section {
+			margin-top: 50rpx;
+
+			.top {
+				font-size: 34rpx;
+				font-weight: 600;
+				color: #16202E;
+				border-bottom: 1px solid #434E5E;
+			}
+
+			.maybe {
+				font-size: 32rpx;
+				color: #434E5E;
+			}
+
+			.like {
+				font-size: 28rpx;
+				color: #434E5E;
+			}
+
+			.record {
+				height: 550rpx;
+				overflow: hidden;
+			}
+
+			.section-mod {
+				display: flex;
+				flex-direction: column;
+				margin-top: 20rpx;
+				align-items: flex-start;
+				.section-mod-title {
+					color: #179F7D;
+					font-size: 32rpx;
+					font-weight: bold;
+					font-family: PingFang-SC-Bold, PingFang-SC;
+					text {
+						margin-left: 5px;
+						color: #F38E08;
+					}
+				}
+				.section-mod-tips {
+					font-size: 28rpx;
+				}
+
+				.section-mod-plan {
+					font-size: 30rpx;
+					font-family: PingFang-SC-Bold, PingFang-SC;
+					width: 100%;
+				}
+			}
+
+			.consultation-record-status {
+				font-size: 26rpx;
+				color: #03BE90;
+			}
+			.heightAuto {
+				height: auto;
+			}
+		}
+	}
+
+	
+	.btn-buy {
+		align-self: center;
+		width: 279rpx;
+		height: 80rpx;
+		background: linear-gradient(233deg, rgba(136, 226, 150, 1) 0%, rgba(3, 190, 144, 1) 100%);
+		border-radius: 40px;
+		color: #FFFFFF;
+		font-family: PingFangSC-Regular, PingFang SC;
+		&.disabled{
+			background: #E4E7F2;
+			color:#A2A9BA
+		}
+	}
+	.my {
+	    padding: 20rpx 0;
+	    width: 100%;
+	    display: flex;
+	    justify-content: flex-end;
+	
+	    .chat-list-content{
+	        margin-right: 10rpx;
+	        max-width: 70%;
+	        min-height: 50rpx;
+	        font-size: 26rpx;
+	       
+	    }
+	
+	    .bubble {
+	        background-color: #179F7D;
+	        // border-bottom-left-radius:50% ;
+	        // border-bottom-right-radius: 50%;
+	        // border-top-left-radius: 50%;
+	        // border-top-right-radius:0 ; 
+	        
+	        color: #fff;
+	        border-radius: 10rpx;
+	        padding: 15rpx 20rpx;
+	        display: flex;
+	        align-items: center;
+	        // font-size: 32rpx;
+	        word-break: break-word;
+	
+	
+	    }
+	
+	    .img {
+	        background-color: transparent;
+	        padding: 0;
+	        overflow: hidden;
+	        image {
+	            flex: 1;
+	            max-width: 350rpx;
+	            max-height: 350rpx;
+	        }
+	    }
+
+	
+	    .chat-list-head {
+	        flex-shrink: 0;
+	        width: 80rpx;
+	        height: 80rpx;
+	
+	        image {
+	            width: 80rpx;
+	            height: 80rpx;
+	            border-radius: 80rpx;
+	        }
+	    }
+	}
+	.other {
+	    flex-direction: row-reverse;
+	
+	    .chat-list-content {
+	        margin-right: 0;
+	        margin-left: 10rpx;
+	    }
+	
+	    .bubble {
+	        background-color: #fff;
+	        color: #333;
+	    }
+	}
+	.cart-item {
+		display: flex;
+		align-items: center;
+		position: relative;
+		padding:30rpx 0;
+		border-bottom: 1px solid #EFF1F6;
+		// background-color: #FFFFFF;
+		overflow: hidden;
+	
+		.image-wrapper {
+			margin-left: 30rpx;
+			width: 156rpx;
+			height: 156rpx;
+			flex-shrink: 0;
+			position: relative;
+	
+			image {
+				border-radius: 8rpx;
+				width: 100%;
+				height: 100%;
+				transition: .6s;
+				opacity: 1;
+			}
+		}
+	
+		.item-right {
+			display: flex;
+			flex-direction: column;
+			flex: 1;
+			overflow: hidden;
+			position: relative;
+			padding-left: 30rpx;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			.title {
+				font-size: 30rpx;
+				color: #2A3441;
+				height: 40rpx;
+				line-height: 40rpx;
+				text-overflow: ellipsis;
+				overflow: hidden;
+				white-space: nowrap;
+			}
+	
+			.price {
+				font-size: 30rpx;
+				color: #16202E;
+				line-height: 40rpx;
+	            display: flex;
+	            flex-direction: row;
+			}
+	
+			.attr {
+				font-size: 26rpx;
+				color: #A2A9BA;
+				height: 50rpx;
+				line-height: 50rpx;
+			}
+	
+			.price {
+				height: 50rpx;
+				line-height: 50rpx;
+			}
+	
+			.item-right-bottom {
+				justify-content: space-between;
+				align-items: center;
+			}
+		}
+	
+		.del-btn {
+			padding: 4rpx 10rpx;
+			font-size: 34rpx;
+			height: 50rpx;
+			color: #4cd964;
+		}
+	}
+</style>

@@ -1,0 +1,467 @@
+<template>
+  <div class="content">
+    <div class="scroll-content">
+      <template v-if="!type">
+      <template v-if="!planData.version && !loading">
+        <div class='content2' ref="capture">
+          <div class='base-info padding'>
+            <div class='customerInfo'>
+              <div class='title'>客户信息</div>
+              <div class='customer-content text'>
+                <div>{{data.name}}，{{data.gender | sexFil}}，{{data.age}}岁</div>
+                <div class='phone'>{{data.phone}}</div>
+              </div>
+            </div>
+            <div class='evaluation-result'>
+              <div class='title'>本次舌象<span style="color: #868E9D;font-size: 14px;margin-left: 20px;">{{formatTimestamp(data.createTime, 'YYYY-MM-DD HH:mm')}}</span></div>
+              <div class='tongueImg'>
+                <div>
+                  <img :src="tongueImages.front" @click="show(0)">
+                </div>
+                <div>
+                  <img :src="tongueImages.back" @click="show(1)">
+                </div>
+              </div>
+            </div>
+            <div class='evaluation-result' v-if="tongueMark">
+              <div class='title'>舌象表现</div>
+              <div style="font-size: 0;">
+                <div style="width: 50%;display: inline-block;font-size: 14px;margin-top: 10px;">[舌色]：{{tongueMark.tongueColor}}</div>
+                <div style="width: 50%;display: inline-block;font-size: 14px;margin-top: 10px;">[苔色]：{{tongueMark.mossColor}}</div>
+                <div style="width: 50%;display: inline-block;font-size: 14px;margin-top: 10px;">[苔质]：{{tongueMark.mossName}}</div>
+                <div style="width: 50%;display: inline-block;font-size: 14px;margin-top: 10px;">[津液]：{{tongueMark.bodyfluidName}}</div>
+                <div style="width: 50%;display: inline-block;font-size: 14px;margin-top: 10px;">[舌下脉络]：{{tongueMark.veinName}}</div>
+              <div style="width: 50%;display: inline-block;font-size: 14px;margin-top: 10px;">[舌形]：{{tongueMark.ligulate}}</div>
+              <div style="width: 50%;display: inline-block;font-size: 14px;margin-top: 10px;">[点刺]：{{tongueMark.prickStatus === undefined ? '' : (tongueMark.prickStatus ? parseStr(tongueMark.prick) : '无')}}</div>
+              <div style="width: 50%;display: inline-block;font-size: 14px;margin-top: 10px;">[瘀斑]：{{tongueMark.ecchymosisStatus === undefined ? '' : (tongueMark.ecchymosisStatus ? parseStr(tongueMark.ecchymosis) : '无')}}</div>
+              <div style="width: 50%;display: inline-block;font-size: 14px;margin-top: 10px;">[瘀点]：{{tongueMark.petechiaStatus === undefined ? '' : (tongueMark.petechiaStatus ? parseStr(tongueMark.petechia) : '无')}}</div>
+              <div style="width: 50%;display: inline-block;font-size: 14px;margin-top: 10px;">[齿痕]：{{tongueMark.indentationStatus === undefined ? '' : (tongueMark.indentationStatus ? '有' : '无')}}</div>
+              <div style="width: 50%;display: inline-block;font-size: 14px;margin-top: 10px;">[裂纹]：{{tongueMark.fissureStatus === undefined ? '' : (tongueMark.fissureStatus ? parseStr(tongueMark.fissure) : '无')}}</div>
+              <div style="width: 50%;display: inline-block;font-size: 14px;margin-top: 10px;">[外观]：{{tongueMark.laonen}}</div>
+            </div>
+          </div>
+          <div class='evaluation-result'>
+            <div class='title'>体质评估结果</div>
+            <div class='result-content text'>根据您的舌像表现及身体表述；评估您为《{{planData.name || (planData.tongue && planData.tongue.tzpgjg)}}体质》</div>
+          </div>
+          <template v-if="planData.tongue && !planData.tongue.constitution">
+            <div class='evaluation-result'>
+              <div class='title'>体质表现</div>
+              <div class='result-content text'>{{planData.tongue.mainPerformance}}</div>
+            </div>
+            <div class='evaluation-result'>
+              <div class='title'>易患疾病</div>
+              <div class='result-content text'>{{planData.tongue.predisposition}}</div>
+            </div>
+          </template>
+          <template v-if="planData.tongue && planData.tongue.constitution">
+            <div class='evaluation-result'>
+            <div class='title'>总体特征</div>
+            <div class='result-content text'>{{planData.tongue.constitution.zttz}}</div>
+          </div>
+          <div class='evaluation-result'>
+            <div class='title'>形体特征</div>
+            <div class='result-content text'>{{planData.tongue.constitution.xttz}}</div>
+          </div>
+          <div class='evaluation-result'>
+            <div class='title'>常见表现</div>
+            <div class='result-content text'>{{planData.tongue.constitution.cjbx}}</div>
+          </div>
+          <div class='evaluation-result'>
+            <div class='title'>心理特征</div>
+            <div class='result-content text'>{{planData.tongue.constitution.xltz}}</div>
+          </div>
+          <div class='evaluation-result'>
+            <div class='title'>发病倾向</div>
+            <div class='result-content text'>{{planData.tongue.constitution.fbqx}}</div>
+          </div>
+          <div class='evaluation-result'>
+            <div class='title'>适应能力</div>
+            <div class='result-content text'>{{planData.tongue.constitution.synl}}</div>
+          </div>
+          <div class='evaluation-result'>
+            <div class='title'>中医辨体描述</div>
+            <div class='result-content text'>{{planData.tongue.constitution.zytzms}}</div>
+          </div>
+          </template>
+        </div>
+        <div class='medical-advice padding'>
+          <div class='title'>专家建议</div>
+          <div class='evaluation-result' style="margin-top: 20px;" v-if="planData.tongue && planData.tongue.tlfx">
+            <div class='title'><img src="/static/image/img_szbg_tlfx@3x.png" style="width: 70px;vertical-align: middle;margin-right: 5px;" />调理方向</div>
+            <div class='result-content text'>{{planData.tongue.tlfx}}</div>
+          </div>
+          <template v-if="planData.tongue && planData.tongue.constitution">
+            <div class='evaluation-result' style="margin-top: 20px;">
+              <div class='title'><img src="/static/image/img_szbg_ysjy@3x.png" style="width: 70px;vertical-align: middle;margin-right: 5px;" />饮食宜忌</div>
+              <div class='result-content text'>{{planData.tongue.constitution.ysyj}}</div>
+            </div>
+            <div class='evaluation-result' style="margin-top: 20px;">
+              <div class='title'><img src="/static/image/img_szbg_ydjy@3x.png" style="width: 70px;vertical-align: middle;margin-right: 5px;" />日常保健</div>
+              <div class='result-content text'>{{planData.tongue.constitution.rcbj}}</div>
+            </div>
+          </template>
+        </div>
+        <div class='plan padding'>
+          <div v-if='planData.plan&&planData.plan.length > 0'>
+            <div class='title'>适用调理配方</div>
+            <div class='plan-recipe text'>
+              <div class='recipe-list' v-for='(item, index) in planData.plan' :key='index'>
+                <div class='recipe-name'>[{{item.name}}]</div>
+                <div class='recipe-plan-list'>
+                  <span v-for='(t, i) in filter(item.dieticianComponents)' :key='i'>{{t.name}}{{filter(item.dieticianComponents).length !== (i + 1) ? ',' : ''}}</span>
+                  等数十种食材（见现场配置）
+                </div>
+              </div>
+              <div class='plan-content'>
+                <div class='plan-content-name'>[服用方法]</div>
+                <div class='plan-content-text'>{{planData.plan[0].instructions}}</div>
+              </div>
+              <template v-if="planData.products && planData.products[0]">
+                <div class='plan-content' v-if="planData.products[0].name">
+                  <div class='plan-content-name'>[建议搭配服用产品]</div>
+                  <div class='plan-content-text'>{{planData.products[0].name}}</div>
+                </div>
+                <div class='plan-content' v-if="planData.products[0].reason">
+                  <div class='plan-content-name'>[建议原因]</div>
+                  <div class='plan-content-text'>{{planData.products[0].reason}}</div>
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div v-transfer-dom>
+        <previewer :list="imgList" ref="previewer" :options="options"></previewer>
+      </div>
+      </template>
+      <template v-if="planData.version && (planData.version < 5) && !loading">
+        <posDetailNew :planData="planData" :data="data" :tongueImages="tongueImages" :tongueMark="tongueMark"></posDetailNew>
+      </template>
+      <template v-if="planData.version && (planData.version == 5) && !loading">
+        <posDetailNew2 :planData="planData" :data="data" :tongueImages="tongueImages" :tongueMark="tongueMark"></posDetailNew2>
+      </template>
+      <template v-if="planData.version && (planData.version == 6) && !loading">
+        <posDetailNew3 :planData="planData" :data="data" :tongueImages="tongueImages" :tongueMark="tongueMark"></posDetailNew3>
+      </template>
+      <template v-if="planData.version && (planData.version == 7) && !loading">
+        <posDetailNew4 :planData="planData" :data="data" :tongueImages="tongueImages" :tongueMark="tongueMark"></posDetailNew4>
+      </template>
+      <template v-if="planData.version && (planData.version == 8) && !loading">
+        <posDetailNew5 :planData="planData" :data="data" :tongueImages="tongueImages" :tongueMark="tongueMark"></posDetailNew5>
+      </template>
+      <template v-if="planData.version && (planData.version == 9) && !loading">
+        <posDetailNew6 :planData="planData" :data="data" :tongueImages="tongueImages" :tongueMark="tongueMark"></posDetailNew6>
+      </template>
+      <template v-if="planData.version && (planData.version == 10) && !loading && (!data.constitutionType || data.constitutionType === 'TONGUE_QUES' )">
+        <posDetailNew7 :planData="planData" :data="data" :tongueImages="tongueImages" :tongueMark="tongueMark"></posDetailNew7>
+      </template>
+      <template v-if="planData.version && (planData.version == 10) && !loading && data.constitutionType === 'QUES'">
+        <posDetailNew7QUES :planData="planData" :data="data" :tongueImages="tongueImages" :tongueMark="tongueMark"></posDetailNew7QUES>
+      </template>
+      <template v-if="planData.version && (planData.version == 10) && !loading && data.constitutionType === 'TONGUE'">
+        <posDetailNew7TONGUE :planData="planData" :data="data" :tongueImages="tongueImages" :tongueMark="tongueMark"></posDetailNew7TONGUE>
+      </template>
+      </template>
+      <template v-if="type == 1 && !loading">
+        <!-- <posDetailNewDOCTOR :data="data"></posDetailNewDOCTOR> -->
+        <posDetailNewDOCTOR2 :data="data"></posDetailNewDOCTOR2>
+      </template>
+    </div>
+    <transition name="router-slid" mode="out-in">
+      <router-view></router-view>
+    </transition>
+  </div>
+</template>
+
+<script>
+import posDetailNew from './posDetailNew'
+import posDetailNew2 from './posDetailNew2'
+import posDetailNew3 from './posDetailNew3'
+import posDetailNew4 from './posDetailNew4'
+import posDetailNew5 from './posDetailNew5'
+import posDetailNew6 from './posDetailNew6'
+import posDetailNew7 from './posDetailNew7'
+import posDetailNew7QUES from './posDetailNew7QUES'
+import posDetailNew7TONGUE from './posDetailNew7TONGUE'
+import posDetailNewDOCTOR from './posDetailNewDOCTOR'
+import posDetailNewDOCTOR2 from './posDetailNewDOCTOR2'
+import { dateFormat, Previewer, TransferDom } from 'vux'
+export default {
+  metaInfo () {
+    return {
+      title: this.type === '1' ? '健康调理报告' : ((this.data && this.data.constitutionType && this.data.constitutionType === 'QUES') ? '脏腑辨证报告' : '体质辨识报告')
+    }
+  },
+  data () {
+    return {
+      viewerId: null,
+      planData: {},
+      data: {},
+      tongueImages: {},
+      tongueMark: {},
+      formatTimestamp: dateFormat,
+      loadCount: 0,
+      test: '',
+      loading: true,
+      imgList: [],
+      options: {
+      },
+      type: this.$route.query.type || ''
+    }
+  },
+  created () {
+    if (this.$route.query.type === '1') {
+      this.$fetch.findByAdvisoryId({
+        advisoryId: this.$route.query.id
+      }).then(r => {
+        this.loading = false
+        if (r.data.status === 'OK') {
+          this.data = r.data.data
+        }
+      })
+    } else {
+      this.$fetch.constitutionRecordInstanceFindById({
+        id: this.$route.query.id
+      }).then(r => {
+        this.loading = false
+        if (r.data.status === 'OK') {
+          this.data = r.data.data
+          this.tongueImages = r.data.data.tongueImagesVo
+          this.imgList = [
+            {
+              msrc: this.tongueImages.front,
+              src: this.tongueImages.front
+            },
+            {
+              msrc: this.tongueImages.back,
+              src: this.tongueImages.back
+            }
+          ]
+          this.tongueMark = r.data.data.tongueMark
+          r.data.data.consResult.map(v => {
+            if (v.code === this.$route.query.code) {
+              this.planData = v
+            }
+          })
+          if (!this.planData.code && r.data.data.consResult.length > 0) {
+            this.planData = r.data.data.consResult[0]
+          }
+        }
+      })
+    }
+  },
+  methods: {
+    show (index) {
+      this.$refs.previewer.show(index)
+    },
+    parseStr (str) {
+      let arr = JSON.parse(str)
+      if (arr.length === 0) {
+        return '有'
+      } else {
+        return arr.join()
+      }
+    },
+    filter (arr) {
+      let end = 0
+      if (arr.length > 8) {
+        end = 8
+      } else if (arr.length === 1) {
+        return arr.slice()
+      } else {
+        end = arr.length - 1
+      }
+      return arr.slice(0, end)
+    }
+  },
+  filters: {
+    sexFil (val) {
+      var sex = {UNKNOWN: '未知', MAN: '男', LADY: '女', null: '未知'}
+      return sex[val]
+    },
+    splice (obj) {
+      let ret = ''
+      if (!obj) return ret
+      if (obj.tongueColor) {
+        ret += `（舌色）${obj.tongueColor}，`
+      }
+      if (obj.mossColor) {
+        ret += `（苔色）${obj.mossColor}，`
+      }
+      if (obj.mossName) {
+        ret += `（苔质）${obj.mossName}，`
+      }
+      if (obj.bodyfluidName) {
+        ret += `（津液）${obj.bodyfluidName}，`
+      }
+      if (obj.veinName) {
+        ret += `（舌下脉络）${obj.veinName}，`
+      }
+      if (obj.ligulate) {
+        ret += `（舌形）${obj.ligulate}，`
+      }
+      if (obj.prickStatus) {
+        ret += `（点刺）有，`
+      } else {
+        ret += `（点刺）无，`
+      }
+      if (obj.ecchymosisStatus) {
+        ret += `（瘀斑）有，`
+      } else {
+        ret += `（瘀斑）无，`
+      }
+      if (obj.petechiaStatus) {
+        ret += `（瘀点）有，`
+      } else {
+        ret += `（瘀点）无，`
+      }
+      if (obj.indentationStatus) {
+        ret += `（齿痕）有，`
+      } else {
+        ret += `（齿痕）无，`
+      }
+      if (obj.fissureStatus) {
+        ret += `（裂纹）有，`
+      } else {
+        ret += `（裂纹）无，`
+      }
+      if (obj.laonen) {
+        ret += `（外观）${obj.laonen}，`
+      }
+      ret = ret.replace(/，$/, '')
+      return ret
+    }
+  },
+  components: {
+    posDetailNew, Previewer, posDetailNew2, posDetailNew3, posDetailNew4, posDetailNew5, posDetailNew6, posDetailNew7, posDetailNew7QUES, posDetailNew7TONGUE, posDetailNewDOCTOR, posDetailNewDOCTOR2
+  },
+  directives: {
+    TransferDom
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.content{
+  @include routerPage;
+  overflow: hidden;
+  height: 100%;
+  position: absolute;
+  width: 100%;
+  display: flex;
+  left: 0;
+  top: 0;
+  flex-direction: column;
+  .scroll-content{
+    @include scrollPage;
+    overflow: auto;
+    background: white;
+    bottom: 0;
+    .content2 {
+      text-align: left;
+      .padding {
+        padding: 20px 30px 0;
+      }
+      .title {
+        height:24px;
+        font-size:16px;
+        font-weight:500;
+        color:#2A3441;
+        line-height:24px;
+        margin-bottom: 10px;
+      }
+      .text {
+        font-size:14px;
+        color: #434E5E;
+      }
+      >div + div {
+        border-top: 10px solid #EFF1F6;
+      }
+      .base-info {
+        padding-bottom: 20px;
+        .customer-content >div {
+          display: inline-block;
+          height:21px;
+          &.phone {
+            margin-left: 66px;
+            // padding-right: 30px;
+            // background: url('/static/image/img_mwzh.png') no-repeat right / 26px;
+          }
+        }
+        .evaluation-result, .evaluation-time {
+          margin-top: 30px;
+        }
+      }
+      // .tongueImg-info {
+      //   padding-bottom: 20px;
+        .tongueImg {
+          font-size: 0;
+          div {
+            display: inline-block;
+            height: 0;
+            padding-top: 138px;
+            width: 104px;
+            background: no-repeat center / cover;
+            margin-right: 20px;
+            position: relative;
+            overflow: hidden;
+            img{
+              position: absolute;
+              width: 100%;
+              left: 0;
+              top: 0;
+            }
+          }
+        }
+        .tongue-exterior {
+          margin-top: 24px;
+        }
+      // }
+      .medical-advice {
+        padding-bottom: 20px;
+        p {
+          line-height: 23px;
+        }
+      }
+      .plan {
+        padding-bottom: 77px;
+        .recipe-list {
+          display: flex;
+          border-bottom: 1px solid #EAEDF4;
+          +.recipe-list {
+            padding-top: 20px;
+          }
+          .recipe-name {
+            margin-right: 20px;
+          }
+          .recipe-plan-list span {
+            display: inline-block;
+            margin-bottom: 20px;
+          }
+        }
+        .plan-content {
+          display: flex;
+          margin-top: 20px;
+          .plan-content-name {
+            flex: 0 0 78px;
+          }
+          .plan-content-text {
+            line-height: 23px;
+          }
+        }
+        .plan-btn {
+          width: 150px;
+          height: 40px;
+          line-height: 40px;
+          text-align: center;
+          color: #FFF;
+          background: linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+          border-radius: 23px;
+          margin-top: 30px;
+        }
+      }
+    }
+  }
+}
+</style>

@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "管家分享",
+  "usingComponents": {
+    "h-community-share": "/components/common/h-community-share",
+    "uni-popup": "/components/uni-popup/uni-popup",
+    "h-comment-list": "/components/common/h-comment-list",
+    "uni-load-more": "/components/uni-load-more/uni-load-more",
+    "h-comment-bottom": "/components/common/h-comment-bottom"
+  }
+}

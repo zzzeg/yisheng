@@ -1,0 +1,304 @@
+<template>
+	<view>
+		<view class="order-status shape">
+			<view class="header">
+				订单状态
+			</view>
+			<uni-steps :options="list1" active-color="#03BE90" :active="active" direction="column" />
+		</view>
+		
+		<!-- 收货人信息 -->
+		<view class="mk-form shape">
+			<view class="header">
+				收货人信息
+			</view>
+			<view class="form-item-container">
+				<view class="form-item-container_label">收件人：</view>
+				<view class="form-item-container_main">
+					{{addressData.name}}
+				</view>
+			</view>
+			<view class="form-item-container">
+				<view class="form-item-container_label">联系方式：</view>
+				<view class="form-item-container_main">
+					{{addressData.mobile}}
+				</view>
+			</view>
+			<view class="form-item-container">
+				<view class="form-item-container_label">所在地区：</view>
+				<view class="form-item-container_main">
+					{{addressData.address}}
+				</view>
+			</view>
+			<view class="form-item-container">
+				<view class="form-item-container_label">详细地址：</view>
+				<view class="form-item-container_main">
+					{{addressData.addressName}}
+				</view>
+			</view>
+		</view>
+
+		<!-- 商品列表 -->
+		<view class="goods-section shape">
+			<view class="header">
+				商品信息
+			</view>
+			<block v-for="(item, index) in goodsList" :key="item.id">
+				<view class="cart-item">
+					<view class="image-wrapper">
+						<image :src="item.image" :class="[item.loaded]" mode="aspectFill" lazy-load @load="onImageLoad('goodsList', index)"
+						 @error="onImageError('goodsList', index)"></image>
+					</view>
+					<view class="item-right">
+						<text class="clamp title">{{item.title}}</text>
+						<text class="attr">{{item.attr_val}}</text>
+						<view class="u-f item-right-bottom">
+							<text class="price">¥{{item.price|toFixed}}</text>
+							<text class="price">x{{item.number}}</text>
+						</view>
+					</view>
+				</view>
+			</block>
+		</view>
+		
+		<!-- 付款信息 -->
+		<view class="mk-form shape">
+			<view class="header">
+				付款信息
+			</view>
+			<view class="form-item-container">
+				<view class="form-item-container_label">付款方式：</view>
+				<view class="form-item-container_main">
+					{{payInfo.payWay}}
+				</view>
+			</view>
+			<view class="form-item-container">
+				<view class="form-item-container_label">付款时间：</view>
+				<view class="form-item-container_main">
+					{{payInfo.payTime}}
+				</view>
+			</view>
+			<view class="form-item-container">
+				<view class="form-item-container_label">订单总额：</view>
+				<view class="form-item-container_main">
+					¥{{payInfo.total|toFixed}}
+				</view>
+			</view>
+			<view class="form-item-container">
+				<view class="form-item-container_label">配送费用：</view>
+				<view class="form-item-container_main">
+					¥{{payInfo.deliveryFee|toFixed}}
+				</view>
+			</view>
+			<view class="form-item-container">
+				<view class="form-item-container_label">应付金额：</view>
+				<view class="form-item-container_main" style="color: #03BE90;">
+					¥{{payInfo.realPay|toFixed}}
+				</view>
+			</view>
+		</view>
+
+
+	</view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				active:4,
+				list1: [{
+					title: '买家下单',
+					desc: '2018-11-11'
+				}, {
+					title: '卖家发货',
+					desc: '2018-11-12'
+				}, {
+					title: '买家签收',
+					desc: '2018-11-13'
+				}, { 
+					title: '交易完成',
+					desc: '2018-11-14'
+				}].reverse(),
+				goodsList: [{
+						id: 1,
+						image: '/static/healthy-mall/img_ssb.png',
+						attr_val: '建议服用2个周期',
+						stock: 15,
+						title: '膳食包膳食包膳食包XXXXXXXXX',
+						price: 278.50,
+						number: 1
+					},
+					{
+						id: 3,
+						image: '/static/healthy-mall/img_ssb.png',
+						attr_val: '建议服用2个周期',
+						stock: 3,
+						title: '定制抗病毒茶',
+						price: 1348.00,
+						number: 5
+					}
+				],
+				addressData: {
+					name: '许小星',
+					mobile: '13853989563',
+					addressName: '金九大道',
+					address: '山东省济南市历城区',
+					area: '149号',
+					default: false,
+				},
+				payInfo:{
+					payWay:'微信支付',
+					payTime:new Date().getTime(),
+					total:2200.00,
+					deliveryFee:0.00,
+					realPay:2200.00
+				}
+			};
+		},
+		methods: {
+			//监听image加载失败
+			onImageError(key, index) {
+				this[key][index].image = '/static/healthy-mall/errorImage.jpg';
+			},
+			//监听image加载完成
+			onImageLoad(key, index) {
+				this.$set(this[key][index], 'loaded', 'loaded');
+			},
+		},
+		filters: {
+			toFixed: function(value) {
+				return value.toFixed(2);
+			}
+		},
+	}
+</script>
+
+<style lang="scss" scoped>
+	.mk-form {
+		background-color: #FFFFFF;
+		font-size: 28rpx;
+	}
+	.header{
+		color: #2A3441;
+		font-size: 32rpx;
+		padding-left: 30rpx;
+	}
+	.shape{
+		border-radius: 10px;
+		margin: 30rpx;
+		padding: 30rpx 0;
+	}
+	.order-status{
+		background-color: #FFFFFF;
+	}
+	.form-item-container {
+		display: flex;
+		flex-direction: row;
+		align-items: flex-start;
+		// border-bottom: 1rpx solid #eee;
+		padding: 0 32rpx;
+		&_label {
+			font-size: 28rpx;
+			color: #A2A9BA;
+			width: 150rpx;
+			line-height: 2.5;
+			&.showAsteriskRect::before {
+				content: '';
+				color: #E22B2B;
+				width: 30rpx;
+				display: inline-block;
+			}
+
+			&.isRequired::before {
+				content: '*';
+			}
+		}
+
+		&_main {
+			font-size: 30rpx;
+			flex: 1;
+			display: flex;
+			color: #434E5E;
+			align-items: center;
+			overflow: hidden;
+			line-height: 2.5;
+		}
+	}
+	.goods-section {
+		margin-top: 16rpx;
+		background: #fff;
+		padding-bottom: 1px;
+		.cart-item {
+			display: flex;
+			align-items: center;
+			position: relative;
+			margin: 0 30rpx;
+			padding:30rpx 0;
+			border-bottom: 1px solid #EFF1F6;
+			background-color: #FFFFFF;
+			overflow: hidden;
+	
+			.image-wrapper {
+				width: 156rpx;
+				height: 156rpx;
+				flex-shrink: 0;
+				position: relative;
+	
+				image {
+					border-radius: 8upx;
+					width: 100%;
+					height: 100%;
+					transition: .6s;
+					opacity: 0;
+	
+					&.loaded {
+						opacity: 1;
+					}
+				}
+			}
+	
+			.item-right {
+				display: flex;
+				flex-direction: column;
+				flex: 1;
+				overflow: hidden;
+				position: relative;
+				padding-left: 30rpx;
+	
+				.title {
+					font-size: 30rpx;
+					color: #2A3441;
+					height: 40rpx;
+					line-height: 40rpx;
+					text-overflow: ellipsis;
+					overflow: hidden;
+					white-space: nowrap;
+				}
+	
+				.price {
+					font-size: 30rpx;
+					color: #16202E;
+					line-height: 40rpx;
+				}
+	
+				.attr {
+					font-size: 26rpx;
+					color: #A2A9BA;
+					height: 50rpx;
+					line-height: 50rpx;
+				}
+	
+				.price {
+					height: 50rpx;
+					line-height: 50rpx;
+				}
+	
+				.item-right-bottom {
+					justify-content: space-between;
+					align-items: center;
+				}
+			}
+		}
+	}
+</style>

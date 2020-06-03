@@ -1,0 +1,113 @@
+<template>
+	<view class="wrapper">
+		<image class="avatar" mode="aspectFill" :src="parse(info.major, []) && parse(info.major, [])[0] && parse(info.major, [])[0].url"></image>
+		<view class="owner">{{info.applyType === 'COMPANY' ? info.companyName : info.contactName}}</view>
+		<view class="name">{{info.name}}</view>
+		<view class="tips">加入服务站了解更多精彩内容</view>
+		<button class="btn" open-type="getUserInfo" @getuserinfo="getUserList">立即加入</button>
+	</view>
+</template>
+
+<script>
+	export default {
+		props: {
+			info: Object
+		},
+		data() {
+			return {
+
+			};
+		},
+		computed:{
+		},
+		methods: {
+			parse (str, initValue) {
+				let ret = initValue
+				try {
+					ret = JSON.parse(str)
+				} catch (e) {}
+				return ret
+			},
+			getUserList: function(res) {
+			    console.log(res)
+			     if (this.login) {
+			         return
+			     }
+			    if (res.detail.errMsg == "getUserInfo:ok") {
+			        //授权
+			        console.log(this.$conn) 
+					getApp().globalData.scene = this.info.id;
+			        if (res.iv) {
+			            getApp().getAccount(res)
+			           
+			            // this.getAccount(res)
+			        } else {
+			            getApp().getAccount(res.target)
+			            // this.getAccount(res.target)
+			        }
+			    
+			    } else {
+			        //拒绝授权
+			        uni.showModal({
+			            title: '提示',
+			            content: '允许授权后放可使用',
+			            success: function(res) {
+			                if (res.confirm) {
+			                    uni.openSetting({
+			                        success(openRes) {
+			                            console.log(res.authSetting)
+			                        }
+			                    });
+			                } else if (res.cancel) {
+			    
+			                }
+			            }
+			        });
+			    
+			    }
+			}
+		},
+	}
+</script>
+
+<style lang="scss" scoped>
+	.wrapper{
+		padding: 52rpx 0 52rpx;
+		text-align: center;
+		.avatar{
+			height: 60rpx;
+			width: 60rpx;
+			border-radius: 50%;
+		}
+		.owner{
+			color: #9C9C9C;
+			font-size: 26rpx;
+			line-height: 36rpx;
+			margin-top: 10rpx;
+		}
+		.name{
+			color: #16202E;
+			font-size: 28rpx;
+			line-height: 40rpx;
+			margin-top: 8rpx;
+			font-weight: bold;
+		}
+		.tips{
+			margin-top: 26rpx;
+			color: #13202F;
+			font-size: 22rpx;
+			line-height: 32rpx;
+		}
+		.btn{
+			height: 64rpx;
+			width: 260rpx;
+			border-radius: 32rpx;
+			background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+			box-shadow:0px 3px 15px 0px rgba(3,190,144,0.3);
+			color: white;
+			font-size: 28rpx;
+			line-height: 64rpx;
+			margin-top: 14rpx;
+		}
+	}
+</style>

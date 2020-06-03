@@ -1,0 +1,24 @@
+<template>
+	<view class="cont">
+		
+	</view>
+</template>
+
+<script>
+	export default{
+		data() {
+			return {
+				type: 'zhuzhan',  // zhuzhan驻站医生，zhineng 智能医生
+			}
+		},
+		onLoad(option) {
+			
+		},
+		methods: {
+			
+		}
+	}
+</script>
+
+<style scoped lang="scss">
+</style>

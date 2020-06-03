@@ -1,0 +1,1 @@
+<view class="content"><image src="../../../static/image/img_scsb.png" mode></image><view class="title">{{''+message+''}}</view><view class="ddd">请重新拍摄</view><button class="login-btn" hover-class="button-hover" data-event-opts="{{[['tap',[['clickCamera',['$event']]]]]}}" bindtap="__e">重新拍摄</button></view>

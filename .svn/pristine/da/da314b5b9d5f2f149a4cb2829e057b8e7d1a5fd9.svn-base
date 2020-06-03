@@ -1,0 +1,346 @@
+import request from './request'
+
+function getMsgCode(obj) {
+
+    return request.post({
+        url: '/api/sms/sendCode',
+        data: obj.data,
+    });
+
+}
+
+
+function getUnionid(obj) {
+    //   console.log("getUnionid")
+    //     console.log(obj)
+    return request.get({
+        url: '/wechatMini/snsJscode2session',
+        data: obj.data,
+    });
+
+}
+// 账户信息
+function getAccountInfo(obj) {
+
+    return request.get({
+        url: '/wechatMini/userInfo',
+        data: obj.data,
+    })
+}
+
+function createUser(obj) {
+
+    return request.post({
+        url: '/api/user/createUser',
+        data: obj.data,
+    })
+}
+
+function findUserById(obj) {
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    return request.get({
+        url: '/constitutionUser/findByUserId',
+        data: obj.data,
+        header: header
+    },true);
+
+}
+
+function findCommunityById(obj) {
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    return request.get({
+        url: '/communityInfo/findById',
+        data: obj.data,
+        header: header
+    },true);
+
+}
+
+function addCommunityAppraise(obj) {
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/json'
+    }
+    return request.post({
+        url: '/communityAppraise/add',
+        data: obj.data,
+        header: header
+    },true);
+
+}
+
+function getUploadParams(obj) {
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+
+    return request.get({
+        url: '/api/getUploadParams',
+        data: obj.data,
+        header: header
+    },true)
+}
+
+function faceAnalysis(obj) {
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+
+    return request.post({
+        url: '/face/analysis',
+        data: obj.data,
+        header: header
+    },true)
+}
+
+function dialWithQuesTestWithQues(obj) {
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/json'
+    }
+
+    return request.post({
+        url: '/constitutionRecordInstance/dialWithQuesTestWithQues',
+        data: obj.data,
+        header: header
+    },true)
+}
+
+function dialWithQuesTestWithTongue(obj) {
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/json'
+    }
+
+    return request.post({
+        url: '/constitutionRecordInstance/dialWithQuesTestWithTongue',
+        data: obj.data,
+        header: header
+    },true)
+}
+
+function analysisFaceImage(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.post({
+        url: '/constitutionRecordInstance/analysisFaceImage',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+function getFaceImageResult(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.get({
+        url: '/constitutionRecordInstance/getFaceImageResult',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+function cutTongueImage(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.post({
+        url: '/constitutionRecordInstance/cutTongueImage',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+function cutTongueBackImage(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.post({
+        url: '/constitutionRecordInstance/cutTongueBackImage',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+function getTongueBackImageResult(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.get({
+        url: '/constitutionRecordInstance/getTongueBackImageResult',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+function getEmchatToken(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.get({
+        url: '/emchat/getToken',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+function emchatCreateConferences(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.post({
+        url: '/emchat/createConferences',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+function addAdvisoryRecord(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.post({
+        url: '/advisoryRecord/add',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+function findFaceById(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.get({
+        url: '/face/findById',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+function faceFindPuductByIdAndType(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.get({
+        url: '/face/findPuductByIdAndType',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+function constitutionOrderFindById(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.get({
+        url: '/constitutionOrder/findById',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+function faceFindDetailByIdAndType(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.get({
+        url: '/face/findDetailByIdAndType',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+function managerMsgPage(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.get({
+        url: '/manager/managerPage',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+
+
+export default {
+    getMsgCode,
+    getAccountInfo,
+    getUnionid,
+    createUser,
+    findUserById,
+    findCommunityById,
+    addCommunityAppraise,
+    getUploadParams,
+    faceAnalysis,
+    dialWithQuesTestWithQues,
+    dialWithQuesTestWithTongue,
+    analysisFaceImage,
+    getFaceImageResult,
+    cutTongueImage,
+    cutTongueBackImage,
+    getTongueBackImageResult,
+    getEmchatToken,
+    addAdvisoryRecord,
+    emchatCreateConferences,
+    findFaceById,
+    faceFindPuductByIdAndType,
+    constitutionOrderFindById,
+    faceFindDetailByIdAndType,
+    managerMsgPage
+}

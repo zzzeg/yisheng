@@ -1,0 +1,238 @@
+<template>
+    <view v-if="doctor" class="content">
+        <image class="logo" src="https://coffer.bainuo.cn/mdt-pub/img_zzys_yisheng_bg.png"></image>
+        <view class="login-box">
+            <view class="boxxxx"></view>
+            <view class="headerBox">
+                <image :src="doctor.pic" mode=""></image>
+            </view>
+            <view style="color: #2A3441;font-size: 38upx;">
+                {{doctor.name}}
+            </view>
+            <view style="color: #A2A9BA;">
+                {{doctor.title?doctor.title:''}} |  {{doctor.rank?doctor.rank:''}}
+            </view>
+            <view class="btnBox">
+                <view class="gkfxbtn" @click="imageInterrogation">图文问诊</view>
+                <view class="gkfxbtn" @click="videoInterrogation">视频问诊</view>
+            </view>
+        </view>    
+        <view class="boxTop" >
+            <view class="titleBox">
+                擅长
+            </view>
+            <view style="margin: 44upx 32upx 6upx 32upx;">
+                {{doctor.speciality}}
+            </view>
+            <view style="height: 50upx;width: 100%;"></view>
+        </view>
+        <view class="boxTop" >
+            <view class="titleBox">
+                简介
+            </view>
+            <view style="margin: 44upx 32upx 6upx 32upx;">
+                {{doctor.remark}}
+            </view>
+            <view style="height: 50upx;width: 100%;"></view>
+        </view>
+        <view class="boxTop" >
+            <view class="titleBox">
+                资质
+            </view>
+            <view style="margin: 44upx 32upx 6upx 32upx;">
+                <uni-swiper-dot :info="doctor.credentials" :current="current" :mode="mode" :dots-styles="dotsStyles" field="content">
+                	<swiper class="swiper-box" @change="change">
+                		<swiper-item v-for="(item, index) in doctor.credentials" :key="index">
+                			<view  class="swiper-item">
+                				<image class="image" :src="item.url" mode="aspectFill" />
+                			</view>
+                		</swiper-item>
+                	</swiper>
+                </uni-swiper-dot>
+            </view>
+            <view style="height: 50upx;width: 100%;"></view>
+        </view>
+    </view>
+    
+</template>
+
+<script>
+    import api from '../../common/api.js';
+    
+    export default {
+    	data() {
+    		return {
+                current: 0,
+                mode: 'dot',
+                dotsStyles: {
+                    backgroundColor: 'rgba(255, 255, 255, 1)',
+                    selectedBackgroundColor: '#03BE90',
+                    border: '1px rgba(83, 200, 249,0.0) solid',
+                    selectedBorder: '1px rgba(83, 200, 249,0.0) solid'
+                },
+                doctor:{
+					credentials:[]
+				},
+				communityId:'',
+				doctorid:''
+            }
+        },
+        onLoad(options) {
+            this.communityId = this.$store.getters.communityId
+			this.doctorid = options.doctorid;
+            api.findExpertById({
+                data:{
+                    id:this.doctorid
+                }
+            }).then(res=>{
+               console.log(res) 
+               if(res.status=='OK'){
+                   this.doctor = res.data
+                   if(this.doctor.pics && JSON.parse(this.doctor.pics).length>0){
+                       this.doctor.pic = JSON.parse(this.doctor.pics)[0].url
+                   }
+                   if(this.doctor.credentials && JSON.parse(this.doctor.credentials).length>0){
+                       this.doctor.credentials = JSON.parse(this.doctor.credentials)
+                   }
+                   
+               }
+            })
+        },
+        methods:{
+			imageInterrogation:function(){
+			    var data = {
+			        expertId:this.doctorid,
+			        type:'IMAGE',
+			        communityId:this.communityId
+			    }
+			    
+			    
+			    api.addAdvisoryRecord({
+			        data:data
+			    }).then(res=>{
+			        console.log(res)
+			        if(res.status == 'OK'){
+			            var pic
+			            if(res.data.expertPics && JSON.parse(res.data.expertPics).length>0){
+			               pic = JSON.parse(res.data.expertPics)[0].url
+			            }
+			            uni.navigateTo({
+			                url:"chatRoom?recordId=" + res.data.id +"&to=" + this.doctorid+"&communityId="
+			                + res.data.communityId +"&title=" + res.data.expertName+"&topic=" + pic
+			            })
+			        }
+			    })
+			},
+			videoInterrogation:function(){
+			    var data = {
+			        expertId:this.doctorid,
+			        type:'VIDEO',
+			        communityId:this.communityId
+			    }
+			    api.addAdvisoryRecord({
+			        data:data
+			    }).then(res=>{
+			        console.log(res)
+			        if(res.status == 'OK'){
+			            uni.navigateTo({
+			                url:"connectVideoInterrogation?recordId=" + res.data.id +"&to=" + this.doctorid
+			            })
+			        }
+			    })
+			    
+			},
+            change(e) {
+            	this.current = e.detail.current
+            }
+        }
+    }
+</script>
+
+<style>
+    page{
+        background: #EFF1F6;
+    }
+    .content{
+        text-align: center;
+        font-size:29upx;
+        color: #434E5E;
+    }
+    .logo {
+    	height: 488upx;
+    	width: 100%;
+        position: absolute;
+        left: 0upx;
+        top: 0upx;
+        z-index: -99;
+    }
+    .boxTop{
+        margin: 30upx 33upx;
+        width:683upx;
+        background:rgba(255,255,255,1);
+        box-shadow:0px 4upx 21upx 0px rgba(85,112,105,0.1);
+        border-radius:21upx;
+        font-size: 30upx;
+        color: #868E9D;
+        text-align: left;
+    }
+    .titleBox{
+        padding-top: 32upx ;
+        margin: 0upx 32upx;
+        height: 78upx;
+        border-bottom: 2upx dashed #C6CAD4;
+        color: #16202E;
+        font-size: 38upx;
+    }
+    .btnBox{
+        display: flex;
+        flex-direction: row;
+        margin: 70upx 123upx 90upx 123upx;
+        justify-content: space-between;
+    }
+    
+    .gkfxbtn{
+        width:197upx;
+        height:67upx;
+        background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+        box-shadow:0px 6upx 31upx 0px rgba(3,190,144,0.3);
+        border-radius:33upx;
+        line-height: 67upx;
+        text-align: center;
+        color: #FFFFFF;
+    }
+    .login-box{
+        width: 683upx;
+        height: 503upx;
+        /* margin-top: -310upx; */
+        position: relative;
+        margin-top: 238upx;
+        margin-left: 33upx;
+    }
+    .boxxxx{
+        position: absolute;
+        z-index: -97;
+        width: 100%;
+        background:#FFFFFF;
+        box-shadow:0upx 42upx 208upx 0upx rgba(22,32,46,0.15);
+        border-radius:31upx;
+        height: 419upx;
+        top: 84upx;
+    }
+    .headerBox{
+        width: 168upx;
+        height: 168upx;
+        margin-top: -84upx;
+        background: #FFFFFF;
+        border-radius: 50%;
+        margin-left: calc(50% - 84upx);
+        
+    }
+    .headerBox image{
+        margin: 8upx;
+        width: 152upx;
+        height: 152upx;
+        border-radius: 50%;
+        background: #F8F8F8;
+    }
+    
+</style>

@@ -1,0 +1,1 @@
+<view class="cont data-v-2b2f5865"><video class="myVideo data-v-2b2f5865" src="{{formData.videoUrl}}" autoplay controls data-event-opts="{{[['error',[['videoErrorCallback',['$event']]]]]}}" binderror="__e"></video></view>

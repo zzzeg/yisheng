@@ -1,0 +1,1202 @@
+<template>
+  <div class="content-wrapper">
+    <div class="tabs">
+      <div class="tab" :class="curTab == 1 ? 'active' : ''" @click="toTab(1)">
+        <div class="tab-inner">辨证报告</div>
+      </div>
+      <div class="tab" :class="curTab == 2 ? 'active' : ''" @click="toTab(2)">
+        <div class="tab-inner">定制食方</div>
+      </div>
+      <div class="tab" :class="curTab == 3 ? 'active' : ''" @click="toTab(3)">
+        <div class="tab-inner">专家建议记录</div>
+      </div>
+    </div>
+    <div class='content2' v-scroll>
+      <div class="user-info">
+        <div class="info-wrapper">
+          <div class="user-name">{{data.name}}</div>
+          <div class="user-gender-age">性别：{{data.gender | sexFil}}<span>年龄：{{data.age}}岁</span></div>
+          <div class="user-phone">电话：{{data.phone}}</div>
+        </div>
+      </div>
+      <div class="block" id="tab1" ref="tab1">
+        <div class="tab-title">
+          <div class="tab-title-text">辨证报告</div>
+          <div class="tab-title-time">{{formatTimestamp(data.createTime, 'YYYY-MM-DD HH:mm')}}</div>
+        </div>
+        <div class="block-title">舌象分析</div>
+        <div class="list">
+          <div class="item">
+            <div class="item-title">中医舌象辨识维度</div>
+            <div class="normal-text tongue-tips"><span>舌形、舌下络脉、苔质、舌色、津液、苔色</span>以判断体质性质、气血盛衰、津液盈亏及脏腑虚实</div>
+            <div class="tongue-example">
+              <img src="/static/img/img_bswdsyt@3x.png">
+            </div>
+            <div class="tongue-images">
+              <div class="tongue-image" @click="showImage(tongueImages.front)">
+                <div class="tongue-image-icon" :style="{backgroundImage: `url(${tongueImages.front})`}"></div>
+                <div class="tongue-image-text">
+                  <div class="top-text">【舌体正面】</div>
+                  <div class="bottom-text">查看大图</div>
+                </div>
+              </div>
+              <div class="tongue-image" @click="showImage(tongueImages.back)">
+                <div class="tongue-image-icon" :style="{backgroundImage: `url(${tongueImages.back})`}"></div>
+                <div class="tongue-image-text">
+                  <div class="top-text">【舌体反面】</div>
+                  <div class="bottom-text">查看大图</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="item">
+            <div class="item-title">舌象</div>
+            <div class="tongue-result-list">
+              <div class="tongue-result-item" :class="(tongueMark.ligulate && tongueMark.ligulate.indexOf('正常') < 0) ? 'active' : ''">舌形：<span>{{tongueMark.ligulate}}</span></div>
+              <!-- <div class="tongue-result-item" :class="tongueMark.petechiaStatus ? 'active' : ''">瘀点：<span>{{tongueMark.petechiaStatus === undefined ? '' : (tongueMark.petechiaStatus ? parseStr(tongueMark.petechia) : '无')}}</span></div> -->
+              <div class="tongue-result-item" :class="tongueMark.tongueColor ? 'active' : ''">舌色：<span>{{tongueMark.tongueColor}}</span></div>
+              <!-- <div class="tongue-result-item" :class="tongueMark.ecchymosisStatus ? 'active' : ''">瘀斑：<span>{{tongueMark.ecchymosisStatus === undefined ? '' : (tongueMark.ecchymosisStatus ? parseStr(tongueMark.ecchymosis) : '无')}}</span></div> -->
+              <div class="tongue-result-item" :class="tongueMark.mossName !== '[]' ? 'active' : ''">苔质：<span>{{parseStr(tongueMark.mossName, '苔') === '有' ? '' : parseStr(tongueMark.mossName, '苔')}}</span></div>
+              <div class="tongue-result-item" :class="tongueMark.indentationStatus ? 'active' : ''">齿痕：<span>{{tongueMark.indentationStatus === undefined ? '' : (tongueMark.indentationStatus ? '有' : '无')}}</span></div>
+              <div class="tongue-result-item" :class="tongueMark.mossColor ? 'active' : ''">苔色：<span>{{tongueMark.mossColor}}</span></div>
+              <div class="tongue-result-item" :class="tongueMark.fissureStatus ? 'active' : ''">裂纹：<span>{{tongueMark.fissureStatus === undefined ? '' : (tongueMark.fissureStatus ? parseStr(tongueMark.fissure) : '无')}}</span></div>
+              <div class="tongue-result-item" :class="tongueMark.bodyfluidName ? 'active' : ''">津液：<span>{{tongueMark.bodyfluidName}}</span></div>
+              <!-- <div class="tongue-result-item" :class="tongueMark.laonen && tongueMark.laonen.indexOf('正常') < 0 ? 'active' : ''">外观：<span>{{tongueMark.laonen}}</span></div> -->
+              <div class="tongue-result-item" :class="tongueMark.prickStatus ? 'active' : ''">点刺：<span>{{tongueMark.prickStatus === undefined ? '' : (tongueMark.prickStatus ? parseStr(tongueMark.prick) : '无')}}</span></div>
+              <!-- <div class="tongue-result-item" :class="tongueMark.veinName && tongueMark.veinName.indexOf('正常') < 0 ? 'active' : ''">脉络：<span>{{tongueMark.veinName}}</span></div> -->
+            </div>
+          </div>
+          <div class="item">
+            <div class="item-title">舌象表现</div>
+            <div class="tongue-abnormal-list">
+              <template v-if="tongueMark.ligulate && tongueMark.ligulate.indexOf('正常') < 0 && getDescribe('ligulate', tongueMark.ligulate)">
+                <div class="tongue-abnormal-item">
+                  <div class="top-text">舌形：{{tongueMark.ligulate}}</div>
+                  <div class="bottom-text">舌形描述：{{getDescribe('ligulate', tongueMark.ligulate)}}</div>
+                </div>
+              </template>
+              <!-- <template v-if="tongueMark.petechiaStatus && getDescribe('petechiaStatus', '瘀点')">
+                <div class="tongue-abnormal-item">
+                  <div class="top-text">瘀点：{{parseStr(tongueMark.petechia)}}</div>
+                  <div class="bottom-text">瘀点描述：{{getDescribe('petechiaStatus', '瘀点')}}</div>
+                </div>
+              </template> -->
+              <template v-if="tongueMark.tongueColor && getDescribe('tongueColor', tongueMark.tongueColor)">
+                <div class="tongue-abnormal-item">
+                  <div class="top-text">舌色：{{tongueMark.tongueColor}}</div>
+                  <div class="bottom-text">舌色描述：{{getDescribe('tongueColor', tongueMark.tongueColor)}}</div>
+                </div>
+              </template>
+              <!-- <template v-if="tongueMark.ecchymosisStatus && getDescribe('ecchymosisStatus', '瘀斑')">
+                <div class="tongue-abnormal-item">
+                  <div class="top-text">瘀斑：{{parseStr(tongueMark.ecchymosis)}}</div>
+                  <div class="bottom-text">瘀斑描述：{{getDescribe('ecchymosisStatus', '瘀斑')}}</div>
+                </div>
+              </template> -->
+              <template v-if="tongueMark.mossName !== '[]' && parse(tongueMark.mossName, []).join()">
+                <div class="tongue-abnormal-item">
+                  <div class="top-text">苔质：{{parse(tongueMark.mossName, []).join()}}</div>
+                  <div class="bottom-text">苔质描述：<template v-for="item in parse(tongueMark.mossName, [])">{{getDescribe('mossName', item)}}</template></div>
+                </div>
+              </template>
+              <template v-if="tongueMark.indentationStatus && getDescribe('indentationStatus', '齿痕')">
+                <div class="tongue-abnormal-item">
+                  <div class="top-text">齿痕：有</div>
+                  <div class="bottom-text">齿痕描述：{{getDescribe('indentationStatus', '齿痕')}}</div>
+                </div>
+              </template>
+              <template v-if="tongueMark.mossColor && getDescribe('mossColor', tongueMark.mossColor)">
+                <div class="tongue-abnormal-item">
+                  <div class="top-text">苔色：{{tongueMark.mossColor}}</div>
+                  <div class="bottom-text">苔色描述：{{getDescribe('mossColor', tongueMark.mossColor)}}</div>
+                </div>
+              </template>
+              <template v-if="tongueMark.fissureStatus && getDescribe('fissureStatus', '裂纹')">
+                <div class="tongue-abnormal-item">
+                  <div class="top-text">裂纹：{{parseStr(tongueMark.fissure)}}</div>
+                  <div class="bottom-text">裂纹描述：{{getDescribe('fissureStatus', '裂纹')}}</div>
+                </div>
+              </template>
+              <template v-if="tongueMark.bodyfluidName && getDescribe('bodyfluidName', tongueMark.bodyfluidName)">
+                <div class="tongue-abnormal-item">
+                  <div class="top-text">津液：{{tongueMark.bodyfluidName}}</div>
+                  <div class="bottom-text">津液描述：{{getDescribe('bodyfluidName', tongueMark.bodyfluidName)}}</div>
+                </div>
+              </template>
+              <!-- <template v-if="tongueMark.laonen && tongueMark.laonen.indexOf('正常') < 0 && getDescribe('laonen', tongueMark.laonen)">
+                <div class="tongue-abnormal-item">
+                  <div class="top-text">外观：{{tongueMark.laonen}}</div>
+                  <div class="bottom-text">外观描述：{{getDescribe('laonen', tongueMark.laonen)}}</div>
+                </div>
+              </template> -->
+              <template v-if="tongueMark.prickStatus && getDescribe('prickStatus', '点刺')">
+                <div class="tongue-abnormal-item">
+                  <div class="top-text">点刺：{{parseStr(tongueMark.prick)}}</div>
+                  <div class="bottom-text">点刺描述：{{getDescribe('prickStatus', '点刺')}}</div>
+                </div>
+              </template>
+              <!-- <template v-if="tongueMark.veinName && tongueMark.veinName.indexOf('正常') < 0">
+                <div class="tongue-abnormal-item">
+                  <div class="top-text">脉络：{{tongueMark.veinName}}</div>
+                  <div class="bottom-text">脉络描述：{{getDescribe('veinName', tongueMark.veinName)}}</div>
+                </div>
+              </template> -->
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="block">
+        <div class="block-title">整体分析</div>
+        <div class="list">
+          <div class="item" v-if="tips">
+            <div class="item-title">脏腑情况</div>
+            <div class="viscera-list">
+              <div class="viscera" v-if="getQuestionResult('心系')">
+                <div class="viscera-icon" style="background-image: url('/static/img/icon_sxfxbg_xx@3x.png')"></div>
+                <div class="viscera-info">
+                  <div class="top-text">【心系】：{{getQuestionResult('心系').title.replace('证', '')}}</div>
+                  <div class="bottom-text">常见表现为{{getQuestionResult('心系').mains.join() || getQuestionResult('心系').subs.join()}}等</div>
+                </div>
+              </div>
+              <div class="viscera" v-if="getQuestionResult('肝胆系')">
+                <div class="viscera-icon" style="background-image: url('/static/img/icon_sxfxbg_gdx@3x.png')"></div>
+                <div class="viscera-info">
+                  <div class="top-text">【肝胆系】：{{getQuestionResult('肝胆系').title.replace('证', '')}}</div>
+                  <div class="bottom-text">常见表现为{{getQuestionResult('肝胆系').mains.join() || getQuestionResult('肝胆系').subs.join()}}等</div>
+                </div>
+              </div>
+              <div class="viscera" v-if="getQuestionResult('脾胃系')">
+                <div class="viscera-icon" style="background-image: url('/static/img/icon_sxfxbg_pwx@3x.png')"></div>
+                <div class="viscera-info">
+                  <div class="top-text">【脾胃系】：{{getQuestionResult('脾胃系').title.replace('证', '')}}</div>
+                  <div class="bottom-text">常见表现为{{getQuestionResult('脾胃系').mains.join() || getQuestionResult('脾胃系').subs.join()}}等</div>
+                </div>
+              </div>
+              <div class="viscera" v-if="getQuestionResult('肾系')">
+                <div class="viscera-icon" style="background-image: url('/static/img/icon_sxfxbg_pwx3@3x.png')"></div>
+                <div class="viscera-info">
+                  <div class="top-text">【肾系】：{{getQuestionResult('肾系').title.replace('证', '')}}</div>
+                  <div class="bottom-text">常见表现为{{getQuestionResult('肾系').mains.join() || getQuestionResult('肾系').subs.join()}}等</div>
+                </div>
+              </div>
+              <div class="viscera" v-if="getQuestionResult('肺系')">
+                <div class="viscera-icon" style="background-image: url('/static/img/icon_sxfxbg_pwx2@3x.png')"></div>
+                <div class="viscera-info">
+                  <div class="top-text">【肺系】：{{getQuestionResult('肺系').title.replace('证', '')}}</div>
+                  <div class="bottom-text">常见表现为{{getQuestionResult('肺系').mains.join() || getQuestionResult('肺系').subs.join()}}等</div>
+                </div>
+              </div>
+            </div>
+            <div class="viscera-tips">
+              <div class="viscera-tips-title">【特别提醒】：</div>
+              <div class="viscera-tips-text">注意{{tips}}检查及保养</div>
+            </div>
+          </div>
+          <div class="item">
+            <div class="item-title">体质辨识</div>
+            <div class="habitus-title">【体质评估结果】：</div>
+            <div class="habitus-text">根据您的舌象表现及身体表述，评估您为</div>
+            <div class="habitus-result">{{planData.name || (planData.tongue && planData.tongue.tzpgjg)}}体质</div>
+          </div>
+        </div>
+      </div>
+      <div class="block" v-if="planData.tongue && planData.tongue.constitution">
+        <div class="block-title">体质调养生活建议<br /><span>【{{planData.name || (planData.tongue && planData.tongue.tzpgjg)}}体质】</span></div>
+        <div class="list">
+          <div class="item">
+            <div class="item-title">易感疾病</div>
+            <div class="item-text">{{planData.tongue.constitution.fbqx}}</div>
+          </div>
+          <div class="item">
+            <div class="item-title">饮食注意</div>
+            <div class="item-text">{{planData.tongue.constitution.ysyj}}</div>
+          </div>
+          <div class="item">
+            <div class="item-title">运动方面</div>
+            <div class="item-text">{{planData.tongue.constitution.rcbj}}</div>
+          </div>
+        </div>
+      </div>
+      <div class="block" id="tab2" ref="tab2">
+        <div class="tab-title">
+          <div class="tab-title-text">定制食方</div>
+        </div>
+        <div class="block-title">定制膳食调理方案<br /><span>【{{planData.name || (planData.tongue && planData.tongue.tzpgjg)}}体质】</span></div>
+        <div class="list">
+          <!-- <div class="item">
+            <div class="item-title">调理方向</div>
+            <div class="nurse-list">
+              <div class="nurse-item">
+                <div class="top-text">【体质调养】：</div>
+                <div class="bottom-text">{{planData.physicalConditioning}}</div>
+              </div>
+              <div class="nurse-item" v-if="planData.visceraConditioningDirec">
+                <div class="top-text">【脏腑调养】：</div>
+                <div class="bottom-text">{{planData.visceraConditioningDirec}}</div>
+              </div>
+            </div>
+          </div> -->
+          <div class="item" v-if="planData.planStatus || (planData.planStatus === undefined)">
+            <div class="item-title">定制食方</div>
+            <div class="nurse-list">
+              <div class="nurse-item">
+                <div class="top-text">【食方成分】：</div>
+                <div class="bottom-text"><span v-for='(t, i) in filter(planData.plan[0].dieticianComponents)' :key='i'>{{t.name}}{{filter(planData.plan[0].dieticianComponents).length !== (i + 1) ? ',' : ''}}</span>等数十种食材。</div>
+              </div>
+              <div class="nurse-item">
+                <div class="top-text">【服用方法】：</div>
+                <div class="bottom-text">{{planData.plan[0] && planData.plan[0].instructions}}</div>
+              </div>
+              <div class="nurse-item" v-if="!order && !$route.query.scale && planData.plan[0]">
+                <div class="top-text">【选择食方】：</div>
+                <div class="select-list">
+                  <div class="select-item" :class="curSelect === item.code ? 'active' : ''" @click="curSelect = item.code" v-for="item in getHighPrice(planData.plan)" :key="item.id">
+                    {{item.name}}<br />¥{{(item.total / 100).toFixed(2)}}
+                  </div>
+                </div>
+              </div>
+              <!-- <div class="nurse-item">
+                <div class="top-text">【热量值】：</div>
+                <div class="bottom-text">{{planData.caloriesAM ? `（早）一平勺卡路里为${planData.caloriesAM}kcal` : `（早）一平勺`}}；<br />{{planData.caloriesPM ? `（晚）一平勺卡路里为${planData.caloriesPM}kcal` : `（晚）一平勺`}}。</div>
+              </div> -->
+            </div>
+            <div v-if='planData.plan&&planData.plan.length > 0 && !order' class='plan-btn' @click="$router.push({path: `/productSelect/?name=${data.name}&phone=${data.phone}&instanceId=${$route.query.id}`})">去下单</div>
+          </div>
+          <div class="item" v-else>
+            <div class="item-text">由于您存在以下情况：血尿，年龄不在调理范围12-70岁，麦麸过敏{{data.gender === 'LADY' ? '，处于孕期或哺乳期' : ''}}，不予调理!</div>
+          </div>
+          <div class="item" v-if="order">
+            <div class="item-title">订单</div>
+            <div class="order" @click="$router.push({path: `/order/orderDetail?id=${data.orderId}`})">
+              <div class="order-title">共{{order.item.reduce((total, currentValue) => total + currentValue.num, 0)}}件商品<span>￥{{(order.actualPrice / 100).toFixed(2)}}</span></div>
+              <div class="order-no">{{order.orderNum}}</div>
+              <div class="order-payWay">{{order.payType === 'WECHAT' ? '微信支付' : '现金支付'}}</div>
+              <div class="order-time">{{formatTimestamp(order.payTime, 'YYYY-MM-DD HH:mm')}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="block" v-if='planData.plan && planData.plan.length > 0'>
+        <div class="block-title">注意事项</div>
+        <div class="attention-list">
+          <div class="attention">1. 本品不能代替药品；</div>
+          <div class="attention">2. 本品可能含有大豆、花生、花粉、坚果、谷物等，食物过敏者请咨询明我“授权咨询师”后服用；</div>
+          <div class="attention">3. 本品非速溶产品，不含任何添加剂；</div>
+          <div class="attention">4. 服用期间可能出现便秘，腹胀，烧心等情况，属正常反应，如一周后情况依旧请咨询客服；</div>
+          <div class="attention">5. 气郁或血瘀体质女性月经期间请暂停食用。</div>
+        </div>
+      </div>
+      <div class="block" id="tab3" ref="tab3">
+        <div class="tab-title">
+          <div class="tab-title-text">专家建议记录</div>
+        </div>
+        <div class="block-title">专家解读记录</div>
+        <div class="list" v-if="list.length !== 0">
+          <div class="item" v-for="item in list" :key="item.id">
+            <div class="doctor-record">
+              <div class="doctor-info">
+                <div class="doctor-avatar" :style="{backgroundImage: `url(${parse(item.expert.pics, []) && parse(item.expert.pics, [])[0] && parse(item.expert.pics, [])[0].url})`}"></div>{{item.expert.name}}<span>{{item.expert.rank}} | {{item.expert.title}}</span>
+              </div>
+              <div class="record-desc">{{item.analysis}}</div>
+              <div class="record-time">
+                {{formatTimestamp(item.lastUpdateTime, 'YYYY-MM-DD HH:mm')}}
+                <div class="evaluate-result" v-if="item.score !== null">
+                  <div class="star" v-for="i in item.score" :key="i"></div>
+                </div>
+                <div class="evaluate-btn" @click="showPopup(item.id)" v-else>未评价</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="list" v-else>
+          <div class="item">
+            <div style="text-align: center;">
+              <img style="width: 40%;margin-top: 30px;" src="/static/img/img_zwzjjy@3x.png">
+              <div style="margin-top: 15px;color: #434E5E;font-size: 14px;text-align: center;">立即点击咨询专家，获取专家建议</div>
+              <div class='plan-btn' style="margin-top: 20px;" @click="$router.push({path: '/consult'})">咨询专家</div>
+            </div>
+          </div>
+        </div>
+        <div class="list" style="margin-top: 0;">
+          <div class="item">
+            <div class="item-text">专家热线：400-0556-003；工作时间：周一至周五：9:00-12:00，13:00-18:00，感谢您选择明我食方！</div>
+          </div>
+        </div>
+      </div>
+      <!-- <div class="block" v-if='planData.plan && planData.plan.length > 0'>
+        <div class="block-title">温馨提示</div>
+        <div class="list">
+          <div class="item">
+            <div class="item-title">如何服用</div>
+            <div class="item-text">每日分早晚两次，初次服用每次1平勺起食用；3-5日后每次2平勺；可随餐代替主食食用，亦可根据喜好与身体状况，加入蜂蜜或牛奶等调节口味。</div>
+          </div>
+          <div class="item">
+            <div class="item-title">如何冲调</div>
+            <div class="item-text">先用少量温开水搅拌均匀，再加入80度以上开水，这样更容易冲调均匀。</div>
+          </div>
+          <div class="item">
+            <div class="item-title">联系客服</div>
+            <div class="item-text">在服用产品的过程中有任何疑问请咨询我们的客服，客服热线 400-0556-003；客服工作时间：周一至周五 9:00—12:00，13:00—18:00，感谢您选择明我食方！</div>
+          </div>
+        </div>
+      </div>
+      <div class="block" v-if='planData.plan && planData.plan.length > 0'>
+        <div class="block-title">注意事项</div>
+        <div class="attention-list">
+          <div class="attention">1. 本品不能代替药品；</div>
+          <div class="attention">2. 本品可能含有大豆、花生、花粉、坚果、谷物等，食物过敏者请咨询明我“授权咨询师”后服用；</div>
+          <div class="attention">3. 本品非速溶产品，不含任何添加剂；</div>
+          <div class="attention">4. 服用期间可能出现便秘，腹胀，烧心等情况，属正常反应，如一周后情况依旧请咨询客服；</div>
+          <div class="attention">5. 气郁或血瘀体质女性月经期间请暂停食用。</div>
+        </div>
+      </div> -->
+    </div>
+    <div class="masker-wrapper" @click="masker = false" :style="{display: masker ? 'block' : 'none'}">
+      <div class="masker-bg"></div>
+      <div class="masker-img" :style="{marginTop: `-${innerWidth / 2}px`, backgroundImage: `url(${maskerImg})`}"></div>
+    </div>
+    <div v-transfer-dom>
+      <popup v-model="show">
+        <div class="evaluate-popup">
+          <div class="evaluate-title"></div>
+          <div class="result">“{{evaluateList[curEvaluate]}}”</div>
+          <div class="star-list">
+            <div class="star" v-for="item in 5" :key="item" @click="curEvaluate = item" :style="{ backgroundImage: item <= curEvaluate ? `url('/static/img/img_star_pj64@3x.png')` : `url('/static/img/img_star_hui@3x.png')`}"></div>
+          </div>
+          <div class="popup-btn" @click="submit">提交</div>
+        </div>
+      </popup>
+    </div>
+  </div>
+</template>
+
+<script>
+import { dateFormat, TransferDom } from 'vux'
+import markAbnormal from '../../../assets/js/querMark'
+let _this
+export default {
+  data () {
+    return {
+      formatTimestamp: dateFormat,
+      loadCount: 0,
+      test: '',
+      masker: false,
+      maskerImg: '',
+      innerWidth: window.innerWidth,
+      show: false,
+      evaluateList: {
+        1: '很不满意',
+        2: '不太满意',
+        3: '还行',
+        4: '比较满意',
+        5: '非常满意'
+      },
+      curEvaluate: 5,
+      list: [],
+      curTab: 1,
+      scoreId: '',
+      order: null
+    }
+  },
+  props: {
+    planData: {},
+    data: {},
+    tongueImages: {},
+    tongueMark: {}
+  },
+  created () {
+    _this = this
+    if (this.planData.plan && this.planData.plan[0]) this.curSelect = this.getHighPrice(this.planData.plan)[0].code
+    this.getScore()
+    if (this.data.orderId) {
+      this.$fetch.constitutionOrderFindById({
+        id: this.data.orderId
+      }).then(r => {
+        if (r.data.status === 'OK') {
+          if (r.data.data) this.order = r.data.data
+        }
+      })
+    }
+  },
+  methods: {
+    getHighPrice (list) {
+      let ret = []
+      list.forEach(item => {
+        if (ret.length === 0) {
+          ret[0] = item
+        } else {
+          if (ret[0].total < item.total) ret[0] = item
+        }
+      })
+      return ret
+    },
+    getScore () {
+      this.$fetch.advisoryRecordFindByInstanceId({
+        instanceId: this.$route.query.id
+      }).then(r => {
+        if (r.data.status === 'OK') {
+          this.list = r.data.data
+        }
+      })
+    },
+    showPopup (id) {
+      this.scoreId = id
+      this.curEvaluate = 5
+      this.show = true
+    },
+    submit () {
+      this.$fetch.advisoryRecordUpdateScore({
+        id: this.scoreId,
+        score: this.curEvaluate
+      }).then(r => {
+        if (r.data.status === 'OK') {
+          this.getScore()
+          this.show = false
+        }
+      })
+    },
+    getQuestionResult (kind) {
+      let arr = this.planData.questionResult || []
+      return arr.find(item => item.kind === kind)
+    },
+    parse (str, init) {
+      let ret = init
+      try {
+        ret = JSON.parse(str)
+      } catch (e) {}
+      if (Object.prototype.toString.call(ret) === '[object Array]') {
+        let set = new Set(ret)
+        set.delete('苔不腻腐')
+        set.delete('无腻腐苔')
+        set.delete('舌苔不剥')
+        ret = [...set]
+      }
+      return ret
+    },
+    getDescribe (key, name) {
+      let ret = markAbnormal.find(item => item.key === key).tongue.find(item => item.name === name)
+      if (ret) {
+        return ret.describe
+      }
+    },
+    showImage (url) {
+      this.maskerImg = url
+      this.masker = true
+    },
+    parseStr (str, delStr) {
+      let arr = JSON.parse(str)
+      if (!arr) return '有'
+      if (arr.length === 0) {
+        return '有'
+      } else {
+        if (delStr) {
+          let reg = new RegExp(`${delStr}$`)
+          arr = arr.map(item => {
+            return item.replace(reg, '')
+          })
+        }
+        return arr.join()
+      }
+    },
+    filter (arr) {
+      let end = 0
+      if (arr.length > 8) {
+        end = 8
+      } else if (arr.length === 1) {
+        return arr.slice()
+      } else {
+        end = arr.length - 1
+      }
+      return arr.slice(0, end)
+    },
+    toTab (id) {
+      this.curTab = id
+      this.$refs[`tab${id}`].scrollIntoView()
+    }
+  },
+  computed: {
+    tips () {
+      let arr = this.planData.questionResult || []
+      let set = new Set()
+      arr.forEach(item => {
+        if (item.kind === '心系' || item.kind === '肝胆系' || item.kind === '脾胃系' || item.kind === '肾系' || item.kind === '肺系') {
+          set.add(item.kind.replace('系', ''))
+        }
+      })
+      return [...set].join()
+    }
+  },
+  filters: {
+    sexFil (val) {
+      var sex = {UNKNOWN: '未知', MAN: '男', LADY: '女', null: '未知'}
+      return sex[val]
+    },
+    splice (obj) {
+      let ret = ''
+      if (!obj) return ret
+      if (obj.tongueColor) {
+        ret += `（舌色）${obj.tongueColor || '--'}，`
+      }
+      if (obj.mossColor) {
+        ret += `（苔色）${obj.mossColor || '--'}，`
+      }
+      if (obj.mossName) {
+        ret += `（苔质）${obj.mossName || '--'}，`
+      }
+      if (obj.bodyfluidName) {
+        ret += `（津液）${obj.bodyfluidName || '--'}，`
+      }
+      if (obj.veinName) {
+        ret += `（舌下脉络）${obj.veinName || '--'}，`
+      }
+      if (obj.ligulate) {
+        ret += `（舌形）${obj.ligulate || '--'}，`
+      }
+      if (obj.prickStatus) {
+        ret += `（点刺）有，`
+      } else {
+        ret += `（点刺）无，`
+      }
+      if (obj.ecchymosisStatus) {
+        ret += `（瘀斑）有，`
+      } else {
+        ret += `（瘀斑）无，`
+      }
+      if (obj.petechiaStatus) {
+        ret += `（瘀点）有，`
+      } else {
+        ret += `（瘀点）无，`
+      }
+      if (obj.indentationStatus) {
+        ret += `（齿痕）有，`
+      } else {
+        ret += `（齿痕）无，`
+      }
+      if (obj.fissureStatus) {
+        ret += `（裂纹）有，`
+      } else {
+        ret += `（裂纹）无，`
+      }
+      if (obj.laonen) {
+        ret += `（外观）${obj.laonen || '--'}，`
+      }
+      ret = ret.replace(/，$/, '')
+      return ret
+    }
+  },
+  components: {
+  },
+  directives: {
+    TransferDom,
+    scroll: {
+      bind: (el, binding) => {
+        el.addEventListener('scroll', () => {
+          let index = 1
+          for (let i = 1; i++; i < 4) {
+            if (_this.$refs[`tab${index + 1}`] && (el.scrollTop >= _this.$refs[`tab${index + 1}`].offsetTop - 55)) {
+              index = index + 1
+            } else {
+              _this.curTab = index
+              return
+            }
+          }
+          _this.curTab = index
+        })
+      }
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.masker-wrapper{
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  overflow: hidden;
+  touch-action: none;
+  z-index: 1500;
+  outline: none;
+  .masker-bg{
+    opacity: 0.8;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    -webkit-backface-visibility: hidden;
+  }
+  .masker-img{
+    width: 100%;
+    padding-top: 100%;
+    height: 0;
+    position: relative;
+    top: 50%;
+    background: no-repeat center bottom / 150% auto;
+  }
+}
+.content2 {
+  text-align: left;
+  background: #F6F7FA;
+  .normal-text{
+    font-size: 14px;
+    line-height: 23px;
+    color: #434E5E;
+    span{
+      color: #179F7D;
+    }
+  }
+  .user-info{
+    height: 0;
+    width: 100%;
+    padding-top: 56.25%;
+    background: url('/static/img/img_nybgdt2@3x.png') no-repeat center / cover;
+    .info-wrapper{
+      color: white;
+      font-size: 13px;
+      line-height: 18px;
+      width: 150px;
+      margin: -30% auto 0;
+      .user-name{
+        font-size: 18px;
+        line-height: 25px;
+        text-align: center;
+      }
+      .user-gender-age{
+        margin-top: 6px;
+        span{
+          margin-left: 20px;
+        }
+      }
+      .user-phone{
+
+      }
+    }
+  }
+  .block{
+    border-radius:25px 25px 0 0;
+    padding-bottom: 25px;
+    background: #F6FAF9;
+    box-shadow:0px -7px 7px 0px rgba(0,49,27,0.05);
+    margin-top: -25px;
+    &:nth-child(even){
+      background: white;
+    }
+    .plan-btn {
+      width: 200px;
+      height: 45px;
+      line-height: 45px;
+      text-align: center;
+      font-size: 16px;
+      color: #FFF;
+      background: linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+      border-radius: 23px;
+      margin-top: 30px;
+      margin: 0 auto 40px;
+    }
+    .block-title{
+      color: #16202E;
+      font-size: 20px;
+      line-height: 28px;
+      padding: 28px 35px 0;
+      position: relative;
+      span{
+        color: #03BE90;
+      }
+      &::before{
+        content: '';
+        height: 12px;
+        width: 12px;
+        border:3px solid rgba(23,159,125,0.6);
+        position: absolute;
+        left: 14px;
+        top: 37px;
+        border-radius: 50%;
+      }
+    }
+    .list{
+      margin-top: 7px;
+      .item{
+        position: relative;
+        .doctor-record{
+          padding: 15px 35px 20px;
+          .doctor-info{
+            position: relative;
+            color: #2A3441;
+            font-size: 16px;
+            line-height: 24px;
+            .doctor-avatar{
+              height: 24px;
+              width: 24px;
+              background: no-repeat center / cover;
+              display: inline-block;
+              border-radius: 50%;
+              vertical-align: middle;
+              margin-right: 6px;
+            }
+            span{
+              color: #A2A9BA;
+              font-size: 13px;
+              line-height: 19px;
+              margin-left: 10px;
+            }
+          }
+          .record-desc{
+            color: #434E5E;
+            font-size: 14px;
+            line-height: 20px;
+            margin-top: 8px;
+          }
+          .record-time{
+            color: #A2A9BA;
+            font-size: 13px;
+            line-height: 19px;
+            margin-top: 10px;
+            .evaluate-result{
+              float: right;
+              font-size: 0;
+              .star{
+                width: 16px;
+                height: 15px;
+                background: url('/static/img/img_star_pj@3x.png') no-repeat center / cover;
+                display: inline-block;
+                +.star{
+                  margin-left: 2px;
+                }
+              }
+            }
+            .evaluate-btn{
+              float: right;
+              color: #03BE90;
+              font-size: 13px;
+              line-height: 23px;
+              border: 1px solid #03BE90;
+              border-radius: 12px;
+              padding: 0 10px;
+            }
+          }
+        }
+        .item-title{
+          padding: 0 35px;
+          color: #179F7D;
+          font-size: 15px;
+          line-height: 21px;
+        }
+        +.item{
+          &::before{
+            content: '';
+            height: 1px;
+            position: absolute;
+            top: 0;
+            left: 35px;
+            right: 35px;
+            border-top: 1px dashed #868E9D;
+          }
+          .item-title{
+            padding-top: 21px;
+          }
+        }
+        .tongue-tips{
+          margin: 13px 35px 0;
+        }
+        .tongue-example{
+          font-size: 0;
+          margin: 25px 8px 21px;
+          img{
+            width: 100%;
+          }
+        }
+        .tongue-images{
+          padding: 0 35px 30px;
+          display: flex;
+          .tongue-image{
+            flex: 1;
+            display: flex;
+            padding: 14px 12px;
+            background: #F6F7FA;
+            border-radius: 10px;
+            +.tongue-image{
+              margin-left: 12px;
+            }
+            .tongue-image-icon{
+              height: 37px;
+              width: 37px;
+              flex: 0 0 37px;
+              border-radius: 5px;
+              background: no-repeat center bottom / 150% auto;
+            }
+            .tongue-image-text{
+              padding-left: 6px;
+              .top-text{
+                color: #434E5E;
+                font-size: 14px;
+                line-height: 14px;
+                white-space: nowrap;
+              }
+              .bottom-text{
+                color: #434E5E;
+                font-size: 12px;
+                line-height: 12px;
+                padding-left: 8px;
+                margin-top: 9px;
+              }
+            }
+          }
+        }
+        .tongue-result-list{
+          padding: 4px 35px 30px 23px;
+          font-size: 0;
+          .tongue-result-item{
+            margin-left: 12px;
+            margin-top: 12px;
+            font-size: 14px;
+            line-height: 14px;
+            color: #434E5E;
+            display: inline-block;
+            width: calc((100% - 24px) / 2);
+            padding: 15px 20px;
+            background: #F6F7FA;
+            border-radius: 10px;
+            span{
+              font-size: 14px;
+              line-height: 14px;
+              color: #434E5E;
+            }
+            &.active{
+              font-size: 14px;
+              line-height: 14px;
+              color: #03BE90;
+              background: #F2FBF9;
+              span{
+                font-size: 14px;
+                line-height: 14px;
+                color: #03BE90;
+              }
+            }
+          }
+        }
+        .tongue-abnormal-list{
+          padding: 1px 35px 26px;
+          .tongue-abnormal-item{
+            padding: 10px 0 0;
+            .top-text{
+              color: #434E5E;
+              font-size: 14px;
+              line-height: 23px;
+            }
+            .bottom-text{
+              margin-top: 3px;
+              color: #A2A9BA;
+              font-size: 12px;
+              line-height: 20px;
+            }
+          }
+        }
+        .viscera-list{
+          padding: 0 35px;
+          .viscera{
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+            .viscera-icon{
+              flex: 0 0 53px;
+              height: 53px;
+              background: no-repeat center / 100%;
+            }
+            .viscera-info{
+              padding-left: 2px;
+              .top-text{
+                font-size: 14px;
+                line-height: 23px;
+                color: #434E5E;
+              }
+              .bottom-text{
+                padding-left: 8px;
+                font-size: 14px;
+                line-height: 23px;
+                color: #434E5E;
+                margin-top: 7px;
+              }
+            }
+          }
+        }
+        .viscera-tips{
+          padding: 20px 26px 25px;
+          .viscera-tips-title{
+            color: #03BE90;
+            font-size: 14px;
+            line-height: 23px;
+          }
+          .viscera-tips-text{
+            color: #03BE90;
+            font-size: 14px;
+            line-height: 23px;
+            padding-left: 9px;
+            margin-top: 2px;
+          }
+        }
+        .habitus-title{
+          font-size: 14px;
+          line-height: 28px;
+          color: #434E5E;
+          margin-top: 9px;
+          padding: 0 26px;
+        }
+        .habitus-text{
+          font-size: 14px;
+          line-height: 28px;
+          color: #434E5E;
+          margin-top: 1px;
+          padding: 0 36px;
+        }
+        .habitus-result{
+          padding: 0 35px 30px;
+          img{
+            vertical-align: middle;
+          }
+          color: #03BE90;
+          font-size: 21px;
+          line-height: 28px;
+        }
+        .item-text{
+          color: #434E5E;
+          font-size: 14px;
+          line-height: 23px;
+          padding: 11px 35px 25px;
+        }
+        .nurse-list{
+          padding-bottom: 26px;
+          .nurse-item{
+            margin-top: 11px;
+            .top-text{
+              padding: 0 26px;
+              font-size: 14px;
+              line-height: 23px;
+              color: #434E5E;
+            }
+            .select-list{
+              font-size: 0;
+              margin-top: 10px;
+              padding: 0 35px 0 25px;
+              .select-item{
+                display: inline-block;
+                font-size: 14px;
+                line-height: 23px;
+                color: #434E5E;
+                margin-left: 10px;
+                width: calc((100% - 20px) / 2);
+                border: 1px solid #868E9D;
+                border-radius: 10px;
+                text-align: center;
+                padding: 4px 4px;
+                &.active{
+                  color: #03BE90;
+                  border-color: #03BE90;
+                }
+              }
+            }
+            .bottom-text{
+              padding: 0 35px;
+              margin-top: 2px;
+              font-size: 14px;
+              line-height: 23px;
+              color: #434E5E;
+            }
+          }
+        }
+      }
+    }
+    .qr-wrapper{
+      padding-bottom: 28px;
+      .qr{
+        width: 83px;
+        height: 83px;
+        margin: 26px auto 0;
+      }
+      .qr-text{
+        color: #434E5E;
+        font-size: 10px;
+        line-height: 14px;
+        text-align: center;
+        margin-top: 15px;
+      }
+    }
+    .attention-list{
+      padding: 0 35px 25px;
+      .attention{
+        margin-top: 7px;
+        color: #434E5E;
+        font-size: 14px;
+        line-height: 23px;
+      }
+    }
+  }
+}
+  .tabs{
+    display: flex;
+    background: white;
+    flex: 0 0 55px;
+    .tab{
+      flex: 1;
+      text-align: center;
+      font-size: 0;
+      display: block;
+      .tab-inner{
+        display: inline-block;
+        font-size: 16px;
+        line-height: 23px;
+        color: #2A3441;
+        margin: 16px auto;
+        position: relative;
+      }
+      &.active{
+        .tab-inner::before{
+          content: '';
+          position: absolute;
+          width:100%;
+          height:3px;
+          bottom: 0;
+          left: 0;
+          background:linear-gradient(315deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+          border-radius:2px;
+        }
+      }
+    }
+  }
+  .tab-title{
+    padding-top: 30px;
+    text-align: center;
+    font-size: 0;
+    .tab-title-text{
+      display: inline-block;
+      position: relative;
+      color: #16202E;
+      font-size: 23px;
+      line-height: 33px;
+      font-weight: bold;
+      &::before{
+        content: '';
+        width:100%;
+        height:5px;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        background:linear-gradient(315deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+        border-radius:3px;
+      }
+    }
+    .tab-title-time{
+      color: #434E5E;
+      font-size: 12px;
+      line-height: 17px;
+    }
+  }
+  .content-wrapper{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    .content2{
+      flex: 1;
+      overflow: auto;
+    }
+  }
+  .order{
+    padding: 15px 22px;
+    margin: 5px 35px 20px;
+    background: white;
+    border-radius: 5px;
+    .order-title{
+      color: #2A3441;
+      font-size: 15px;
+      line-height: 23px;
+      span{
+        float: right;
+      }
+    }
+    .order-no{
+      padding-left: 28px;
+      margin-top: 10px;
+      background: url('/static/img/icon_dd_bh@3x.png') no-repeat 0 center / 18px 18px;
+      color: #434E5E;
+      font-size: 13px;
+      line-height: 19px;
+    }
+    .order-payWay{
+      padding-left: 28px;
+      margin-top: 10px;
+      background: url('/static/img/icon_dd_zffs@3x.png') no-repeat 0 center / 18px 18px;
+      color: #434E5E;
+      font-size: 13px;
+      line-height: 19px;
+    }
+    .order-time{
+      padding-left: 28px;
+      margin-top: 10px;
+      background: url('/static/img/icon_dd_sj@3x.png') no-repeat 0 center / 18px 18px;
+      color: #434E5E;
+      font-size: 13px;
+      line-height: 19px;
+    }
+  }
+</style>
+<style lang="scss">
+.evaluate-popup{
+  border-radius: 15px 15px 0 0;
+  background: white;
+  padding: 44px 60px 40px;
+  .evaluate-title{
+    height: 1px;
+    background: #C6CAD4;
+    margin: 0 7px;
+    position: relative;
+    &::before{
+      content: '提交评价';
+      position: absolute;
+      padding: 0 15px;
+      color: #16202E;
+      font-weight: bold;
+      font-size: 19px;
+      line-height: 28px;
+      left: 50%;
+      margin-top: -14px;
+      margin-left: -53px;
+      background: white;
+    }
+  }
+  .result{
+    color: #16202E;
+    font-size: 21px;
+    line-height: 31px;
+    margin-top: 34px;
+    text-align: center;
+    font-weight: bold;
+  }
+  .star-list{
+    text-align: center;
+    font-size: 0;
+    margin-top: 20px;
+    .star{
+      display: inline-block;
+      width: 31px;
+      height: 29px;
+      background: no-repeat center / cover;
+      +.star{
+        margin-left: 5px;
+      }
+    }
+  }
+  .popup-btn{
+    margin-top: 33px;
+    line-height: 45px;
+    height: 45px;
+    text-align: center;
+    color: white;
+    background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+    box-shadow:0px 2px 7px 0px rgba(3,190,144,0.3);
+    border-radius:23px;
+  }
+}
+</style>

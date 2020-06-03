@@ -1,0 +1,835 @@
+import request from './request'
+
+function getMsgCode(obj) {
+
+    return request.post({
+        url: '/api/sms/sendCode',
+        data: obj.data,
+    });
+
+}
+
+
+function getUnionid(obj) {
+    //   console.log("getUnionid")
+    //     console.log(obj)
+    return request.get({
+        url: '/wechatMWMini/snsJscode2session',
+        data: obj.data,
+    });
+
+}
+// 账户信息
+function getAccountInfo(obj) {
+
+    return request.get({
+        url: '/wechatMWMini/userInfo',
+        data: obj.data,
+    })
+}
+
+function createUser(obj) {
+
+    return request.post({
+        url: '/api/user/createUser',
+        data: obj.data,
+    })
+}
+
+function findUserById(obj) {
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    return request.get({
+        url: '/constitutionUser/findByUserId',
+        data: obj.data,
+        header: header
+    },true);
+
+}
+
+function findCommunityById(obj) {
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    return request.get({
+        url: '/communityInfo/findById',
+        data: obj.data,
+        header: header
+    },true);
+
+}
+
+function addCommunityAppraise(obj) {
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/json'
+    }
+    return request.post({
+        url: '/communityAppraise/add',
+        data: obj.data,
+        header: header
+    },true);
+
+}
+
+function getUploadParams(obj) {
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+
+    return request.get({
+        url: '/api/getUploadParams',
+        data: obj.data,
+        header: header
+    },true)
+}
+
+function faceAnalysis(obj) {
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+
+    return request.post({
+        url: '/face/analysis',
+        data: obj.data,
+        header: header
+    },true)
+}
+
+function dialWithQuesTestWithQues(obj) {
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/json'
+    }
+
+    return request.post({
+        url: '/constitutionRecordInstance/dialWithQuesTestWithQues',
+        data: obj.data,
+        header: header
+    },true)
+}
+
+function dialWithQuesTestWithTongue(obj) {
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/json'
+    }
+
+    return request.post({
+        url: '/constitutionRecordInstance/dialWithQuesTestWithTongue',
+        data: obj.data,
+        header: header
+    },true)
+}
+
+function analysisFaceImage(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.post({
+        url: '/constitutionRecordInstance/analysisFaceImage',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+function getFaceImageResult(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.get({
+        url: '/constitutionRecordInstance/getFaceImageResult',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+function cutTongueImage(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.post({
+        url: '/constitutionRecordInstance/cutTongueImage',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+function cutTongueBackImage(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.post({
+        url: '/constitutionRecordInstance/cutTongueBackImage',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+function getTongueBackImageResult(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.get({
+        url: '/constitutionRecordInstance/getTongueBackImageResult',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+function getEmchatToken(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.get({
+        url: '/emchat/getToken',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+function emchatCreateConferences(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.post({
+        url: '/emchat/createConferences',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+function addAdvisoryRecord(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.post({
+        url: '/advisoryRecord/add',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+function findFaceById(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.get({
+        url: '/face/findById',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+function faceFindPuductByIdAndType(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.get({
+        url: '/face/findPuductByIdAndType',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+function constitutionOrderFindById(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.get({
+        url: '/constitutionOrder/findById',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+function faceFindDetailByIdAndType(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.get({
+        url: '/face/findDetailByIdAndType',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+function findByAdvisoryId(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.get({
+        url: '/advisoryReport/findByAdvisoryId',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+function constitutionRecordInstanceFindById(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.get({
+        url: '/constitutionRecordInstance/findById',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+function findAdvisoryReport(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.get({
+        url: '/advisoryReport/findByAdvisoryId',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+function expertMessage(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.get({
+        url: '/expertMessage/page',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+function findExpertById(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.get({
+        url: '/expert/findById',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+// 健康商城
+function productClassifyList (obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'Content-Type':'application/json'
+    }
+    return request.get({
+        url: '/productClassify/list',
+        data: obj,
+        header: header
+    },false)
+}
+function communityProductList (obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'Content-Type':'application/json'
+    }
+    return request.get({
+        url: '/communityProduct/page',
+        data: obj,
+        header: header
+    },false)
+}
+function communityProductDetail (obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'Content-Type':'application/json'
+    }
+    return request.get({
+        url: '/communityProduct/findById',
+        data: obj,
+        header: header
+    },false)
+}
+
+function addByExpert(obj) {
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/json'
+    }
+    return request.post({
+        url: '/expertMessage/add',
+        data: obj.data,
+        header: header
+    });
+}
+function findProduct (obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'Content-Type':'application/json'
+    }
+    return request.get({
+        url: '/communityProduct/findProduct',
+        data: obj,
+        header: header
+    },false)
+}
+
+function getClassify (obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'Content-Type':'application/json'
+    }
+    return request.get({
+        url: '/customerProduct/getClassify',
+        data: obj,
+        header: header
+    },false)
+}
+
+function customerProductPage (obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+	console.log(uni.getStorageSync('sessionId'));
+    const header = {
+        'sskey': sessionKey,
+        'Content-Type':'application/json'
+    }
+    return request.get({
+        url: '/customerProduct/page',
+        data: obj,
+        header: header
+    },false)
+}
+function customerProductFindById (obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'Content-Type':'application/json'
+    }
+    return request.get({
+        url: '/customerProduct/findById',
+        data: obj,
+        header: header
+    },false)
+}
+// 获取服务站商城运费情况
+function customerGetPostage (obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'Content-Type':'application/json'
+    }
+    return request.get({
+        url: '/customerOrder/getPostage',
+        data: obj,
+        header: header
+    },false)
+}
+// // 获取健康商城运费情况
+function communityGetPostage (obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'Content-Type':'application/json'
+    }
+    return request.get({
+        url: '/constitutionOrder/getPostage',
+        data: obj,
+        header: header
+    },false)
+}
+//健康商城 提交订单
+function constitutionOrderAddOrder (obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'Content-Type':'application/json'
+    }
+    return request.post({
+        url: '/constitutionOrder/addOrder',
+        data: obj,
+        header: header
+    },false)
+}
+// 管家分享列表
+function marketMaterialPage (obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'Content-Type':'application/json'
+    }
+    return request.get({
+        url: '/marketMaterial/page',
+        data: obj,
+        header: header
+    },false)
+}
+//  管家分享详情
+function marketMaterialDetail (obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'Content-Type':'application/json'
+    }
+    return request.get({
+        url: '/marketMaterial/findById',
+        data: obj,
+        header: header
+    },false)
+}
+//  管家分享评论列表
+function materialCommentPage (obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'Content-Type':'application/json'
+    }
+    return request.get({
+        url: '/materialComment/page',
+        data: obj,
+        header: header
+    },false)
+}
+//  管家分享 评论
+function materialCommentAdd (obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'Content-Type':'application/x-www-form-urlencoded'
+    }
+    return request.post({
+        url: '/materialComment/add',
+        data: obj,
+        header: header
+    },false)
+}
+//  管家分享点赞
+function materialPraiseAdd (obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'Content-Type':'application/x-www-form-urlencoded'
+    }
+    return request.post({
+        url: '/materialPraise/add',
+        data: obj,
+        header: header
+    },false)
+}
+//  管家分享  取消点赞
+function materialPraiseCancel (obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'Content-Type':'application/x-www-form-urlencoded'
+    }
+    return request.post({
+        url: '/materialPraise/deleteByMaterialId',
+        data: obj,
+        header: header
+    },false)
+}
+//  管家分享  评论点赞
+function materialCommentPraiseAdd (obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'Content-Type':'application/x-www-form-urlencoded'
+    }
+    return request.post({
+        url: '/materialCommentPraise/add',
+        data: obj,
+        header: header
+    },false)
+}
+//  管家分享  评论取消点赞
+function materialCommentPraiseCancel(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'Content-Type':'application/x-www-form-urlencoded'
+    }
+    return request.post({
+        url: '/materialCommentPraise/deleteByCommentId',
+        data: obj,
+        header: header
+    },false)
+}
+//  管家分享 收藏
+function marketMaterialMark(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'Content-Type':'application/x-www-form-urlencoded'
+    }
+    return request.post({
+        url: '/marketMaterial/markMaterial',
+        data: obj,
+        header: header
+    },false)
+}
+//  管家分享 取消收藏
+function marketMaterialCancelMark(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'Content-Type':'application/x-www-form-urlencoded'
+    }
+    return request.post({
+        url: '/marketMaterial/cancelMark',
+        data: obj,
+        header: header
+    },false)
+}
+// 商品收藏 
+function productMarkAdd (obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'Content-Type':'application/x-www-form-urlencoded'
+    }
+    return request.post({
+        url: '/productMark/add',
+        data: obj,
+        header: header
+    },false)
+}
+// 取消商品收藏
+function productMarkDelete (obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'Content-Type':'application/json'
+    }
+    return request.post({
+        url: '/productMark/deleteByProductId',
+        data: obj,
+        header: header
+    },false)
+}
+// 商品收藏列表
+function productMarkList (obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'Content-Type':'application/json'
+    }
+    return request.get({
+        url: '/productMark/findPage',
+        data: obj,
+        header: header
+    },false)
+}
+
+
+// 获取服务站列表
+function getcommuty(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.get({
+        url: '/communityInfo/findPage',
+        data: obj,
+        header: header
+    },false)
+}
+// 已加入服务站列表
+function getmyjoincommunity(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.get({
+        url: '/communityInfo/findMyJoin',
+        data: obj,
+        header: header
+    },false)
+}
+
+// 已加入服务站列表
+function canceljoincommunity(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.post({
+        url: '/constitutionUser/cancelJoin',
+        data: obj,
+        header: header
+    },false)
+}
+
+// 加入服务站
+function joincommunity(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.post({
+        url: '/constitutionUser/joinCommunity',
+        data: obj,
+        header: header
+    },false)
+}
+
+// 获取服务站类型
+function getcommunityType(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.get({
+        url: '/communityApply/getPTag',
+        data: obj,
+        header: header
+    },false)
+}
+// 获取服务站地区列表
+function getareasList(obj){
+    const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.get({
+        url: '/communityInfo/areas',
+        data: obj,
+        header: header
+    },false)
+}
+
+export default {
+    getMsgCode,
+    getAccountInfo,
+    getUnionid,
+    createUser,
+    findUserById,
+    findCommunityById,
+    addCommunityAppraise,
+    getUploadParams,
+    faceAnalysis,
+    dialWithQuesTestWithQues,
+    dialWithQuesTestWithTongue,
+    analysisFaceImage,
+    getFaceImageResult,
+    cutTongueImage,
+    cutTongueBackImage,
+    getTongueBackImageResult,
+    getEmchatToken,
+    addAdvisoryRecord,
+    emchatCreateConferences,
+    findFaceById,
+    faceFindPuductByIdAndType,
+    constitutionOrderFindById,
+    faceFindDetailByIdAndType,
+    findByAdvisoryId,
+    constitutionRecordInstanceFindById,
+    findAdvisoryReport,
+    findExpertById,
+    addByExpert,
+    expertMessage,
+	// 健康商城
+	productClassifyList,
+	communityProductList,
+	communityProductDetail,
+	findProduct,
+	getClassify,
+	customerProductPage,
+	customerProductFindById,
+	customerGetPostage,
+	communityGetPostage,
+	constitutionOrderAddOrder,
+	marketMaterialPage,
+	marketMaterialDetail,
+	materialCommentPage,
+	materialCommentAdd,
+	materialPraiseCancel,
+	materialPraiseAdd,
+	marketMaterialMark,
+	marketMaterialCancelMark,
+	materialCommentPraiseAdd,
+	materialCommentPraiseCancel,
+	productMarkAdd,
+	productMarkDelete,
+	productMarkList,
+	// 服务站
+	getcommuty,
+	getmyjoincommunity,
+	canceljoincommunity,
+	joincommunity,
+	getcommunityType,
+	getareasList
+}

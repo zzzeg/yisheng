@@ -1,0 +1,505 @@
+<template>
+    <view class="content" :style="{ height: screenHeight }">
+        <movable-area>
+            <movable-view :class="[!isFull ? 'manpin' : 'xiaopin']" :x="playX" :y="playY" direction="all" @change="onChangePlay" @click="clickMovableView(1)" >
+                <live-player
+                    
+                     :id="streamId"
+                     :src="playerUrl" 
+                     mode="RTC" 
+                     object-fit="contain"
+                     autoplay 
+                 ></live-player>
+             </movable-view>
+        	<movable-view :class="[isFull ? 'manpin' : 'xiaopin']" :x="pusX" :y="pusY" direction="all" @change="onChangePus" @click="clickMovableView(2)" >
+                <live-pusher id='livePusher' ref="livePusher" :url="pusUrl"
+                        mode="SD" :muted="muted" :enable-camera="true" :auto-focus="true" :beauty="1" whiteness="2"
+                        aspect="9:16"  @error = "error"
+                        ></live-pusher>
+               
+            </movable-view>
+        </movable-area>
+        <view v-if="callStatusText != 'successful'" class="callStatus">
+            {{callStatusText}} <text class="ani_dot">···</text>
+        </view>
+        <view class="navigation" :style="{ height: statusBarHeight }">
+            <image @click="clickBack" class="backBtn" src="../../static/image/icon_left.png" mode=""></image>
+            <view class="titleNav">
+                视频问诊
+            </view>
+        </view>
+        <view v-if="isShowBtn" class="controlContent">
+            <view class="emediaContrContent">
+        		<view class="controlItem" @click="toggleCamera" :style="{'color':devicePositionColor}">
+        			<image
+        				class="icon-record"
+        				:src='devicePositionIcon' style="width:22px; height: 24px"/>
+        			切换摄像头
+        		</view>
+        		<view class="controlItem" @click="toggleMuted" :style="{'color':micphoneColor}">
+        			<image
+        				class="icon-record"
+        				:src='micphoneIcon' style="width:22px; height: 24px"/>
+        			麦克风</view>
+        		<view class="controlItem" @click="togglePlay" :style="{'color':videoColor}">
+        			<image
+        				class="icon-record"
+        				:src='videoIcon' style="width:22px; height: 24px"/>
+        			视频</view>
+        	
+        	</view>
+                
+        	<view class="hangup" @click="hangup">
+        		<image
+        			class="icon-record"
+        			src='../../static/image/hangup@2x.png'/>
+        	</view>
+        </view>
+    </view>
+</template>
+
+<script>
+    var statusBarHeight = uni.getSystemInfoSync().statusBarHeight + 44 + 'px'
+    var screenHeight = uni.getSystemInfoSync().screenHeight + 'px'
+    export default {
+        
+    	data() {
+    		return {
+                LivePusherContext:null,
+                
+                muted:false,
+    			statusBarHeight: statusBarHeight,
+                screenHeight:screenHeight,
+                communityId:'',
+                
+                isFull:false,
+                isShowBtn:true,
+                playX: 0,
+                playY: 0,
+                scale: 2,
+                oldPlay: {
+                	x: 0,
+                	y: 0,
+                	scale: 2
+                },
+                pusX: 0,
+                pusY: 0,
+                oldPus: {
+                	x: 0,
+                	y: 0,
+                	scale: 2
+                },
+                videoColor:'',
+                devicePositionColor:'#fff',
+                micphoneColor:'',
+                devicePositionIcon:'../../static/image/switchCamera_white@2x.png',
+                videoIcon:'../../static/image/video_white@2x.png',
+                micphoneIcon:'../../static/image/micphone_white@2x.png',
+                
+                enableCamera: false,
+                playerUrl: '',
+                pusUrl: "",
+                
+                confrId:null,
+                hangup:false,
+                callStatusText:'正在连接对方'
+    		}
+    	},
+        onReady() {
+            // 注意：需要在onReady中 或 onLoad 延时
+            this.LivePusherContext = uni.createLivePusherContext("livePusher", this);
+            console.log(this.LivePusherContext)
+            var _self = this
+           
+        },
+    	onLoad(options) {
+            this.confrId = options.confrId
+            var _self = this
+                            
+            wx.emedia.mgr.joinConference(options.confrId,options.pwd, '').then(function(joinRes){
+                console.log('加入会议成功', joinRes)
+                
+            })
+            wx.emedia.mgr.onMemberExited = function(member, stream){
+                var _self = this
+                var jid = wx.WebIM.conn.context.jid
+                let identityName = jid.appKey + '_' + jid.name+ '@' + jid.domain
+                            	// let identityName = wx.WebIM.conn.context.jid.split("/")[0]
+                            	// 如果是自己进入会议了，开始发布流
+                console.log(identityName)
+                if(member.name != identityName && _self.hangup){
+                    uni.showModal({
+                    	content: '对方已经挂断！',
+                    	success: (e) => {
+                    		wx.emedia.mgr.exitConference(_self.confrId)
+                    		wx.emedia.mgr.destroyConference(_self.confrId).then(function(){
+                    		    
+                    		})
+                    		uni.navigateBack({
+                    		    delta:1
+                    		})
+                    	}
+                    })
+                }
+                
+			};
+            wx.emedia.mgr.onConferenceExit = function (reason, failed) {
+                reason = (reason || 0);
+                console.log('onConferenceExit')
+                    switch (reason){
+                        case 0:
+                            reason = "正常挂断";
+                            break;
+                        case 1:
+                            reason = "没响应";
+                            break;
+                        case 2:
+                            reason = "服务器拒绝";
+                            break;
+                        case 3:
+                            // reason = "对方忙";
+                            uni.showModal({
+                            	content: '对方忙！',
+                            	success: (e) => {
+                            		if (e.confirm) {
+                            			
+                            		}
+                            	}
+                            })
+                            break;
+                        case 4:
+                            reason = "失败,可能是网络或服务器拒绝";
+                            if(failed === -9527){
+                                reason = "失败,网络原因";
+                            }
+                            if(failed === -500){
+                                reason = "Ticket失效";
+                            }
+                            if(failed === -502){
+                                reason = "Ticket过期";
+                            }
+                            if(failed === -504){
+                                reason = "链接已失效";
+                            }
+                            if(failed === -508){
+                                reason = "会议无效";
+                            }
+                            if(failed === -510){
+                                reason = "服务端限制";
+                            }
+                            break;
+                        case 5:
+                            reason = "不支持";
+                            break;
+                        case 10:
+                            reason = "其他设备登录";
+                            break;
+                        case 11:
+                            reason = "会议关闭";
+                            break;
+                    }
+                    this.clickBack()
+            }
+            wx.emedia.mgr.onMemberJoined = function(mem){
+            	console.log("++++++++++ member", mem)
+                var jid = wx.WebIM.conn.context.jid
+            	let identityName = jid.appKey + '_' + jid.name+ '@' + jid.domain
+            	// let identityName = wx.WebIM.conn.context.jid.split("/")[0]
+            	// 如果是自己进入会议了，开始发布流
+                console.log(identityName)
+            	if(mem.name == identityName){
+                    
+                    console.log("++++++++++ mr", mem)
+            		let rtcId = wx.emedia.util.getRtcId()
+            		wx.emedia.mgr.pubStream(rtcId).then(function(res){
+            		    _self.pusUrl = res.data.rtmp
+            			console.log(_self.pusUrl)
+            		})
+                    setTimeout(() => {
+                        console.log("livePusher:",_self.LivePusherContext)
+                    	_self.LivePusherContext.start({
+                            success: (a) => {
+                                console.log("livePusher.startsuccess:" + JSON.stringify(a));
+                               
+                                _self.micphoneIcon = '../../static/image/micphone_white@2x.png'
+                                _self.micphoneColor = '#aaa'
+                                _self.videoIcon = '../../static/image/video_gray@2x.png'
+                                _self.videoColor = '#aaa'
+                                _self.enableCamera = true;
+                            },complete:(r) =>{
+                                console.log("livePusher.start:" ,r)
+                            }
+                        });
+                    }, 5000)
+            	}else{
+                    _self.callStatusText = '连接成功'
+                    setTimeout(() => {
+                        _self.callStatusText = 'successful'
+                    },1500)
+                }
+            }
+            
+            wx.emedia.mgr.onStreamAdded = function(stream){
+                console.log('%c onAddStream', 'color: green', stream)
+            	let streamId = stream.id
+            	// setTimeout(() => {
+            		// if(playerUrl.length > 8){
+            		// 	return
+            		// }
+            		wx.emedia.mgr.subStream(streamId).then(function(data){
+            			console.log('%c 订阅流成功', 'color:green', data)
+            			
+                        _self.playerUrl = data.data.rtmp
+                        _self.streamId = streamId
+            				// showInvite: false
+            			
+            		})
+            	// }, 2000)
+                        
+            }
+    	},
+        onUnload() {
+            wx.emedia.mgr.exitConference(this.confrId)
+            wx.emedia.mgr.destroyConference(this.confrId).then(function(){
+                
+            })
+        },
+    	methods: {
+            error:function(err){
+                
+                console.log("errrr:",err)
+            },
+            clickBack:function(){
+               
+                wx.emedia.mgr.exitConference(this.confrId)
+                wx.emedia.mgr.destroyConference(this.confrId).then(function(){
+                    
+                })
+                uni.navigateBack({
+                    delta:1
+                })
+               
+            },
+            onChangePlay: function(e) {
+            	this.oldPlay.x = e.detail.x
+            	this.oldPlay.y = e.detail.y
+            },
+            onChangePus: function(e) {
+            	this.oldPus.x = e.detail.x
+            	this.oldPus.y = e.detail.y
+            },
+            toggleCamera:function(){
+                
+                let _self = this
+                // me.LivePusherContext.stop()
+               
+                this.LivePusherContext.switchCamera({
+                    success: function(){
+                        _self.devicePositionIcon = _self.devicePositionIcon =='../../static/image/switchCamera_white@2x.png'?'../../static/image/switchCamera_gray@2x.png': '../../static/image/switchCamera_white@2x.png'
+                		_self.devicePositionColor = _self.devicePositionColor == '#fff'? '#aaa':'#fff'
+                	}
+                })
+            },
+            togglePlay:function(){
+                let _self = this
+            	console.log("%c togglePlay", "color:green")
+                if(_self.enableCamera){
+                    _self.LivePusherContext.stop({
+                        success: (a) => {
+                            console.log("stop:" + JSON.stringify(a));
+                            _self.enableCamera = false
+                            _self.videoColor = '#fff'
+                            _self.videoIcon = '../../static/image/video_white@2x.png'
+                        },complete:(error) =>{
+                            console.log("stoperr:" ,error)
+                        }
+                    })
+                }else{
+                    _self.LivePusherContext.start({
+                        success: (a) => {
+                            console.log("start:" + JSON.stringify(a));
+                            _self.enableCamera = true
+                            _self.videoColor = '#aaa'
+                            _self.videoIcon = '../../static/image/video_gray@2x.png'
+                        },complete:(error) =>{
+                            console.log("start:" ,error)
+                        }
+                    });
+                }
+                 
+            },
+            toggleMuted:function(){
+                console.log("%c toggleMuted", "color:green")
+                this.muted = !this.muted
+                if(this.micphoneColor == '#fff'){
+                    this.micphoneColor = '#aaa'
+                    this.micphoneIcon = '../../static/image/micphone_gray@2x.png'
+                }else{
+                    this.micphoneColor = '#fff'
+                    this.micphoneIcon = '../../static/image/micphone_white@2x.png'
+                }
+            },
+            hangup:function(){
+                console.log('挂断', this.confrId)
+                this.hangup = true
+            	this.clickBack()
+            },
+            clickMovableView:function(tag){
+                console.log(tag,this.isFull)
+                if((tag == 1 && this.isFull) || (tag == 2 && !this.isFull)){
+                    this.isFull = !this.isFull
+                }else{
+                    this.isShowBtn = !this.isShowBtn
+                }
+                
+            }
+        }
+    }
+</script>
+
+<style lang="scss" scoped>
+    .xiaopin{
+        height: 266upx;
+        width: 150upx;
+        border: 2upx #F1F1F1 solid;
+        z-index: 99;
+        live-player {
+            width: 100%;
+            height: 100%;
+        }
+        live-pusher {
+            width: 100%;
+            height: 100%;
+        }
+    }
+    .manpin{
+        width: 100%;
+        height: 100%;
+        live-player {
+            width: 100%;
+            height: 100%;
+        }
+        live-pusher {
+            width: 100%;
+            height: 100%;
+        }
+    }
+    
+    movable-area {
+    	height: 100%;
+    	width: 100%;
+    	/* background-color: #D8D8D8; */
+    	overflow: hidden;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+    /* movable-view {
+    	display: flex;
+    	align-items: center;
+    	justify-content: center;
+    	
+    	background-color: #007AFF;
+    	color: #fff;
+    } */
+    .callStatus{
+        position: absolute;
+        width: 100%;
+        top: 49%;
+        text-align: center;
+        z-index: 99;
+        color: #FFFFFF;
+    }
+    .ani_dot {
+        font-family: simsun;    
+    }
+    :root .ani_dot { /* 这里使用Hack是因为IE6~IE8浏览器下， vertical-align解析不规范，值为bottom或其他会改变按钮的实际高度*/
+        display: inline-block;
+        width: 90upx;
+        vertical-align: bottom;
+        overflow: hidden;
+    }
+    @-webkit-keyframes dot {
+        0% { width: 0; margin-right: 1.5upx; }
+        33% { width: 30upx; margin-right: 1upx; }
+        66% { width: 60upx; margin-right: .5upx; }
+        100% { width: 90upx; margin-right: 0;}
+    }
+    .ani_dot {
+        -webkit-animation: dot 3s infinite step-start;
+    }
+    
+    @keyframes dot {
+        0% { width: 0; margin-right: 1.5upx; }
+        33% { width: 30upx; margin-right: 1upx; }
+        66% { width: 60upx; margin-right: .5upx; }
+        100% { width: 90upx; margin-right: 0;}
+    }
+    .ani_dot {
+        animation: dot 3s infinite step-start;
+    }
+    .navigation{
+        position: absolute;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        top: 0;
+    }
+    .titleNav{
+        width:152upx;
+        height:56upx;
+        font-size:38upx;
+        font-weight:300;
+        color:rgba(255,255,255,1);
+        line-height:56upx;
+        position: absolute;
+        bottom: 21upx;
+        left: calc(50% - 76upx);
+    }
+    .backBtn{
+        position: absolute;
+        width: 50upx;
+        height: 50upx;
+        bottom: 21upx;
+        left: 21upx;
+    }
+    .controlContent {
+    	display: flex;
+    	flex-direction: column;
+    	height: 340rpx;
+    	width: 100%;
+    	align-items: center;
+    	padding-top: 20rpx;
+        position: absolute;
+        bottom: 0;
+    }
+    
+    .emediaContrContent {
+    	display: flex;
+    	width: 100%;
+    }
+    .controlItem {
+    	flex: 1;
+    	height: 100rpx;
+    	text-align: center;
+    	color: #fff;
+    	display: flex;
+    	flex-direction: column;
+    	align-items: center;
+    	font-size: 12px;
+    }
+    .icon-record {
+    	width: 100rpx;
+    	height: 100rpx;
+    }
+    .hangup {
+    	width: 100rpx;
+    	height: 100rpx;
+    	border-radius: 50rpx;
+    	background: red;
+    	margin-top: 60rpx;
+    	display: flex;
+    	align-items: center;
+    	justify-content: center;
+    }
+</style>

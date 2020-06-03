@@ -1,0 +1,1643 @@
+<template>
+  <div class="content-wrapper">
+    <div class="tabs">
+      <div class="tab" :class="curTab == 1 ? 'active' : ''" @click="toTab(1)">
+        <div class="tab-inner">辨证报告</div>
+      </div>
+      <div class="tab" :class="curTab == 2 ? 'active' : ''" @click="toTab(2)">
+        <div class="tab-inner">定制食方</div>
+      </div>
+      <div class="tab" :class="curTab == 3 ? 'active' : ''" @click="toTab(3)">
+        <div class="tab-inner">专家建议记录</div>
+      </div>
+    </div>
+    <div class='content2' v-scroll>
+      <div class="user-info">
+        <div class="info-wrapper">
+          <div class="user-name">{{data.name}}</div>
+          <div class="user-gender-age">性别：{{data.gender | sexFil}}<span>年龄：{{data.age}}岁</span></div>
+          <div class="user-phone">电话：{{data.phone}}</div>
+        </div>
+      </div>
+      <div class="block" id="tab1" ref="tab1">
+        <div class="literature">
+          <div class="literature-title">由以下机构提供技术与理论支持：</div>
+          <div class="literature-item">
+            <div class="literature-name">世界中联药膳食疗研究专业委员会</div>
+          </div>
+          <div class="literature-item">
+            <div class="literature-name">国家中医药管理局重点研究室（舌诊原理与应用）</div>
+          </div>
+          <div class="literature-item">
+            <div class="literature-name">百诺精准健康研究院</div>
+          </div>
+        </div>
+        <div class="tab-title">
+          <div class="tab-title-text">辨证报告</div>
+          <div class="tab-title-time">{{formatTimestamp(data.createTime, 'YYYY-MM-DD HH:mm')}}</div>
+        </div>
+        <div class="block-title">舌象分析</div>
+        <div class="list">
+          <div class="item">
+            <div class="item-title">中医舌象辨识维度</div>
+            <div class="normal-text tongue-tips"><span>舌形、舌下络脉、苔质、舌色、津液、苔色</span>以判断体质性质、气血盛衰、津液盈亏及脏腑虚实</div>
+            <div class="tongue-example">
+              <img src="/static/img/img_bswdsyt@3x.png">
+            </div>
+            <div class="tongue-images" v-if="tongueMark">
+              <div class="tongue-image" @click="showImage(tongueImages.front)">
+                <div class="tongue-image-icon" :style="{backgroundImage: `url(${tongueImages.front})`}"></div>
+                <div class="tongue-image-text">
+                  <div class="top-text">【舌体正面】</div>
+                  <div class="bottom-text">查看大图</div>
+                </div>
+              </div>
+              <div class="tongue-image" @click="showImage(tongueImages.back)">
+                <div class="tongue-image-icon" :style="{backgroundImage: `url(${tongueImages.back})`}"></div>
+                <div class="tongue-image-text">
+                  <div class="top-text">【舌体反面】</div>
+                  <div class="bottom-text">查看大图</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <template v-if="tongueMark">
+          <div class="item">
+            <div class="item-title">舌象</div>
+            <div class="tongue-result-list">
+              <div class="tongue-result-item" :class="(tongueMark.ligulate && tongueMark.ligulate.indexOf('正常') < 0) ? 'active' : ''">舌形：<span>{{tongueMark.ligulate}}</span></div>
+              <!-- <div class="tongue-result-item" :class="tongueMark.petechiaStatus ? 'active' : ''">瘀点：<span>{{tongueMark.petechiaStatus === undefined ? '' : (tongueMark.petechiaStatus ? parseStr(tongueMark.petechia) : '无')}}</span></div> -->
+              <div class="tongue-result-item" :class="tongueMark.tongueColor ? 'active' : ''">舌色：<span>{{tongueMark.tongueColor}}</span></div>
+              <!-- <div class="tongue-result-item" :class="tongueMark.ecchymosisStatus ? 'active' : ''">瘀斑：<span>{{tongueMark.ecchymosisStatus === undefined ? '' : (tongueMark.ecchymosisStatus ? parseStr(tongueMark.ecchymosis) : '无')}}</span></div> -->
+              <div class="tongue-result-item" :class="tongueMark.mossName !== '[]' ? 'active' : ''">苔质：<span>{{parseStr(tongueMark.mossName, '苔') === '有' ? '' : parseStr(tongueMark.mossName, '苔')}}</span></div>
+              <div class="tongue-result-item" :class="tongueMark.indentationStatus ? 'active' : ''">齿痕：<span>{{tongueMark.indentationStatus === undefined ? '' : (tongueMark.indentationStatus ? '有' : '无')}}</span></div>
+              <div class="tongue-result-item" :class="tongueMark.mossColor ? 'active' : ''">苔色：<span>{{tongueMark.mossColor}}</span></div>
+              <div class="tongue-result-item" :class="tongueMark.fissureStatus ? 'active' : ''">裂纹：<span>{{tongueMark.fissureStatus === undefined ? '' : (tongueMark.fissureStatus ? parseStr(tongueMark.fissure) : '无')}}</span></div>
+              <div class="tongue-result-item" :class="tongueMark.bodyfluidName ? 'active' : ''">津液：<span>{{tongueMark.bodyfluidName}}</span></div>
+              <!-- <div class="tongue-result-item" :class="tongueMark.laonen && tongueMark.laonen.indexOf('正常') < 0 ? 'active' : ''">外观：<span>{{tongueMark.laonen}}</span></div> -->
+              <div class="tongue-result-item" :class="tongueMark.prickStatus ? 'active' : ''">点刺：<span>{{tongueMark.prickStatus === undefined ? '' : (tongueMark.prickStatus ? parseStr(tongueMark.prick) : '无')}}</span></div>
+              <!-- <div class="tongue-result-item" :class="tongueMark.veinName && tongueMark.veinName.indexOf('正常') < 0 ? 'active' : ''">脉络：<span>{{tongueMark.veinName}}</span></div> -->
+            </div>
+          </div>
+          <div class="item" style="padding-top: 1px;">
+            <div class="literature">
+              <div class="literature-title">理论文献：</div>
+              <div class="literature-item">
+                <div class="literature-name">《舌苔原理及其计量诊断综合系列研究》</div>
+                <div class="literature-sub">广东省科学技术进步二等奖</div>
+              </div>
+              <div class="literature-item">
+                <div class="literature-name">《常见舌苔细胞化学变化规律的定性定量研究》</div>
+                <div class="literature-sub">国家中医药科技进步三等奖（证书号95-国-中医药-3-25)</div>
+              </div>
+            </div>
+            <div class="item-title">舌象表现</div>
+            <div class="tongue-abnormal-list">
+              <template v-if="tongueMark.ligulate && tongueMark.ligulate.indexOf('正常') < 0 && getDescribe('ligulate', tongueMark.ligulate)">
+                <div class="tongue-abnormal-item">
+                  <div class="top-text">舌形：{{tongueMark.ligulate}}</div>
+                  <div class="bottom-text">舌形描述：{{getDescribe('ligulate', tongueMark.ligulate)}}</div>
+                </div>
+              </template>
+              <!-- <template v-if="tongueMark.petechiaStatus && getDescribe('petechiaStatus', '瘀点')">
+                <div class="tongue-abnormal-item">
+                  <div class="top-text">瘀点：{{parseStr(tongueMark.petechia)}}</div>
+                  <div class="bottom-text">瘀点描述：{{getDescribe('petechiaStatus', '瘀点')}}</div>
+                </div>
+              </template> -->
+              <template v-if="tongueMark.tongueColor && getDescribe('tongueColor', tongueMark.tongueColor)">
+                <div class="tongue-abnormal-item">
+                  <div class="top-text">舌色：{{tongueMark.tongueColor}}</div>
+                  <div class="bottom-text">舌色描述：{{getDescribe('tongueColor', tongueMark.tongueColor)}}</div>
+                </div>
+              </template>
+              <!-- <template v-if="tongueMark.ecchymosisStatus && getDescribe('ecchymosisStatus', '瘀斑')">
+                <div class="tongue-abnormal-item">
+                  <div class="top-text">瘀斑：{{parseStr(tongueMark.ecchymosis)}}</div>
+                  <div class="bottom-text">瘀斑描述：{{getDescribe('ecchymosisStatus', '瘀斑')}}</div>
+                </div>
+              </template> -->
+              <template v-if="tongueMark.mossName !== '[]' && parse(tongueMark.mossName, []).join()">
+                <div class="tongue-abnormal-item">
+                  <div class="top-text">苔质：{{parse(tongueMark.mossName, []).join()}}</div>
+                  <div class="bottom-text">苔质描述：<template v-for="item in parse(tongueMark.mossName, [])">{{getDescribe('mossName', item)}}</template></div>
+                </div>
+              </template>
+              <template v-if="tongueMark.indentationStatus && getDescribe('indentationStatus', '齿痕')">
+                <div class="tongue-abnormal-item">
+                  <div class="top-text">齿痕：有</div>
+                  <div class="bottom-text">齿痕描述：{{getDescribe('indentationStatus', '齿痕')}}</div>
+                </div>
+              </template>
+              <template v-if="tongueMark.mossColor && getDescribe('mossColor', tongueMark.mossColor)">
+                <div class="tongue-abnormal-item">
+                  <div class="top-text">苔色：{{tongueMark.mossColor}}</div>
+                  <div class="bottom-text">苔色描述：{{getDescribe('mossColor', tongueMark.mossColor)}}</div>
+                </div>
+              </template>
+              <template v-if="tongueMark.fissureStatus && getDescribe('fissureStatus', '裂纹')">
+                <div class="tongue-abnormal-item">
+                  <div class="top-text">裂纹：{{parseStr(tongueMark.fissure)}}</div>
+                  <div class="bottom-text">裂纹描述：{{getDescribe('fissureStatus', '裂纹')}}</div>
+                </div>
+              </template>
+              <template v-if="tongueMark.bodyfluidName && getDescribe('bodyfluidName', tongueMark.bodyfluidName)">
+                <div class="tongue-abnormal-item">
+                  <div class="top-text">津液：{{tongueMark.bodyfluidName}}</div>
+                  <div class="bottom-text">津液描述：{{getDescribe('bodyfluidName', tongueMark.bodyfluidName)}}</div>
+                </div>
+              </template>
+              <!-- <template v-if="tongueMark.laonen && tongueMark.laonen.indexOf('正常') < 0 && getDescribe('laonen', tongueMark.laonen)">
+                <div class="tongue-abnormal-item">
+                  <div class="top-text">外观：{{tongueMark.laonen}}</div>
+                  <div class="bottom-text">外观描述：{{getDescribe('laonen', tongueMark.laonen)}}</div>
+                </div>
+              </template> -->
+              <template v-if="tongueMark.prickStatus && getDescribe('prickStatus', '点刺')">
+                <div class="tongue-abnormal-item">
+                  <div class="top-text">点刺：{{parseStr(tongueMark.prick)}}</div>
+                  <div class="bottom-text">点刺描述：{{getDescribe('prickStatus', '点刺')}}</div>
+                </div>
+              </template>
+              <!-- <template v-if="tongueMark.veinName && tongueMark.veinName.indexOf('正常') < 0">
+                <div class="tongue-abnormal-item">
+                  <div class="top-text">脉络：{{tongueMark.veinName}}</div>
+                  <div class="bottom-text">脉络描述：{{getDescribe('veinName', tongueMark.veinName)}}</div>
+                </div>
+              </template> -->
+            </div>
+          </div>
+          </template>
+        </div>
+      </div>
+      <div class="block">
+        <div class="block-title">整体分析</div>
+        <div class="list">
+          <div class="item">
+            <div class="item-title">体质辨识</div>
+            <div class="habitus-title">【体质评估结果】：</div>
+            <div class="habitus-text">根据您的身体状况及舌象表现，评估您为</div>
+            <div class="habitus-result">{{planData.name || (planData.tongue && planData.tongue.tzpgjg)}}体质</div>
+          </div>
+          <div class="item" v-if="tips">
+            <div class="item-title">脏腑情况</div>
+            <div class="viscera-list">
+              <div class="viscera" v-if="getQuestionResult('心系')">
+                <div class="viscera-icon" style="background-image: url('/static/img/icon_sxfxbg_xx@3x.png')"></div>
+                <div class="viscera-info">
+                  <div class="top-text">【心系】：{{getQuestionResult('心系').title.replace('证', '')}}</div>
+                  <div class="bottom-text">常见表现为{{getQuestionResult('心系').mains.join() || getQuestionResult('心系').subs.join()}}等</div>
+                </div>
+              </div>
+              <div class="viscera" v-if="getQuestionResult('肝胆系')">
+                <div class="viscera-icon" style="background-image: url('/static/img/icon_sxfxbg_gdx@3x.png')"></div>
+                <div class="viscera-info">
+                  <div class="top-text">【肝胆系】：{{getQuestionResult('肝胆系').title.replace('证', '')}}</div>
+                  <div class="bottom-text">常见表现为{{getQuestionResult('肝胆系').mains.join() || getQuestionResult('肝胆系').subs.join()}}等</div>
+                </div>
+              </div>
+              <div class="viscera" v-if="getQuestionResult('脾胃系')">
+                <div class="viscera-icon" style="background-image: url('/static/img/icon_sxfxbg_pwx@3x.png')"></div>
+                <div class="viscera-info">
+                  <div class="top-text">【脾胃系】：{{getQuestionResult('脾胃系').title.replace('证', '')}}</div>
+                  <div class="bottom-text">常见表现为{{getQuestionResult('脾胃系').mains.join() || getQuestionResult('脾胃系').subs.join()}}等</div>
+                </div>
+              </div>
+              <div class="viscera" v-if="getQuestionResult('肾系')">
+                <div class="viscera-icon" style="background-image: url('/static/img/icon_sxfxbg_pwx3@3x.png')"></div>
+                <div class="viscera-info">
+                  <div class="top-text">【肾系】：{{getQuestionResult('肾系').title.replace('证', '')}}</div>
+                  <div class="bottom-text">常见表现为{{getQuestionResult('肾系').mains.join() || getQuestionResult('肾系').subs.join()}}等</div>
+                </div>
+              </div>
+              <div class="viscera" v-if="getQuestionResult('肺系')">
+                <div class="viscera-icon" style="background-image: url('/static/img/icon_sxfxbg_pwx2@3x.png')"></div>
+                <div class="viscera-info">
+                  <div class="top-text">【肺系】：{{getQuestionResult('肺系').title.replace('证', '')}}</div>
+                  <div class="bottom-text">常见表现为{{getQuestionResult('肺系').mains.join() || getQuestionResult('肺系').subs.join()}}等</div>
+                </div>
+              </div>
+              <div class="viscera" v-if="getQuestionResult('脏腑兼病')">
+                <div class="viscera-icon" style="background-image: url('/static/img/icon_sxfxbg_zfjb@3x.png')"></div>
+                <div class="viscera-info">
+                  <div class="top-text">【脏腑兼病】：{{getQuestionResult('脏腑兼病').title.replace('证', '')}}</div>
+                  <div class="bottom-text">常见表现为{{getQuestionResult('脏腑兼病').mains.join() || getQuestionResult('脏腑兼病').subs.join()}}等</div>
+                </div>
+              </div>
+            </div>
+            <div class="viscera-tips">
+              <div class="viscera-tips-title">【特别提醒】：</div>
+              <div class="viscera-tips-text">注意{{tips}}检查及保养</div>
+            </div>
+          </div>
+        </div>
+        <div class="literature" style="background: white;margin-top: 0;margin-bottom: 30px;">
+          <div class="literature-title">理论文献：</div>
+          <div class="literature-item">
+            <div class="literature-name">《中医舌苔的现代生命科学原理及其微观辨证规律系列研究》</div>
+            <div class="literature-sub">广东省科学技术二等奖 2011年</div>
+          </div>
+          <div class="literature-item">
+            <div class="literature-name">《中医舌苔微观辨证分子基础及其变化规律》</div>
+            <div class="literature-sub">中国中西医结合学会科学技术二等奖 2013年</div>
+          </div>
+        </div>
+      </div>
+      <div class="block" v-if="planData.tongue && planData.tongue.constitution">
+        <div class="block-title">体质调养生活建议<br /><span>【{{planData.name || (planData.tongue && planData.tongue.tzpgjg)}}体质】</span></div>
+        <div class="list">
+          <div class="item">
+            <div class="item-title">易感疾病</div>
+            <div class="item-text">{{planData.tongue.constitution.ygjb}}</div>
+          </div>
+          <div class="item">
+            <div class="item-title">饮食注意</div>
+            <div class="item-text">{{planData.tongue.constitution.ysyj}}</div>
+          </div>
+          <div class="item">
+            <div class="item-title">运动方面</div>
+            <div class="item-text">{{planData.tongue.constitution.ydfm}}</div>
+          </div>
+        </div>
+      </div>
+      <div class="block" id="tab2" ref="tab2">
+        <div class="tab-title">
+          <div class="tab-title-text">定制食方</div>
+        </div>
+        <div class="list">
+          <div class="item">
+            <div class="block-title">根据您体质与脏腑情况分析</div>
+            <div style="font-size: 18px;color: #03BE90;padding: 9px 35px 0;">{{planData.name || (planData.tongue && planData.tongue.tzpgjg)}}
+              <span style="float: right;font-size: 13px;" @click="$router.push(`/home/posDetail/constitution?id=${$route.query.id}`)">了解更多体质信息></span>
+            </div>
+            <div style="font-size: 13px;color: #868E9D;padding: 2px 35px 30px;">{{getQuestionResults()}}</div>
+          </div>
+          <template v-if="planData.planStatus || (planData.planStatus === undefined)">
+          <div class="item">
+            <div>
+              <div class="block-title">明我健康AI为您定制设计以下膳食调养方案</div>
+            </div>
+            <div class="item-title">选择食方</div>
+            <div class="product-list">
+              <div class="product-item" :class="curPlan.code === item.code ? 'active' : ''" v-for="item in planData.plan" :key="item.id" @click="curPlan = item">
+                <!-- ${item.picUrl ? (parse(item.picUrl, []) && parse(item.picUrl, [])[0] && parse(item.picUrl, [])[0].url) : '/static/img/iji9@3x.png'} -->
+                <div class="product-picture" :style="{backgroundImage: `url(${item.picUrl ? (parse(item.picUrl, []) && parse(item.picUrl, [])[0] && parse(item.picUrl, [])[0].url) : '/static/img/iji9@3x.png'})`}"></div>
+                <div class="product-name">{{item.name}}</div>
+              </div>
+            </div>
+            <div class="swiper" style="margin-top: 15px;">
+              <div class="swiper-container swiper-container1" style="margin: 0 35px;z-index: 0;">
+                <div class="swiper-wrapper" style="z-index: 0;">
+                    <div class="swiper-slide" :style="{height: '0', paddingTop: '49.7%', borderRadius: '10px', background: `url('/static/img/img1234.png') no-repeat center / cover`, height: '0'}"></div>
+                </div>
+                <div class="swiper-pagination"></div>
+              </div>
+            </div>
+            <div class="nurse-list">
+              <!-- <div class="nurse-item" style="padding: 0;">
+                <div class="top-text">【食方功效】</div>
+                <div class="bottom-text">{{curPlan && curPlan.efficacy}}</div>
+              </div> -->
+              <div class="nurse-item" style="padding: 0;">
+                <div class="top-text">【服用周期】</div>
+                <div class="bottom-text">{{curPlan && curPlan.treatment}}天</div>
+              </div>
+              <div class="nurse-item" style="padding: 0;">
+                <div class="top-text">【单周期价】</div>
+                <div class="bottom-text">¥{{(curPlan.price / 100).toFixed(2)}}</div>
+              </div>
+              <div class="nurse-item" style="padding: 0;">
+                <div class="top-text">【服用周期数】</div>
+                <div class="bottom-text">建议服用{{curPlan && curPlan.num}}个疗程</div>
+              </div>
+              <div class="nurse-item" style="padding: 0;">
+                <div class="top-text">【金额】</div>
+                <div class="bottom-text">¥{{(curPlan.total / 100).toFixed(2)}}</div>
+              </div>
+              <div class="nurse-item" style="padding: 0;">
+                <div class="top-text">【食方成分】：</div>
+                <div class="ingredient" v-for="(t, i) in filter(curPlan.quesType === 'bd' ? parse(curPlan.extInfo, []) : curPlan.dieticianComponents)" :key='i' @click="showPopup2(t)">
+                  <div class="ingredient-icon" :style="{backgroundImage: `url(${parse(t.picUrl, []) && parse(t.picUrl, [])[0] && parse(t.picUrl, [])[0].url})`}"></div>
+                  <div class="ingredient-text">
+                    <div class="ingredient-name">{{t.name}}</div>
+                    <div class="ingredient-remark">{{t.efficacy}}</div>
+                  </div>
+                </div>
+                <div class="bottom-text">及其他数种食材。</div>
+              </div>
+              <div class="nurse-item" style="padding: 0;">
+                <div class="top-text">【服用方法】：</div>
+                <div class="bottom-text">{{curPlan && curPlan.instructions}}</div>
+              </div>
+            </div>
+            <div v-if='planData.plan&&planData.plan.length > 0 && !order' class='plan-btn' @click="$router.push({path: `/productSelect/?name=${data.name}&phone=${data.phone}&instanceId=${$route.query.id}`})">点击购买</div>
+            <template v-if="order">
+              <div class="item-title">订单</div>
+              <div class="order" @click="$router.push({path: `/order/orderDetail?id=${data.orderId}`})">
+                <div class="order-title">共{{order.item.reduce((total, currentValue) => total + currentValue.num, 0)}}件商品<span>￥{{(order.actualPrice / 100).toFixed(2)}}</span></div>
+                <div class="order-no">{{order.orderNum}}</div>
+                <div class="order-payWay">{{order.payType === 'WECHAT' ? '微信支付' : '现金支付'}}</div>
+                <div class="order-time">{{formatTimestamp(order.payTime, 'YYYY-MM-DD HH:mm')}}</div>
+              </div>
+            </template>
+          </div>
+          <div class="item">
+            <div class="item-title2">体质调养 | 一人一方</div>
+            <div class="item-text">失眠、虚胖、身体沉重、胃胀胃痛…很多都是偏颇体质的体现，特别是生活节奏快的城市居民，偏颇体质人群占了大多数。</div>
+            <div class="item-img" style="padding-bottom: 9px;"><img src="/static/img/img_hc_1@3x.png"></div>
+            <div class="item-text">而其调养必须针对每个人的体质特性，以及个体差异，制定调理原则，才能真正安全有效。大一统的膳食调养无法做到对所有人都起作用，有些甚至会起到相反的效果。<br />正确的体质调养，从明我食方开始。</div>
+          </div>
+          <div class="item" style="padding-bottom: 30px;" v-if="exampleList.length !== 0">
+            <div class="item-title2">与您状况类似的用户案例</div>
+            <div class="swiper" style="margin-top: 20px;">
+              <div class="swiper-container swiper-container2" style="margin: 0 15px;z-index: 0;">
+                <div class="swiper-wrapper" style="z-index: 0;">
+                    <div class="swiper-slide" v-for="(item, index) in exampleList" :key="index" style="box-shadow:0px 0px 7px 0px rgba(0,49,27,0.05);border-radius:15px;background: white;padding: 15px 20px 40px;">
+                      <div style="color: #16202E;font-size: 16px;line-height: 23px;">{{item.name}}，{{item.gender === 'MAN' ? '男' : '女'}}，{{item.age}}岁</div>
+                      <div style="margin-top: 6px;word-spacing: 10px;font-size: 0;">
+                        <div style="display: inline-block;color: #868E9D;font-size: 13px;line-height: 18px;">{{item.constitutionName}}</div>
+                      </div>
+                      <div style="margin-top: 12px;display: flex;align-items: center;">
+                        <div :style="{width: '45%', paddingTop: '45%', position: 'relative', background: `url(${parse(item.beforeTongueImgFront, []) && parse(item.beforeTongueImgFront, [])[0] && parse(item.beforeTongueImgFront, [])[0].url}) no-repeat center / cover`}"><div style="width: 100%;padding: 6px 0;white-space: nowrap;position: absolute;left: 0;top: 0;background: #003A31;color: white;font-size: 12px;">{{formatTimestamp(item.startTime, 'YYYY年MM月DD号')}} | 调理前</div></div>
+                        <div style="width: 10%;padding-top: 10%;background: url('/static/img/img_hc_zxjt@3x.png') no-repeat center / cover;"></div>
+                        <div :style="{width: '45%', paddingTop: '45%', position: 'relative', background: `url(${parse(item.afterTongueImgFront, []) && parse(item.afterTongueImgFront, [])[0] && parse(item.afterTongueImgFront, [])[0].url}) no-repeat center / cover`}"><div style="width: 100%;padding: 6px 0;white-space: nowrap;position: absolute;left: 0;top: 0;background: #003A31;color: white;font-size: 12px;">{{formatTimestamp(item.endTime, 'YYYY年MM月DD号')}} | 调理后</div></div>
+                      </div>
+                      <div style="margin-top: 12px;display: flex;justify-content: space-between;">
+                        <div style="width: 45%;font-size: 12px;line-height: 19px;color: #434E5E;">{{item.beforeTongueFront}}</div>
+                        <div style="width: 45%;font-size: 12px;line-height: 19px;color: #434E5E;">{{item.afterTongueFront}}</div>
+                      </div>
+                    </div>
+                </div>
+                <div class="swiper-pagination swiper-pagination2"></div>
+              </div>
+            </div>
+          </div>
+          <div class="item">
+            <div class="item-title2">服务流程</div>
+            <div class="item-img" style="padding-bottom: 30px;padding-top: 20px;"><img src="/static/img/img_hc_2@3x.png"></div>
+          </div>
+          <div class="item">
+            <div class="item-title2">食方研发团队</div>
+            <div class="item-text">百诺健康拥有实力强大的专家团队，并与国内多个高精尖的中医药、药理研究等科研专家团队建立了长期合作关系。部分专家介绍：</div>
+            <div class="item-img" style="padding-bottom: 30px;"><img src="/static/img/img_hc_3@3x.png"></div>
+          </div>
+          <div class="item">
+            <div class="item-title2">资质与自主创新成果</div>
+            <div class="item-img" style="padding: 12px 7px 20px;"><img src="/static/img/img_hc_4@3x.png"></div>
+          </div>
+          <div class="item">
+            <div class="item-title2">食材与制作工艺</div>
+            <div class="item-text">臻选食材，源地直采，无任何中间环节。</div>
+            <div class="item-img" style="padding-bottom: 30px;"><img src="/static/img/img_hc_5@3x.png"></div>
+          </div>
+          <div class="item">
+            <div class="item-title2">类似体质与身体状况的用户</div>
+            <div class="user-list">
+              <div class="user-count">{{getBuyNum()}}人已购买</div>
+              <div class="avatar-list">
+                <div class="avatar-item" :class="curUser === item ? 'active' : ''" v-for="(item, index) in userList" :key="index" :style="{backgroundImage: `url(${item.avatar})`}" @click="curUser = item;setTime();"></div>
+                <div class="avatar-item" style="background-image: url('/static/img/img_more@3x.png');"></div>
+              </div>
+              <div class="user-introduce" >
+                <div class="name">{{curUser.name}}，{{curUser.gender}}，{{curUser.age}}<span>{{formatTimestamp(curUser.time, 'YYYY.MM.DD')}}</span></div>
+                <div style="font-size: 18px;color: #03BE90;margin-top: 6px;">{{planData.name || (planData.tongue && planData.tongue.tzpgjg)}}体质</div>
+                <div style="margin-top: 6px;word-spacing: 10px;font-size: 13px;">
+                  <div style="display: inline-block;color: #868E9D;line-height: 18px;margin-left: 10px;" v-for="(i, idx) in curUser.z" :key="idx">{{i}}</div>
+                </div>
+              </div>
+              <div class="nurse-list">
+                <div class="nurse-item">
+                  <div class="top-text" style="padding: 0;">【食方价格】</div>
+                  <div class="bottom-text" style="padding: 0;">¥{{(curPlan.total / 100).toFixed(2)}}</div>
+                </div>
+              </div>
+            </div>
+            <div v-if='planData.plan&&planData.plan.length > 0 && !order' class='plan-btn' @click="$router.push({path: `/productSelect/?name=${data.name}&phone=${data.phone}&instanceId=${$route.query.id}`})">点击购买</div>
+          </div>
+          </template>
+          <div class="item" v-else>
+            <div>
+              <div class="block-title">明我健康AI为您定制设计以下膳食调养方案</div>
+            </div>
+            <div class="item-text">由于您存在以下情况：血尿，年龄不在调理范围12-70岁，麦麸过敏{{data.gender === 'LADY' ? '，处于孕期或哺乳期' : ''}}，不予调理!</div>
+          </div>
+        </div>
+      </div>
+      <div class="block" v-if='planData.plan && planData.plan.length > 0'>
+        <div class="block-title">注意事项</div>
+        <div class="attention-list">
+          <div class="attention">1. 本品不能代替药品；</div>
+          <div class="attention">2. 本品可能含有大豆、花生、花粉、坚果、谷物等，食物过敏者请咨询明我“授权咨询师”后服用；</div>
+          <div class="attention">3. 本品非速溶产品，不含任何添加剂；</div>
+          <div class="attention">4. 服用期间可能出现便秘，腹胀，烧心等情况，属正常反应，如一周后情况依旧请咨询客服；</div>
+          <div class="attention">5. 气郁或血瘀体质女性月经期间请暂停食用。</div>
+        </div>
+      </div>
+      <div class="block" id="tab3" ref="tab3">
+        <div class="tab-title">
+          <div class="tab-title-text">专家建议记录</div>
+        </div>
+        <div class="block-title">专家解读记录</div>
+        <div style="color: #03BE90;font-size: 14px;line-height: 20px;padding: 10px 30px;">专家基于客户自述情况以及辨证报告所发表的言论仅供参考，不能作为诊断和治疗的直接依据。</div>
+        <div class="list" v-if="list.length !== 0">
+          <div class="item" v-for="item in list" :key="item.id">
+            <div class="doctor-record">
+              <div class="doctor-info">
+                <div class="doctor-avatar" :style="{backgroundImage: `url(${parse(item.expert.pics, []) && parse(item.expert.pics, [])[0] && parse(item.expert.pics, [])[0].url})`}"></div>{{item.expert.name}}<span>{{item.expert.rank}} | {{item.expert.title}}</span>
+              </div>
+              <div class="record-desc">{{item.analysis}}</div>
+              <div class="record-time">
+                {{formatTimestamp(item.lastUpdateTime, 'YYYY-MM-DD HH:mm')}}
+                <div class="evaluate-result" v-if="item.score !== null">
+                  <div class="star" v-for="i in item.score" :key="i"></div>
+                </div>
+                <div class="evaluate-btn" @click="showPopup(item.id)" v-else>未评价</div>
+              </div>
+            </div>
+          </div>
+          <div style="padding: 25px 35px 0;color: #434E5E;font-size: 14px;line-height: 20px;">获得更多体质与定制膳食调养的专业意见——</div>
+          <div class='plan-btn' style="margin-top: 20px;" @click="$router.push({path: '/consult'})">继续咨询专家</div>
+        </div>
+        <div class="list" v-else>
+          <div class="item">
+            <div style="text-align: center;">
+              <img style="width: 40%;margin-top: 30px;" src="/static/img/img_zwzjjy@3x.png">
+              <div style="margin-top: 15px;color: #434E5E;font-size: 14px;text-align: center;">立即点击咨询专家，获取专家建议</div>
+              <div class='plan-btn' style="margin-top: 20px;" @click="$router.push({path: '/consult'})">咨询专家</div>
+            </div>
+          </div>
+        </div>
+        <div class="list" style="margin-top: 0;">
+          <div class="item">
+            <div class="item-text">专家热线：400-0556-003；工作时间：周一至周五：9:00-12:00，13:00-18:00，感谢您选择明我食方！</div>
+          </div>
+        </div>
+      </div>
+      <!-- <div class="block" v-if='planData.plan && planData.plan.length > 0'>
+        <div class="block-title">温馨提示</div>
+        <div class="list">
+          <div class="item">
+            <div class="item-title">如何服用</div>
+            <div class="item-text">每日分早晚两次，初次服用每次1平勺起食用；3-5日后每次2平勺；可随餐代替主食食用，亦可根据喜好与身体状况，加入蜂蜜或牛奶等调节口味。</div>
+          </div>
+          <div class="item">
+            <div class="item-title">如何冲调</div>
+            <div class="item-text">先用少量温开水搅拌均匀，再加入80度以上开水，这样更容易冲调均匀。</div>
+          </div>
+          <div class="item">
+            <div class="item-title">联系客服</div>
+            <div class="item-text">在服用产品的过程中有任何疑问请咨询我们的客服，客服热线 400-0556-003；客服工作时间：周一至周五 9:00—12:00，13:00—18:00，感谢您选择明我食方！</div>
+          </div>
+        </div>
+      </div>
+      <div class="block" v-if='planData.plan && planData.plan.length > 0'>
+        <div class="block-title">注意事项</div>
+        <div class="attention-list">
+          <div class="attention">1. 本品不能代替药品；</div>
+          <div class="attention">2. 本品可能含有大豆、花生、花粉、坚果、谷物等，食物过敏者请咨询明我“授权咨询师”后服用；</div>
+          <div class="attention">3. 本品非速溶产品，不含任何添加剂；</div>
+          <div class="attention">4. 服用期间可能出现便秘，腹胀，烧心等情况，属正常反应，如一周后情况依旧请咨询客服；</div>
+          <div class="attention">5. 气郁或血瘀体质女性月经期间请暂停食用。</div>
+        </div>
+      </div> -->
+    </div>
+    <div class="masker-wrapper" @click="masker = false" :style="{display: masker ? 'block' : 'none'}">
+      <div class="masker-bg"></div>
+      <div class="masker-img" :style="{marginTop: `-${innerWidth / 2}px`, backgroundImage: `url(${maskerImg})`}"></div>
+    </div>
+    <div v-transfer-dom>
+      <popup v-model="show">
+        <div class="evaluate-popup">
+          <div class="evaluate-title"></div>
+          <div class="result">“{{evaluateList[curEvaluate]}}”</div>
+          <div class="star-list">
+            <div class="star" v-for="item in 5" :key="item" @click="curEvaluate = item" :style="{ backgroundImage: item <= curEvaluate ? `url('/static/img/img_star_pj64@3x.png')` : `url('/static/img/img_star_hui@3x.png')`}"></div>
+          </div>
+          <div class="popup-btn" @click="submit">提交</div>
+        </div>
+      </popup>
+    </div>
+    <popup v-model="popup" height="80%" style="background: white;border-radius:15px 15px 0px 0px;" v-transfer-dom>
+      <div style="padding: 41px 35px;position: relative;">
+        <div style="height: 16px;width: 16px;background: url('/static/img/icon_tcgb@3x.png') no-repeat center / cover;position: absolute; right: 15px;top: 15px;" @click="popup = false"></div>
+        <div :style="{width: '40%', paddingTop: '40%', margin: '0 auto', borderRadius: '10px', background: `url(${parse(curIngredient.picUrl, []) && parse(curIngredient.picUrl, [])[0] && parse(curIngredient.picUrl, [])[0].url}) no-repeat center / cover`}"></div>
+        <div style="color: #16202E; font-size: 19px; text-align: center; font-weight: bold;padding: 10px;">{{curIngredient.name}}</div>
+        <div style="color: #434E5E;font-size: 14px;line-height: 23px;">{{curIngredient.remark}}</div>
+      </div>
+    </popup>
+  </div>
+</template>
+
+<script>
+import { dateFormat, TransferDom } from 'vux'
+import markAbnormal from '../../../assets/js/querMark'
+let Swiper = require('@/assets/js/swiper.min.js')
+let _this
+export default {
+  data () {
+    return {
+      formatTimestamp: dateFormat,
+      loadCount: 0,
+      test: '',
+      masker: false,
+      maskerImg: '',
+      innerWidth: window.innerWidth,
+      show: false,
+      popup: false,
+      evaluateList: {
+        1: '很不满意',
+        2: '不太满意',
+        3: '还行',
+        4: '比较满意',
+        5: '非常满意'
+      },
+      curEvaluate: 5,
+      list: [],
+      curTab: 1,
+      scoreId: '',
+      order: null,
+      curPlan: {},
+      curIngredient: {},
+      avatarList: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      nameList: ['秦', '周', '吴', '郑', '王', '柏', '水', '窦', '章', '沈', '赵', '谈', '蓝', '闵'],
+      zList: ['心气虚证', '心阳虚证', '心血虚证', '心阴虚证', '心火亢盛证', '肝气郁结证', '肝火上炎证', '肝血虚证', '肝阴虚证', '肝胆湿热证', '脾气虚证', '脾阳虚证', '湿热蕴脾证', '胃寒证', '胃热证', '胃阴虚证', '食滞胃脘证', '肺气虚证', '肺阴虚证', '痰湿阻肺证'],
+      userList: [],
+      curUser: {},
+      exampleList: [],
+      timer: null
+    }
+  },
+  props: {
+    planData: {},
+    data: {},
+    tongueImages: null,
+    tongueMark: null
+  },
+  created () {
+    this.$nextTick(() => {
+      this.initSwiper()
+    })
+    _this = this
+    this.curPlan = this.planData.plan && this.planData.plan[0]
+    this.getScore()
+    this.getConstitutionExamplePage()
+    this.getRandomUser()
+    this.curUser = this.userList[0]
+    this.setTime()
+    if (this.data.orderId) {
+      this.$fetch.constitutionOrderFindById({
+        id: this.data.orderId
+      }).then(r => {
+        if (r.data.status === 'OK') {
+          if (r.data.data) this.order = r.data.data
+        }
+      })
+    }
+  },
+  methods: {
+    setTime () {
+      if (this.timer) clearInterval(this.timer)
+      this.timer = setInterval(() => {
+        let index = this.userList.findIndex(item => item === this.curUser)
+        if (index === (this.userList.length - 1)) {
+          index = 0
+        } else {
+          index++
+        }
+        this.curUser = this.userList[index]
+      }, 3000)
+    },
+    initSwiper () {
+      let mySwiper = new Swiper.Swiper('.swiper-container1', {
+        autoplay: true,
+        pagination: {
+          el: '.swiper-pagination'
+        }
+      })
+      return mySwiper
+    },
+    initSwiper2 () {
+      let mySwiper = new Swiper.Swiper('.swiper-container2', {
+        autoplay: true,
+        pagination: {
+          el: '.swiper-pagination2',
+          type: 'fraction'
+        }
+      })
+      return mySwiper
+    },
+    getRandomUser () {
+      let userCount = 4
+      let avatarList = this.getRandomFromArr(this.avatarList, userCount)
+      let nameList = this.getRandomFromArr(this.nameList, userCount)
+      let userList = []
+      for (let i = 0; i < userCount; i++) {
+        userList.push({
+          avatar: `/static/img/avatars/${avatarList[i]}.png`,
+          name: nameList[i] + '**',
+          gender: avatarList[i] > 5 ? '男' : '女',
+          age: Math.floor(20 + (Math.random() * 20)) + '岁',
+          time: 1556640000000 + Math.floor((new Date().getTime() - 1556640000000) * Math.random()),
+          z: this.getRandomFromArr(this.zList, Math.floor(Math.random() * 3) + 1)
+        })
+      }
+      this.userList = userList
+    },
+    getRandomFromArr (arr, count) {
+      let copyArr = arr.slice()
+      let ret = []
+      for (let i = 1; i <= count; i++) {
+        ret = ret.concat(copyArr.splice(Math.floor(Math.random() * copyArr.length), 1))
+      }
+      return ret
+    },
+    getConstitutionExamplePage () {
+      this.$fetch.constitutionExamplePage({
+        constitutionName: this.planData.name || (this.planData.tongue && this.planData.tongue.tzpgjg),
+        page: 1,
+        size: 3
+      }).then(r => {
+        if (r.data.status === 'OK') {
+          this.exampleList = r.data.list
+          this.$nextTick(() => {
+            this.initSwiper2()
+          })
+        }
+      })
+    },
+    getHighPrice (list) {
+      let ret = []
+      list.forEach(item => {
+        if (ret.length === 0) {
+          ret[0] = item
+        } else {
+          if (ret[0].total < item.total) ret[0] = item
+        }
+      })
+      return ret
+    },
+    getScore () {
+      this.$fetch.advisoryRecordFindByInstanceId({
+        instanceId: this.$route.query.id
+      }).then(r => {
+        if (r.data.status === 'OK') {
+          this.list = r.data.data
+        }
+      })
+    },
+    showPopup (id) {
+      this.scoreId = id
+      this.curEvaluate = 5
+      this.show = true
+    },
+    showPopup2 (t) {
+      this.curIngredient = t
+      this.popup = true
+    },
+    submit () {
+      this.$fetch.advisoryRecordUpdateScore({
+        id: this.scoreId,
+        score: this.curEvaluate
+      }).then(r => {
+        if (r.data.status === 'OK') {
+          this.getScore()
+          this.show = false
+        }
+      })
+    },
+    getBuyNum () {
+      let baseNum = 1100
+      let hours = Math.ceil((new Date().getTime() - 1582787203315) / (3600 * 1000))
+      return baseNum + 2 * hours
+    },
+    getQuestionResult (kind) {
+      let arr = this.planData.questionResult || []
+      return arr.find(item => item.kind === kind)
+    },
+    getQuestionResults () {
+      let map = {}
+      let result = []
+      let arr = this.planData.questionResult || []
+      arr.forEach(item => {
+        if (!map[item.kind] && item.title) {
+          console.log(item)
+          map[item.kind] = true
+          result.push(item.title.replace('证', ''))
+        }
+      })
+      return result.join('、')
+    },
+    parse (str, init) {
+      let ret = init
+      try {
+        ret = JSON.parse(str)
+      } catch (e) {}
+      if (Object.prototype.toString.call(ret) === '[object Array]') {
+        let set = new Set(ret)
+        set.delete('苔不腻腐')
+        set.delete('无腻腐苔')
+        set.delete('舌苔不剥')
+        ret = [...set]
+      }
+      return ret
+    },
+    getDescribe (key, name) {
+      let ret = markAbnormal.find(item => item.key === key).tongue.find(item => item.name === name)
+      if (ret) {
+        return ret.describe
+      }
+    },
+    showImage (url) {
+      this.maskerImg = url
+      this.masker = true
+    },
+    parseStr (str, delStr) {
+      let arr = JSON.parse(str)
+      if (!arr) return '有'
+      if (arr.length === 0) {
+        return '有'
+      } else {
+        if (delStr) {
+          let reg = new RegExp(`${delStr}$`)
+          arr = arr.map(item => {
+            return item.replace(reg, '')
+          })
+        }
+        return arr.join()
+      }
+    },
+    filter (arr) {
+      let end = 0
+      if (arr.length > 8) {
+        end = 8
+      } else if (arr.length === 1) {
+        return arr.slice()
+      } else {
+        end = arr.length - 1
+      }
+      return arr.slice(0, end)
+    },
+    toTab (id) {
+      this.curTab = id
+      this.$refs[`tab${id}`].scrollIntoView()
+    }
+  },
+  computed: {
+    tips () {
+      let arr = this.planData.questionResult || []
+      let set = new Set()
+      arr.forEach(item => {
+        if (item.kind === '心系' || item.kind === '肝胆系' || item.kind === '脾胃系' || item.kind === '肾系' || item.kind === '肺系' || item.kind === '脏腑兼病') {
+          set.add(item.kind.replace('系', ''))
+        }
+      })
+      return [...set].join()
+    }
+  },
+  filters: {
+    sexFil (val) {
+      var sex = {UNKNOWN: '未知', MAN: '男', LADY: '女', null: '未知'}
+      return sex[val]
+    },
+    splice (obj) {
+      let ret = ''
+      if (!obj) return ret
+      if (obj.tongueColor) {
+        ret += `（舌色）${obj.tongueColor || '--'}，`
+      }
+      if (obj.mossColor) {
+        ret += `（苔色）${obj.mossColor || '--'}，`
+      }
+      if (obj.mossName) {
+        ret += `（苔质）${obj.mossName || '--'}，`
+      }
+      if (obj.bodyfluidName) {
+        ret += `（津液）${obj.bodyfluidName || '--'}，`
+      }
+      if (obj.veinName) {
+        ret += `（舌下脉络）${obj.veinName || '--'}，`
+      }
+      if (obj.ligulate) {
+        ret += `（舌形）${obj.ligulate || '--'}，`
+      }
+      if (obj.prickStatus) {
+        ret += `（点刺）有，`
+      } else {
+        ret += `（点刺）无，`
+      }
+      if (obj.ecchymosisStatus) {
+        ret += `（瘀斑）有，`
+      } else {
+        ret += `（瘀斑）无，`
+      }
+      if (obj.petechiaStatus) {
+        ret += `（瘀点）有，`
+      } else {
+        ret += `（瘀点）无，`
+      }
+      if (obj.indentationStatus) {
+        ret += `（齿痕）有，`
+      } else {
+        ret += `（齿痕）无，`
+      }
+      if (obj.fissureStatus) {
+        ret += `（裂纹）有，`
+      } else {
+        ret += `（裂纹）无，`
+      }
+      if (obj.laonen) {
+        ret += `（外观）${obj.laonen || '--'}，`
+      }
+      ret = ret.replace(/，$/, '')
+      return ret
+    }
+  },
+  components: {
+  },
+  destroyed () {
+    if (this.timer) clearInterval(this.timer)
+  },
+  directives: {
+    TransferDom,
+    scroll: {
+      bind: (el, binding) => {
+        el.addEventListener('scroll', () => {
+          let index = 1
+          for (let i = 1; i++; i < 4) {
+            if (_this.$refs[`tab${index + 1}`] && (el.scrollTop >= _this.$refs[`tab${index + 1}`].offsetTop - 55)) {
+              index = index + 1
+            } else {
+              _this.curTab = index
+              return
+            }
+          }
+          _this.curTab = index
+        })
+      }
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.masker-wrapper{
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  overflow: hidden;
+  touch-action: none;
+  z-index: 1500;
+  outline: none;
+  .masker-bg{
+    opacity: 0.8;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    -webkit-backface-visibility: hidden;
+  }
+  .masker-img{
+    width: 100%;
+    padding-top: 100%;
+    height: 0;
+    position: relative;
+    top: 50%;
+    background: no-repeat center bottom / 150% auto;
+  }
+}
+.content2 {
+  text-align: left;
+  background: #F6F7FA;
+  /deep/{
+    .swiper-pagination-bullet-active{
+      background: #03BE90;
+    }
+    .swiper-pagination-bullets{
+      bottom: -2px;
+    }
+    .swiper-pagination2{
+      font-size: 12px;
+      color: #868E9D;
+    }
+  }
+  .literature{
+    margin: 30px 35px 0;
+    background: #F6FAF9;
+    border-radius: 10px;
+    padding: 10px;
+    .literature-title{
+      color: #A2A9BA;
+      font-size: 12px;
+      line-height: 20px;
+    }
+    .literature-item{
+      margin-top: 8px;
+      .literature-name{
+        color: #434E5E;
+        font-size: 14px;
+        line-height: 20px;
+      }
+      .literature-sub{
+        margin-top: 3px;
+        color: #868E9D;
+        font-size: 12px;
+        line-height: 16px;
+      }
+    }
+  }
+  .normal-text{
+    font-size: 14px;
+    line-height: 23px;
+    color: #434E5E;
+    span{
+      color: #179F7D;
+    }
+  }
+  .user-info{
+    height: 0;
+    width: 100%;
+    padding-top: 56.25%;
+    background: url('/static/img/img_nybgdt2@3x.png') no-repeat center / cover;
+    .info-wrapper{
+      color: white;
+      font-size: 13px;
+      line-height: 18px;
+      width: 150px;
+      margin: -30% auto 0;
+      .user-name{
+        font-size: 18px;
+        line-height: 25px;
+        text-align: center;
+      }
+      .user-gender-age{
+        margin-top: 6px;
+        span{
+          margin-left: 20px;
+        }
+      }
+      .user-phone{
+
+      }
+    }
+  }
+  .block{
+    border-radius:25px 25px 0 0;
+    padding-bottom: 25px;
+    padding-top: 1px;
+    background: #F6FAF9;
+    box-shadow:0px -7px 7px 0px rgba(0,49,27,0.05);
+    margin-top: -25px;
+    &:nth-child(even){
+      background: white;
+    }
+    .plan-btn {
+      width: 200px;
+      height: 45px;
+      line-height: 45px;
+      text-align: center;
+      font-size: 16px;
+      color: #FFF;
+      background: linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+      border-radius: 23px;
+      margin-top: 30px;
+      margin: 0 auto 40px;
+    }
+    .block-title{
+      color: #16202E;
+      font-size: 20px;
+      line-height: 28px;
+      padding: 28px 35px 0;
+      position: relative;
+      span{
+        color: #03BE90;
+      }
+      &::before{
+        content: '';
+        height: 12px;
+        width: 12px;
+        border:3px solid rgba(23,159,125,0.6);
+        position: absolute;
+        left: 14px;
+        top: 37px;
+        border-radius: 50%;
+      }
+    }
+    .list{
+      margin-top: 7px;
+      .item{
+        position: relative;
+        .user-list{
+          margin-top: 10px;
+          .user-count{
+            font-size: #434E5E;
+            font-size: 14px;
+            line-height: 23px;
+            padding: 0 35px;
+          }
+          .avatar-list{
+            margin-top: 10px;
+            padding: 0 35px;
+            font-size: 0;
+            .avatar-item{
+              width: 46px;
+              height: 46px;
+              border: 1px solid white;
+              border-radius: 50%;
+              background: no-repeat center / cover;
+              display: inline-block;
+              &.active{
+                border: 1px solid #03BE90;
+              }
+              +.avatar-item{
+                margin-left: 10px;
+              }
+            }
+          }
+          .user-introduce{
+            background:rgba(255,255,255,1);
+            box-shadow:0px 0px 7px 0px rgba(0,49,27,0.05);
+            border-radius: 15px;
+            margin: 20px 35px;
+            padding: 15px;
+            .name{
+              font-size: 16px;
+              color: #16202E;
+              line-height: 23px;
+              span{
+                float: right;
+                font-size: 13px;
+                line-height: 18px;
+                color: #868E9D;
+              }
+            }
+          }
+        }
+        .product-list{
+          overflow-y: hidden;
+          overflow-x: auto;
+          font-size: 0;
+          margin-top: 10px;
+          padding: 0 35px 0 15px;
+          .product-item{
+            display: inline-block;
+            width: 120px;
+            margin-left: 20px;
+            border-radius: 5px;
+            &.active{
+              border: 2px solid #F7CF41;
+              border-radius: 5px;
+              .product-picture::before{
+                content: '';
+                height: 22px;
+                width: 22px;
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                margin-left: -11px;
+                margin-top: -11px;
+                background: url('/static/img/icon_xuanzhong@3x.png') no-repeat center / cover;
+              }
+            }
+            .product-picture{
+              height: 93px;
+              background: no-repeat center / cover;
+              position: relative;
+            }
+            .product-name{
+              line-height: 32px;
+              height: 32px;
+              color: #434E5E;
+              font-size: 14px;
+              text-align: center;
+              overflow: hidden;
+              white-space: nowrap;
+              text-overflow:ellipsis;
+            }
+          }
+        }
+        .doctor-record{
+          padding: 15px 35px 20px;
+          .doctor-info{
+            position: relative;
+            color: #2A3441;
+            font-size: 16px;
+            line-height: 24px;
+            .doctor-avatar{
+              height: 24px;
+              width: 24px;
+              background: no-repeat center / cover;
+              display: inline-block;
+              border-radius: 50%;
+              vertical-align: middle;
+              margin-right: 6px;
+            }
+            span{
+              color: #A2A9BA;
+              font-size: 13px;
+              line-height: 19px;
+              margin-left: 10px;
+            }
+          }
+          .record-desc{
+            color: #434E5E;
+            font-size: 14px;
+            line-height: 20px;
+            margin-top: 8px;
+          }
+          .record-time{
+            color: #A2A9BA;
+            font-size: 13px;
+            line-height: 19px;
+            margin-top: 10px;
+            .evaluate-result{
+              float: right;
+              font-size: 0;
+              .star{
+                width: 16px;
+                height: 15px;
+                background: url('/static/img/img_star_pj@3x.png') no-repeat center / cover;
+                display: inline-block;
+                +.star{
+                  margin-left: 2px;
+                }
+              }
+            }
+            .evaluate-btn{
+              float: right;
+              color: #03BE90;
+              font-size: 13px;
+              line-height: 23px;
+              border: 1px solid #03BE90;
+              border-radius: 12px;
+              padding: 0 10px;
+            }
+          }
+        }
+        .item-title{
+          padding: 0 35px;
+          color: #179F7D;
+          font-size: 15px;
+          line-height: 21px;
+        }
+        .item-title2{
+          padding: 30px 35px 0;
+          color: #16202E;
+          font-size: 18px;
+          line-height: 25px;
+        }
+        .item-img{
+          font-size: 0;
+          padding: 0 35px;
+          img{
+            width: 100%;
+          }
+        }
+        +.item{
+          &::before{
+            content: '';
+            height: 1px;
+            position: absolute;
+            top: 0;
+            left: 35px;
+            right: 35px;
+            border-top: 1px dashed #868E9D;
+          }
+          .item-title{
+            padding-top: 21px;
+          }
+        }
+        .tongue-tips{
+          margin: 13px 35px 0;
+        }
+        .tongue-example{
+          font-size: 0;
+          margin: 25px 8px 21px;
+          img{
+            width: 100%;
+          }
+        }
+        .tongue-images{
+          padding: 0 35px 30px;
+          display: flex;
+          .tongue-image{
+            flex: 1;
+            display: flex;
+            padding: 14px 12px;
+            background: #F6F7FA;
+            border-radius: 10px;
+            +.tongue-image{
+              margin-left: 12px;
+            }
+            .tongue-image-icon{
+              height: 37px;
+              width: 37px;
+              flex: 0 0 37px;
+              border-radius: 5px;
+              background: no-repeat center bottom / 150% auto;
+            }
+            .tongue-image-text{
+              padding-left: 6px;
+              .top-text{
+                color: #434E5E;
+                font-size: 14px;
+                line-height: 14px;
+                white-space: nowrap;
+              }
+              .bottom-text{
+                color: #434E5E;
+                font-size: 12px;
+                line-height: 12px;
+                padding-left: 8px;
+                margin-top: 9px;
+              }
+            }
+          }
+        }
+        .tongue-result-list{
+          padding: 4px 35px 30px 23px;
+          font-size: 0;
+          .tongue-result-item{
+            margin-left: 12px;
+            margin-top: 12px;
+            font-size: 14px;
+            line-height: 14px;
+            color: #434E5E;
+            display: inline-block;
+            width: calc((100% - 24px) / 2);
+            padding: 15px 20px;
+            background: #F6F7FA;
+            border-radius: 10px;
+            span{
+              font-size: 14px;
+              line-height: 14px;
+              color: #434E5E;
+            }
+            &.active{
+              font-size: 14px;
+              line-height: 14px;
+              color: #03BE90;
+              background: #F2FBF9;
+              span{
+                font-size: 14px;
+                line-height: 14px;
+                color: #03BE90;
+              }
+            }
+          }
+        }
+        .tongue-abnormal-list{
+          padding: 1px 35px 26px;
+          .tongue-abnormal-item{
+            padding: 10px 0 0;
+            .top-text{
+              color: #434E5E;
+              font-size: 14px;
+              line-height: 23px;
+            }
+            .bottom-text{
+              margin-top: 3px;
+              color: #A2A9BA;
+              font-size: 12px;
+              line-height: 20px;
+            }
+          }
+        }
+        .viscera-list{
+          padding: 0 35px;
+          .viscera{
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+            .viscera-icon{
+              flex: 0 0 53px;
+              height: 53px;
+              background: no-repeat center / 100%;
+            }
+            .viscera-info{
+              padding-left: 2px;
+              .top-text{
+                font-size: 14px;
+                line-height: 23px;
+                color: #434E5E;
+              }
+              .bottom-text{
+                padding-left: 8px;
+                font-size: 14px;
+                line-height: 23px;
+                color: #434E5E;
+                margin-top: 7px;
+              }
+            }
+          }
+        }
+        .viscera-tips{
+          padding: 20px 26px 25px;
+          .viscera-tips-title{
+            color: #03BE90;
+            font-size: 14px;
+            line-height: 23px;
+          }
+          .viscera-tips-text{
+            color: #03BE90;
+            font-size: 14px;
+            line-height: 23px;
+            padding-left: 9px;
+            margin-top: 2px;
+          }
+        }
+        .habitus-title{
+          font-size: 14px;
+          line-height: 28px;
+          color: #434E5E;
+          margin-top: 9px;
+          padding: 0 26px;
+        }
+        .habitus-text{
+          font-size: 14px;
+          line-height: 28px;
+          color: #434E5E;
+          margin-top: 1px;
+          padding: 0 36px;
+        }
+        .habitus-result{
+          padding: 0 35px 30px;
+          img{
+            vertical-align: middle;
+          }
+          color: #03BE90;
+          font-size: 21px;
+          line-height: 28px;
+        }
+        .item-text{
+          color: #434E5E;
+          font-size: 14px;
+          line-height: 23px;
+          padding: 11px 35px 25px;
+        }
+        .nurse-list{
+          padding-bottom: 26px;
+          .nurse-item{
+            margin-top: 11px;
+            padding: 0 35px;
+            .ingredient{
+              margin-top: 5px;
+              padding: 0 35px;
+              display: flex;
+              +.ingredient{
+                margin-top: 10px;
+              }
+              .ingredient-icon{
+                flex: 0 0 59px;
+                height: 59px;
+                border-radius: 5px;
+                background: no-repeat center / cover;
+              }
+              .ingredient-text{
+                flex: 1;
+                padding-left: 10px;
+                .ingredient-name{
+                  font-size: 14px;
+                  line-height: 23px;
+                  color: #434E5E;
+                }
+                .ingredient-remark{
+                  font-size: 12px;
+                  color: #A2A9BA;
+                  line-height: 18px;
+                  margin-top: 2px;
+                }
+              }
+            }
+            .top-text{
+              padding: 0 26px;
+              font-size: 14px;
+              line-height: 23px;
+              color: #434E5E;
+            }
+            .select-list{
+              font-size: 0;
+              margin-top: 10px;
+              padding: 0 35px 0 25px;
+              .select-item{
+                display: inline-block;
+                font-size: 14px;
+                line-height: 23px;
+                color: #434E5E;
+                margin-left: 10px;
+                width: calc((100% - 20px) / 2);
+                border: 1px solid #868E9D;
+                border-radius: 10px;
+                text-align: center;
+                padding: 4px 4px;
+                &.active{
+                  color: #03BE90;
+                  border-color: #03BE90;
+                }
+              }
+            }
+            .bottom-text{
+              padding: 0 35px;
+              margin-top: 2px;
+              font-size: 14px;
+              line-height: 23px;
+              color: #434E5E;
+            }
+          }
+        }
+      }
+    }
+    .qr-wrapper{
+      padding-bottom: 28px;
+      .qr{
+        width: 83px;
+        height: 83px;
+        margin: 26px auto 0;
+      }
+      .qr-text{
+        color: #434E5E;
+        font-size: 10px;
+        line-height: 14px;
+        text-align: center;
+        margin-top: 15px;
+      }
+    }
+    .attention-list{
+      padding: 0 35px 25px;
+      .attention{
+        margin-top: 7px;
+        color: #434E5E;
+        font-size: 14px;
+        line-height: 23px;
+      }
+    }
+  }
+}
+  .tabs{
+    display: flex;
+    background: white;
+    flex: 0 0 55px;
+    .tab{
+      flex: 1;
+      text-align: center;
+      font-size: 0;
+      display: block;
+      .tab-inner{
+        display: inline-block;
+        font-size: 16px;
+        line-height: 23px;
+        color: #2A3441;
+        margin: 16px auto;
+        position: relative;
+      }
+      &.active{
+        .tab-inner::before{
+          content: '';
+          position: absolute;
+          width:100%;
+          height:3px;
+          bottom: 0;
+          left: 0;
+          background:linear-gradient(315deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+          border-radius:2px;
+        }
+      }
+    }
+  }
+  .tab-title{
+    padding-top: 30px;
+    text-align: center;
+    font-size: 0;
+    .tab-title-text{
+      display: inline-block;
+      position: relative;
+      color: #16202E;
+      font-size: 23px;
+      line-height: 33px;
+      font-weight: bold;
+      &::before{
+        content: '';
+        width:100%;
+        height:5px;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        background:linear-gradient(315deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+        border-radius:3px;
+      }
+    }
+    .tab-title-time{
+      color: #434E5E;
+      font-size: 12px;
+      line-height: 17px;
+    }
+  }
+  .content-wrapper{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    .content2{
+      flex: 1;
+      overflow: auto;
+    }
+  }
+  .order{
+    padding: 15px 22px;
+    margin: 5px 35px 20px;
+    background: white;
+    border-radius: 5px;
+    .order-title{
+      color: #2A3441;
+      font-size: 15px;
+      line-height: 23px;
+      span{
+        float: right;
+      }
+    }
+    .order-no{
+      padding-left: 28px;
+      margin-top: 10px;
+      background: url('/static/img/icon_dd_bh@3x.png') no-repeat 0 center / 18px 18px;
+      color: #434E5E;
+      font-size: 13px;
+      line-height: 19px;
+    }
+    .order-payWay{
+      padding-left: 28px;
+      margin-top: 10px;
+      background: url('/static/img/icon_dd_zffs@3x.png') no-repeat 0 center / 18px 18px;
+      color: #434E5E;
+      font-size: 13px;
+      line-height: 19px;
+    }
+    .order-time{
+      padding-left: 28px;
+      margin-top: 10px;
+      background: url('/static/img/icon_dd_sj@3x.png') no-repeat 0 center / 18px 18px;
+      color: #434E5E;
+      font-size: 13px;
+      line-height: 19px;
+    }
+  }
+</style>
+<style lang="scss">
+.evaluate-popup{
+  border-radius: 15px 15px 0 0;
+  background: white;
+  padding: 44px 60px 40px;
+  .evaluate-title{
+    height: 1px;
+    background: #C6CAD4;
+    margin: 0 7px;
+    position: relative;
+    &::before{
+      content: '提交评价';
+      position: absolute;
+      padding: 0 15px;
+      color: #16202E;
+      font-weight: bold;
+      font-size: 19px;
+      line-height: 28px;
+      left: 50%;
+      margin-top: -14px;
+      margin-left: -53px;
+      background: white;
+    }
+  }
+  .result{
+    color: #16202E;
+    font-size: 21px;
+    line-height: 31px;
+    margin-top: 34px;
+    text-align: center;
+    font-weight: bold;
+  }
+  .star-list{
+    text-align: center;
+    font-size: 0;
+    margin-top: 20px;
+    .star{
+      display: inline-block;
+      width: 31px;
+      height: 29px;
+      background: no-repeat center / cover;
+      +.star{
+        margin-left: 5px;
+      }
+    }
+  }
+  .popup-btn{
+    margin-top: 33px;
+    line-height: 45px;
+    height: 45px;
+    text-align: center;
+    color: white;
+    background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+    box-shadow:0px 2px 7px 0px rgba(3,190,144,0.3);
+    border-radius:23px;
+  }
+}
+</style>

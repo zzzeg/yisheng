@@ -1,0 +1,265 @@
+<template>
+	<view>
+		<view class="health-top-content">
+			<uni-search-bar radius="100" cancelButton="none" placeholder="输入商品名称或关键字" @confirm="search" />
+			<uni-swiper-dot :info="bannerList" :current="current" :mode="mode" :dots-styles="dotsStyles" field="content">
+				<swiper class="swiper-box" @change="change">
+					<swiper-item v-for="(item, index) in bannerList" :key="index">
+						<view :class="item.colorClass" class="swiper-item" @tap="goDetail(item.id,'community')">
+							<image class="image" :src="item.url" mode="widthFix" />
+						</view>
+					</swiper-item>
+				</swiper>
+			</uni-swiper-dot>
+			<scroll-view id="tab-bar" class="scroll-h" :scroll-x="true" :show-scrollbar="false" :scroll-into-view="scrollInto">
+			    <view v-for="(tab,index) in tabBars" :key="index" class="uni-tab-item" :id="tab.id" :data-current="index" @tap="ontabtap(tab)">   
+			        <text class="uni-tab-item-title" :class="tabIndex==index ? 'uni-tab-item-title-active' : ''">{{tab.label}}</text>
+			    </view>
+			</scroll-view>
+		</view>
+		<view class="health-middle-content">
+			<view class="health-model">
+				<view class="h-title">
+					热卖产品
+				</view>
+				<view class="u-f h-wrap">
+					<block v-for="(item,index) in hotProductList" :key="index">
+						<h-product-list :item='item' @click="goDetail($event,'community')"></h-product-list>
+					</block>
+				</view>
+			</view>
+		</view>
+        
+        <image v-if="goodsNum>0" @click="clickGwc" class="gwcClass" src="../../static/image/icon_jksc_gwc.png" mode=""></image>
+        <view v-if="goodsNum>0" class="gwcNum">{{goodsNum}}</view>
+        
+	</view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				dotsStyles: {
+					backgroundColor: 'rgba(249, 249, 251, 1)',
+					border: 'none',
+					color: '#fff',
+					selectedBackgroundColor: 'rgba(3, 190, 144, 1)',
+					selectedBorder: 'none'
+				},
+				mode: 'dot',
+				current:0,
+				tabBars:[],
+				bannerList: [],
+				hotProductList:[],
+				newProductList:[],
+                goodsNum:0
+			};
+		},
+        onShow() {
+            var cartList = uni.getStorageSync('community_cartList')
+            this.goodsNum = 0
+			if(cartList){
+				cartList.forEach(item=>{
+					this.goodsNum += item.number
+				})	
+			}
+        },
+		onLoad() {
+			console.log(this.communityId);
+			this.requestClassifyData();
+			this.getHotProduct();
+			this.getBannerList();
+            
+		},
+		computed: {
+			communityId(){
+				return this.$store.getters.communityId
+			}
+		},
+		methods: {
+            clickGwc:function(){
+                uni.navigateTo({
+                	url:`/pages/cart/cart?type=community`
+                })
+            },
+			search(res) {
+				uni.navigateTo({
+					url: `/pages/health-search-page/health-search-page?value=${res.value}&type=community`,
+				});
+			},
+			change(e) {
+				this.current = e.detail.current
+			},
+			ontabtap(tab) {
+				console.log(tab);
+			    uni.navigateTo({
+			    	url: `/pages/health-mall-community/health-mall-community2?title=${tab.label}&classifyId=${tab.id}`,
+			    });
+			},
+			goDetail(id,type){
+				uni.navigateTo({
+					url: `/pages/health-product-detail/health-product-detail?id=${id}&type=${type}`,
+				});
+			},
+			requestClassifyData(){
+				this.$api.productClassifyList().then(res=>{
+					if(res.status=="OK"){
+						let arr = res.data
+						arr.map(item=>{
+							this.tabBars.push({
+								id:item.id,
+								label:item.name,
+								value:''
+							})
+						})
+					}
+				}).catch(err=>{
+					console.log(err);
+				})
+			},
+			getHotProduct(){
+				this.$api.communityProductList({
+					size:999,
+					page:1,
+					hot:true,
+				}).then(res=>{
+					if(res.status=="OK"){
+						res.list.map(item=>{
+							this.hotProductList.push({
+								price:item.price/100,
+								originalPrice:item.originalPrice/100,
+								name:item.name,
+								pic:JSON.parse(item.icon)[0].url,
+								id:item.id
+							})
+						})
+					}
+				}).catch(err=>{
+					console.log(err);
+				})
+			},
+			getBannerList(){
+				this.$api.communityProductList({
+					size:999,
+					page:1,
+					banner:true,
+				}).then(res=>{
+					if(res.status=="OK"){
+						res.list.map(item=>{
+							this.bannerList.push({
+								url:JSON.parse(item.bannerPic)[0].url,
+								name:item.name,
+								id:item.id
+							})
+						})
+					}
+				}).catch(err=>{
+					console.log(err);
+				})
+			}
+		},
+		
+	}
+</script>
+
+<style lang="scss" scoped>
+	.health-top-content{
+		background-color: #FFFFFF;
+	}
+	.health-middle-content{
+		.h-title{
+			color: #16202E;
+			font-size: 38rpx;
+			font-weight:500;
+			// margin: 20rpx 0;
+            height: 158upx;
+            line-height: 158upx;
+			text-align: center;
+			// width:22px;
+			// height:10px;
+			// background:linear-gradient(90deg,rgba(3,190,144,0) 0%,rgba(3,190,144,1) 100%);
+		}
+		
+	}
+    
+	.h-wrap{
+		padding: 10rpx 32rpx;
+		justify-content: space-between;
+		flex-wrap: wrap;
+	}
+    swiper{
+        height:313upx;
+    }
+	.swiper-box {
+	    flex: 1;
+		padding: 0 31rpx;
+	}
+	.swiper-item {
+       
+	    display: flex;
+	    flex-direction: row;
+		height: 100%;
+		border-radius: 20rpx;
+		overflow: hidden;
+	}
+	.image {
+		width: 100%;
+        height: 313upx;
+        border-radius:31upx;
+	}
+	.scroll-h {
+	    display: flex;
+	    width: 100%;
+	    height: 133upx;
+        
+	    flex-direction: row;
+	    background-color: transparent;
+	    /* #ifndef APP-PLUS */
+	    white-space: nowrap;
+	    /* #endif */
+	}
+	.uni-tab-item {
+		/* #ifndef APP-PLUS */
+		display: inline-block;
+		/* #endif */
+		display: inline-block;
+	    flex-wrap: nowrap;
+	    padding-left: 34rpx;
+	    padding-right: 34rpx;
+        height: 100%;
+        line-height:133upx;
+	}
+	.uni-tab-item-title {
+	    color: #434E5E;
+	    font-size: 30rpx;
+	    height: 80rpx;
+	    line-height: 80rpx;
+	    flex-wrap: nowrap;
+	    /* #ifndef APP-PLUS */
+	    white-space: nowrap;
+	    /* #endif */
+	}
+	.gwcClass{
+        position: fixed;
+        bottom: 490upx;
+        width: 192upx;
+        height: 213upx;
+        right: 0;
+        z-index: 95;
+    }
+    .gwcNum{
+        position: fixed;
+        right: 33upx;
+        bottom: 620upx;
+        z-index: 99;
+        width: 38upx;
+        height: 38upx;
+        border-radius: 19upx;
+        background: #F7CF41;
+        font-size:21upx;
+        color: #FFFFFF;
+        line-height: 38upx;
+        text-align: center;
+    }
+</style>

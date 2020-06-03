@@ -1,0 +1,70 @@
+<template>
+	<view class="cont">
+		<view class="items" v-for="(item, index) in reportList" :key="index" v-if="reportList.length > 0">
+			<view class="liner">
+				<view class="disinline">
+					服务站名称
+				</view>
+				<view class="disinline fr" v-if="type == 'zhuzhan'">
+					驻站医生：陈燕冰
+				</view>
+			</view>
+			
+			<view class="liner">
+				<view class="disinline color_gray">
+					<image src="../../static/image/icon_sy_sj@2x.png" class="disinline" style="width:36rpx; height:36rpx; vertical-align: middle; margin:0rpx 20rpx 8rpx 0" mode=""></image>
+					{{ '2020-02-02  12:43' }}
+				</view>
+				<view class="disinline fr color_gray">
+					{{ '方案已实施' }}
+				</view>
+			</view>
+			
+			<view class="titles">
+				{{ '健康调理报告' }}
+			</view>
+		</view>
+		<view v-else>
+			<image src="../../static/image/img_zwbzjl@2x.png" class="disinline" style="width:232rpx; height:232rpx;"></image>
+		</view>
+	</view>
+</template>
+
+<script>
+	export default{
+		data() {
+			return {
+				type: 'zhuzhan',  // zhuzhan驻站医生，zhineng 智能医生
+				reportList: [{
+					title: 'xxx'
+				},{
+					title: 'xxx'
+				}]
+			}
+		},
+		onLoad(option) {
+			this.type = option.type
+		},
+		methods: {
+			
+		}
+	}
+</script>
+
+<style scoped lang="scss">
+	.cont{ background:#EFF1F6; height:100vh; overflow:auto; box-sizing:border-box; 
+		.items{
+			padding:30rpx 30rpx 40rpx 30rpx;
+			margin:30rpx 32rpx 0 32rpx;
+			background:#fff;
+			box-shadow:0px 4rpx 20rpx 0px rgba(85,112,105,0.1);
+			border-radius:10px;
+			font-size:28rpx; line-height:40rpx;
+			.liner{ overflow:hidden; margin:0rpx 0 16rpx 0; }
+			.titles{ font-size:32rpx; line-height:40rpx; color:#16202E; }
+		}
+	}
+	.fr{ float:right; }
+	.disinline{ display:inline-block; vertical-align: top; }
+	.color_gray{ color:#A2A9BA }
+</style>

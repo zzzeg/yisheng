@@ -1,0 +1,522 @@
+<template>
+	<view>
+		<view class="segmented-control">
+			<uni-segmented-control :current="current" :values="items" style-type="text" active-color="#03BE90" @clickItem="onClickItem" />
+		</view>
+		<view class="content">
+			<view v-if="current === 0">
+               
+				<view class="u-f u-column record-item" v-for="(item, index) in reportList" :key="index" v-if="reportList.length > 0" @click="clickReport(index)">
+					<view class="u-f-jsb doctor">
+						<text>{{item.communityName}}</text>
+						<text v-if="item.type == 'advisory_report'">驻站医生：{{item.expertName}}</text>
+					</view>
+					<view class="u-f-ac time">
+						<image src="/static/image/icon_dd_sj@2x.png" mode="aspectFit"></image>
+						<text>{{ item.createTime }}</text>
+					</view>
+					<view class="name">
+						{{ item.type == 'face_check' ? '皮肤检测报告' : item.type == 'TONGUE' ? '体质辨识报告' : item.type == 'TONGUE_QUES' ? '体质和脏腑报告' : item.type == 'QUES' ? '脏腑辨证报告' : item.type == 'znwz' ? '智能问诊报告' : '健康调理报告'}}
+					</view>
+					<view class="u-f-jsb status">
+						<view :class="{'color_g' : !item.orderId}"> {{ item.orderId ? '方案已实施' : '方案未实施'}} </view>
+						<view v-if="!item.orderId" class="u-f-ac" @tap="goNow"> 立即实施 </view>
+					</view>
+				</view>
+			</view>
+			<view v-if="current === 1">
+				<!-- 商品列表 -->
+				<view  v-for="(record, index) in orderlist" :key="index" v-if="orderlist.length > 0" class="goods-section shape">
+					<view class="header">
+						{{record.communityName}}
+					</view>
+					<view class="u-f-jsb delivery-status">
+						<text>{{record.createTime}}</text>
+						<text>
+                            {{record.status=='GRIND_WAIT' ? '待处理' : record.status=='GRIND_DONIG' ? '处理中' : record.status=='GRIND_SUCCES' ? '处理完成' : record.status=='DELIVERY' ? '已发货' : record.status=='RECEIVED' ? '已收件' :
+                            record.status=='GRIND_NOTPAY' ? '未支付' : 
+                            record.status=='GRIND_WAIT' ? '待支付' : record.status=='GRIND_SUCCESS' ? '待处理' : record.status=='CANCLE' ? '已取消' : ''}}
+                        </text>
+					</view>
+					<block v-for="(it, index) in record.items" :key="it.id">
+						<view class="cart-item">
+							<view class="image-wrapper">
+								<image :src="it.icon" mode="aspectFill"></image>
+							</view>
+							<view class="item-right">
+								<text class="title">{{it.name}}</text>
+								<!-- <text class="attr">{{it.attr_val}}</text> -->
+								<view class="u-f item-right-bottom">
+									<text class="price">¥{{it.price/100}}</text>
+									<text class="price">x{{it.num}}</text>
+								</view>
+							</view>
+						</view>
+					</block>
+					<view class="yt-list">
+						<view class="yt-list-cell b-b">
+							<text class="cell-tit">收货人：{{record.name}}    共<text class="base">{{record.num}}</text> 件 订单总额：</text>
+							<text class="cell-tip">￥{{record.price/100}}</text>
+						</view>
+						<view class="yt-list-cell b-b">
+							<view class="btn primary" @click="clickOrder(index)" > 订单详情 </view>
+							<view class="btn filled" v-if="record.constitutionId" @click="clickReportDetail(record.constitutionId,2)"> 查看报告 </view>
+                            <view class="btn filled" v-if="record.expertReportId" @click="clickReportDetail(record.expertReportId,1)"> 查看报告 </view>
+                            <view class="btn filled" v-if="record.faceRecordId" @click="clickReportDetail(record.faceRecordId,3)"> 查看报告 </view>
+                            <view class="btn filled" v-if="record.znwzId" @click="clickReportDetail(record.znwzId,4)"> 查看报告 </view>
+						</view>
+					</view>
+				</view>
+			</view>
+		</view>
+        <view v-if="ismore">
+        	<uni-load-more :status="status"  :content-text="contentText" color="#007aff"  />
+        </view>
+	</view>
+</template>
+
+<script>
+    import util from '../../common/util.js'
+	import uniLoadMore from "../../components/uni-load-more/uni-load-more.vue"
+	export default{
+	    components: {uniLoadMore},
+		data() {
+			return {
+                ismore:false,
+                contentText: {
+                    contentdown: '查看更多',
+                    contentrefresh: '加载中',
+                    contentnomore: '没有更多',
+                },
+                
+                communityId:null,
+				items: ['报告记录', '消费记录'],
+				current: 0,
+                reportList:null,
+                orderlist:null,
+                
+                reportPage:1,
+                reportSize:10,
+                orderPage:1,
+                orderSize:10
+			};
+		},
+		onLoad(options) {
+			this.communityId = this.$store.getters.communityId
+			this.getReportList()
+			this.getOrderList()
+		},
+		onPullDownRefresh() {
+		    
+		    
+            if(this.current == 0){
+                this.reportPage = 1
+                this.getReportList()
+            }else{
+                this.orderPage = 1
+                this.getOrderList()
+            }
+		},
+		onReachBottom() {
+		    console.log('onReachBottom')
+		    this.status = 'loading'
+		    uni.showNavigationBarLoading()
+		    
+            if(this.current == 0){
+                this.reportPage++
+                this.getReportList()
+            }else{
+                this.orderPage++
+                this.getOrderList()
+            }
+		    
+		},
+		methods: {
+			onClickItem(e) {
+				if (this.current !== e.currentIndex) {
+					this.current = e.currentIndex
+				}
+			},
+            clickOrder:function(index){
+                var order = this.orderlist[index]
+                uni.navigateTo({
+                    url:"../order-detail/order-detail?orderid="+ order.id + '&type='+order.type
+                })
+            },
+            clickReportDetail:function(id,type){
+                console.log(type)
+                if(type == 2){
+                    this.$api.constitutionRecordInstanceFindById({
+                        data:{
+                            'id':id,
+                            // 'id':'446941302549631907'
+                        }
+                    }).then(res=>{
+                        console.log(res)
+                        if(res.status == 'OK'){
+                            
+                            var constitutionType = res.data.constitutionType
+							this.$store.state.communityId = res.data.communityId;
+                            if(constitutionType == 'QUES'){
+                                uni.navigateTo({
+                                    url:"../index/physicalReport?reportId="+id +"&reportType=0&communityId="+res.data.communityId
+                                })
+                            }
+                            if(constitutionType == 'TONGUE' || constitutionType == 'TONGUE_QUES'){
+                                uni.navigateTo({
+                                    url:"../index/physicalReport2?reportId="+id +"&reportType=1&communityId="+res.data.communityId
+                                })
+                            }
+                            if(constitutionType == 'face_check'){
+                                uni.navigateTo({
+                                    url:'../index/skinPos?sid='+id+"&communityId="+res.data.communityId
+                                })
+                            }
+                            if(constitutionType == 'advisory_report'){
+                                uni.navigateTo({
+                                    url:'../index/doctorReport?rid='+id+"&communityId="+res.data.communityId
+                                })
+                            }
+							
+                        }
+                    })
+                }
+                if(type == 1){
+                    uni.navigateTo({
+                        url:'../index/doctorReport?rid='+id
+                    })
+                }
+                if(type == 3){
+                    uni.navigateTo({
+                        url:'../index/skinPos?sid='+id
+                    })
+                }
+				if(type == 4){
+					uni.navigateTo({
+						url:'/pages/consultation-report/consultation-report?rid='+id+"&communityId="+res.data.communityId
+					})
+				}
+            },
+            clickReport:function(index){
+                var type = this.reportList[index].type
+                console.log(this.reportList[index])
+				this.$store.state.communityId = this.reportList[index].communityId;
+                if(type == 'QUES' ){
+                    uni.navigateTo({
+                        url:"../index/physicalReport?reportId="+this.reportList[index].id +"&reportType=0&communityId="+this.reportList[index].communityId
+                    })
+                }
+                if(type == 'TONGUE' || type == 'TONGUE_QUES'){
+                    uni.navigateTo({
+                        url:"../index/physicalReport2?reportId="+this.reportList[index].id +"&reportType=1&communityId="+this.reportList[index].communityId
+                    })
+                }
+                if(type == 'face_check'){
+                    uni.navigateTo({
+                        url:'../index/skinPos?sid='+this.reportList[index].id+"&communityId="+this.reportList[index].communityId
+                    })
+                }
+                if(type == 'advisory_report'){
+                    uni.navigateTo({
+                        url:'../index/doctorReport?rid='+this.reportList[index].id+"&communityId="+this.reportList[index].communityId
+                    })
+                }
+				if(type == 'znwz'){
+				    uni.navigateTo({
+				        url:'/pages/consultation-report/consultation-report?rid='+this.reportList[index].id+"&communityId="+this.reportList[index].communityId
+				    })
+				}
+            },
+			goNow() {
+
+			},
+			//监听image加载失败
+			onImageError(key, index) {
+				this[key][index].image = '/static/healthy-mall/errorImage.jpg';
+			},
+			//监听image加载完成
+			onImageLoad(key, index) {
+				this.$set(this[key][index], 'loaded', 'loaded');
+			},
+			getReportList(){
+				this.$api.reportPage({
+					size:this.reportSize,	
+					page:this.reportPage,	
+					communityId:this.communityId,
+					bought: 0
+				}).then(res=>{
+					console.log(res);
+                    if(res.status == 'OK'){
+                        
+                        if(this.reportPage == 1){
+                            this.reportList = []
+                            if(res.list.length>=this.size){
+                                console.log('ismoreismoreismore')
+                                this.ismore = true
+                            }
+                        }
+                        // this.reportList = res.list
+                        res.list.forEach(item => {
+                            item.createTime = util.formatTimestamp(item.createTime, 'yyyy-MM-dd hh:mm')
+                            
+                            this.reportList.push(item);
+                        })
+                    }
+                    uni.stopPullDownRefresh();
+                    uni.hideNavigationBarLoading()
+				}).catch(err=>{
+					console.log(err);
+				})
+			},
+			getOrderList(){
+                
+				this.$api.constitutionOrderPage({
+					size:this.orderSize,
+					page:this.orderPage,
+				}).then(res=>{
+					console.log(res);
+                    if(res.status == 'OK'){
+                        if(this.orderPage == 1){
+                            this.orderlist = []
+                            if(res.list.length>=this.size){
+                                console.log('ismoreismoreismore')
+                                this.ismore = true
+                            }
+                        }
+                        res.list.forEach(item => {
+                            item.createTime = util.formatTimestamp(item.orderTime, 'yyyy-MM-dd hh:mm')
+                            item.num = 0
+                            if(item.items){
+                                item.items.forEach(it => {
+                                    item.num = item.num +it.num
+                                    
+                                    if(it.icon && JSON.parse(it.icon).length > 0){
+                                        it.icon = JSON.parse(it.icon)[0].url
+                                    }
+                                })
+                            }
+                            this.orderlist.push(item);
+                        })
+                        uni.stopPullDownRefresh();
+                        uni.hideNavigationBarLoading()
+                    }
+				}).catch(err=>{
+					console.log(err);
+				})
+			}
+		},
+		filters: {
+			toFixed: function(value) {
+				return value.toFixed(2);
+			}
+		},
+	}
+</script>
+
+<style scoped lang="scss">
+	.segmented-control {
+		background-color: #FFFFFF;
+        position:fixed;
+        width: 100%;
+        height: 90upx;
+        top: 0;
+        z-index: 99;
+	}
+    .content{
+        margin-top: 110upx;
+    }
+	.record-item {
+		font-size: 28rpx;
+		margin: 30rpx;
+		padding: 30rpx;
+		border-radius: 10px;
+		background-color: #FFFFFF;
+
+		.name {
+			color: #16202E;
+			font-size: 32rpx;
+		}
+
+		.doctor {
+			color: #434E5E;
+
+		}
+
+		.time {
+			color: #A2A9BA;
+			margin-top: 20rpx;
+			margin-bottom: 12rpx;
+
+			image {
+				width: 36rpx;
+				height: 36rpx;
+			}
+		}
+
+		.status {
+			margin-top: 20rpx;
+			color: #03BE90;
+
+			view:nth-child(2) {
+				font-size: 24rpx;
+				color: #FFFFFF;
+				padding: 0 20rpx;
+				background: linear-gradient(315deg, rgba(136, 226, 150, 1) 0%, rgba(3, 190, 144, 1) 100%);
+				border-radius: 14px;
+			}
+
+		}
+	}
+
+
+	.goods-section {
+		background: #fff;
+		padding-bottom: 1px;
+		margin: 0 30rpx;
+		margin-top: 30rpx;
+		padding: 30rpx;
+		background-color: #FFFFFF;
+		border-radius: 10px;
+		.header{
+			font-size: 28rpx;
+			color: #434E5E;
+		}
+		.delivery-status{
+			font-size: 26rpx;
+			margin: 20rpx 0;
+			text:nth-child(1){
+				color:#A2A9BA ;
+			}
+			text:nth-child(2){
+				color:#03BE90 ;
+			}
+		}
+		.cart-item {
+			display: flex;
+			align-items: center;
+			position: relative;
+			border-bottom: 1px solid #EFF1F6;
+			overflow: hidden;
+			padding: 30rpx 0;
+			.image-wrapper {
+				width: 156rpx;
+				height: 156rpx;
+				flex-shrink: 0;
+				position: relative;
+
+				image {
+					border-radius: 8upx;
+					width: 100%;
+					height: 100%;
+					transition: .6s;
+					opacity: 1;
+
+				}
+			}
+
+			.item-right {
+				display: flex;
+				flex-direction: column;
+				flex: 1;
+				overflow: hidden;
+				position: relative;
+				padding-left: 30rpx;
+
+				.title {
+					font-size: 30rpx;
+					color: #2A3441;
+					height: 40rpx;
+					line-height: 40rpx;
+					text-overflow: ellipsis;
+					overflow: hidden;
+					white-space: nowrap;
+				}
+
+				.price {
+					font-size: 30rpx;
+					color: #16202E;
+					line-height: 40rpx;
+				}
+
+				.attr {
+					font-size: 26rpx;
+					color: #A2A9BA;
+					height: 50rpx;
+					line-height: 50rpx;
+				}
+
+				.price {
+					height: 50rpx;
+					line-height: 50rpx;
+				}
+
+				.item-right-bottom {
+					justify-content: space-between;
+					align-items: center;
+				}
+			}
+		}
+	}
+
+	.yt-list {
+		background: #fff;
+	}
+
+	.yt-list-cell {
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+		padding: 10rpx 0rpx 10rpx 40rpx;
+		line-height: 70rpx;
+		position: relative;
+
+		&.cell-hover {
+			background: #fafafa;
+		}
+
+		&.b-b:after {
+			left: 30rpx;
+		}
+		.cell-tit {
+			font-size: 26rpx;
+			color: #2A3441;
+			margin-right: 10rpx;
+
+			.base {
+				color: #03BE90;
+			}
+		}
+
+		.cell-tip {
+			font-size: 28rpx;
+			color: #2A3441;
+
+			&.base {
+				color: #03BE90;
+			}
+
+			&.smalltip {
+				color: #A2A9BA;
+				font-size: 20rpx;
+			}
+		}
+		.btn{
+			padding:0rpx 20rpx;
+			border-radius: 15px;
+			font-size: 26rpx;
+			font-family:Helvetica;
+			&.primary{
+				border:1px solid rgba(3,190,144,1);
+				color: #03BE90;
+				margin-right: 20rpx;
+			}
+			&.filled{
+				color: #FFFFFF;
+				background:linear-gradient(315deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+			}
+		}
+	}
+    .color_g{
+        color: #03BE90;
+    }
+</style>

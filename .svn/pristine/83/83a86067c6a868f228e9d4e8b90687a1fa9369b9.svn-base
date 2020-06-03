@@ -1,0 +1,517 @@
+<script>
+    
+    let msgStorage = require("comps/chat/msgstorage");
+    let msgType = require("comps/chat/msgtype");
+    let disp = require("utils/broadcast");
+    
+    const emedia = wx.emedia = require("./common/emedia/emedia_for_miniProgram") 
+    
+    import api from 'common/api.js';
+    
+	export default {
+        data(){
+            return {
+                pageUrl:'/pages/index/index',
+            }
+        },
+		onLaunch: function(options) {
+			console.log('App Launch')
+            console.log(options.path)
+            
+            var action = true
+            if(options.path){
+                if(options.path.search('index/login') != -1){
+                    action = false
+                }
+            }
+            
+            if(action){
+                var _self = this
+                this.pageUrl = options.path
+                uni.checkSession({
+                    success() {
+                        // session_key 未过期，并且在本生命周期一直有效
+                        console.log("未过期");
+                        _self.wxlogin()
+                            
+                    },
+                    fail() {
+                        console.log("过期");
+                        _self.wxlogin()
+                    }
+                })
+            }
+            
+            this.$im.conn.listen({
+            	onOpened: (message)=>{
+            		// this.$im.conn.setPresence();
+            		console.log('登录成功登录成功');
+            		// message.accessToken && uni.setStorageSync("myToken", message.accessToken);
+            		// if (is_reconnect) {
+            		// 	uni.hideToast();
+            		// 	this.$helper.toast('success', '登陆成功', 2000)
+            		// 	is_reconnect = false;
+            		// }
+            		// if(this.getCurrentRoute() == "pages/login/login" || getCurrentRoute() == "pages/login_token/login_token"){
+            		// 	this.onLoginSuccess();
+            		// }
+            		
+            	},
+            	onReconnect: ()=>{
+            		// this.$helper.toast('loading', '重连中...', 2000)
+            	},
+            	onSocketConnected: ()=>{
+            		// this.$helper.toast('success', '登陆成功', 2000)
+            	},
+            	onClosed: ()=>{
+            		// this.$helper.toast('none', '网络已断开', 2000)
+            		uni.redirectTo({
+            			url: "../login/login"
+            		});
+            		this.$conn.closed = true;
+            		this.$im.conn.close();
+            	},
+            	onInviteMessage: (message)=>{
+            		this.$options.globalData.saveGroupInvitedList.push(message);
+            		disp.fire("em.xmpp.invite.joingroup", message);
+            
+            	},
+            	onPresence: (message)=>{
+            		console.log("onPresence", message);
+            		switch(message.type){
+            		case "unsubscribe":
+            			// pages[0].moveFriend(message);
+            			break;
+            		// 好友邀请列表
+            		case "subscribe":
+            			if(message.status === "[resp:true]"){
+            				return;
+            			}
+            			else{
+            				// pages[0].handleFriendMsg(message);
+            				for (let i = 0; i < this.$options.globalData.saveFriendList.length; i ++) {
+            			      	if(this.$options.globalData.saveFriendList[i].from === message.from){
+            			      		this.$options.globalData.saveFriendList[i] = message
+            			      		disp.fire("em.xmpp.subscribe");
+            						return;
+            			 		}
+            			    }
+            				this.$options.globalData.saveFriendList.push(message);
+            				console.log(JSON.stringify(this.$options.globalData.saveFriendList));
+            				disp.fire("em.xmpp.subscribe");
+            			}
+            			break;
+            		case "subscribed":
+            			uni.showToast({
+            				title: "添加成功",
+            				duration: 1000
+            			});
+            			disp.fire("em.xmpp.subscribed");
+            			break;
+            		case "unsubscribed":
+            			uni.showToast({
+            				title: "已拒绝",
+            				duration: 1000
+            			});
+            			break;
+            		case "memberJoinPublicGroupSuccess":
+            			this.$helper.toast('none', '已进群', 1000)
+            			break;
+            
+            		case "unavailable":
+            			disp.fire("em.xmpp.contacts.remove");
+            			disp.fire("em.xmpp.group.leaveGroup", message);
+            			break;
+            
+            		case 'deleteGroupChat':
+            			disp.fire("em.xmpp.invite.deleteGroup", message);
+            			break;
+            
+            		case "leaveGroup": 
+            			disp.fire("em.xmpp.group.leaveGroup", message);
+            			break;
+            
+            		case "removedFromGroup": 
+            			disp.fire("em.xmpp.group.leaveGroup", message);
+            			break;
+            
+            
+            		default:
+            			break;
+            		}
+            	},
+            
+            	onRoster: (message)=>{
+            		// let pages = getCurrentPages();
+            		// if(pages[0]){
+            		// 	pages[0].onShow();
+            		// }
+            	},
+            
+            	onVideoMessage: (message)=>{
+            		console.log("onVideoMessage: ", message);
+            		if(message){
+            			msgStorage.saveReceiveMsg(message, msgType.VIDEO);
+            		}
+            		// this.calcUnReadSpot(message);
+            		// this.ack(message);
+            	},
+            
+            	onAudioMessage: (message)=>{
+            		console.log("onAudioMessage", message);
+            		if(message){
+            			if(this.onMessageError(message)){
+            				msgStorage.saveReceiveMsg(message, msgType.AUDIO);
+            			}
+            			// this.calcUnReadSpot(message);
+            			// this.ack(message);
+            		}
+            	},
+            	
+            	onCmdMessage: (message)=>{
+            		console.log("onCmdMessage", message);
+            		if(message){
+            			if(this.onMessageError(message)){
+            				msgStorage.saveReceiveMsg(message, msgType.CMD);
+            			}
+            			// this.calcUnReadSpot(message);
+            			// this.ack(message);
+            		}
+            	},
+            
+            	onTextMessage: (message)=>{
+            		console.log("onTextMessage", message);
+            		if(message){
+            			if(this.onMessageError(message)){
+            				msgStorage.saveReceiveMsg(message, msgType.TEXT);
+            			}
+            			// this.calcUnReadSpot(message);
+            			// this.ack(message);
+            		}
+            	},
+            
+            	onEmojiMessage: (message)=>{
+            		console.log("onEmojiMessage", message);
+            		if(message){
+            			if(this.onMessageError(message)){
+            				msgStorage.saveReceiveMsg(message, msgType.EMOJI);
+            			}
+            			// this.calcUnReadSpot(message);
+            			// this.ack(message);
+            		}
+            	},
+            
+            	onPictureMessage: (message)=>{
+            		console.log("onPictureMessage", message);
+            		if(message){
+            			if(this.onMessageError(message)){
+            				msgStorage.saveReceiveMsg(message, msgType.IMAGE);
+            			}
+            			// this.calcUnReadSpot(message);
+            			// this.ack(message);
+            		}
+            	},
+            
+            	onFileMessage: (message)=>{
+            		console.log('onFileMessage', message);
+            		if (message) {
+            			if(this.onMessageError(message)){
+            				msgStorage.saveReceiveMsg(message, msgType.FILE);
+            			}
+            			// this.calcUnReadSpot(message);
+            			// this.ack(message);
+            		}
+            	},
+            
+            	// 各种异常
+            	onError: (error)=>{
+            		console.log(error)
+            		// 16: server-side close the websocket connection
+            		if(error.type == this.$im.statusCode.WEBIM_CONNCTION_DISCONNECTED && !logout){
+            			if(this.$im.conn.autoReconnectNumTotal < this.$im.conn.autoReconnectNumMax){
+            				return;
+            			}
+            			uni.showToast({
+            				title: "server-side close the websocket connection",
+            				duration: 1000
+            			});
+            			// uni.redirectTo({
+            			// 	url: "../login/login"
+            			// });
+            			logout = true
+            			return;
+            		}
+            		// 8: offline by multi login
+            		if(error.type == this.$im.statusCode.WEBIM_CONNCTION_SERVER_ERROR){
+            			uni.showToast({
+            				title: "offline by multi login",
+            				duration: 1000
+            			});
+            			// uni.redirectTo({
+            			// 	url: "../login/login"
+            			// });
+            		}
+            		if(error.type ==  this.$im.statusCode.WEBIM_CONNCTION_OPEN_ERROR){
+            			disp.fire("em.xmpp.error.passwordErr");
+            			
+            		}
+            		if (error.type == this.$im.statusCode.WEBIM_CONNCTION_AUTH_ERROR) {
+            			disp.fire("em.xmpp.error.tokenErr");
+            		}
+            		if (error.type == 'socket_error') {///sendMsgError
+            			console.log('socket_errorsocket_error', error)
+            			uni.showToast({
+            				title: "网络已断开",
+            				icon: 'none',
+            				duration: 2000
+            			});
+            			disp.fire("em.xmpp.error.sendMsgErr", error);
+            		}
+            	},
+            });
+            
+		},
+		onShow: function(options) {
+			console.log('App Show')
+            
+		},
+		onHide: function() {
+			console.log('App Hide')
+		},methods: {
+            wxlogin:function(){
+                var _self = this
+                uni.login({
+                    provider: 'weixin',
+                    success: function(loginRes) {
+                        console.log(loginRes)
+                        const obj = {
+                            code: loginRes.code
+                        }
+                        api.getUnionid({
+                            data: obj
+                        }).then(res => {
+                            console.log(res)
+                            console.log('sk:' + res.data.session_key)
+                            uni.setStorageSync('sk', res.data.session_key);
+                            uni.setStorageSync('openid', res.data.openid);
+                            uni.setStorageSync('unionid', res.data.unionid);
+                            _self.checkAuth()
+                        })
+                    }
+                });
+            },checkAuth: function() {
+                var _self = this
+                uni.getUserInfo({
+                    success(res) { //已经授权请求是否绑定信息
+                        console.log("getUserInfo:",res)
+                        _self.getAccount(res)
+                    },
+                    fail(res) { //没有授权直接跳转登录
+                        console.log("没有授权")
+                        uni.reLaunch({
+                            url:"/pages/index/auth"
+                        })
+                    }
+                })
+            },
+            getAccount: function(res) {
+                const sessionKey = uni.getStorageSync('sk');
+                // console.log("res.iv:")
+                // console.log(res.iv)
+                const data = {
+                    encryptedData: res.encryptedData,
+                    iv: res.iv,
+                    sessionKey: sessionKey
+                }
+                var _self = this
+                api.getAccountInfo({
+                    data: data
+                }).then(accountRes => {
+                    console.log("accountRes:")
+                    console.log(accountRes)
+                    if (!accountRes.data.bnUserInfo) {
+                        uni.removeStorageSync('sk');
+                        return;
+                    }
+                    
+                    if(accountRes.data.wxUserInfo && accountRes.data.wxUserInfo.unionid ){
+                        uni.setStorageSync('unionid', accountRes.data.wxUserInfo.unionid);
+                    }
+                    if(accountRes.data.bnUserInfo && accountRes.data.bnUserInfo.sessionId ){
+                        const sessionId = accountRes.data.bnUserInfo.sessionId
+                        uni.setStorageSync('sessionId', sessionId)
+                    }
+                    
+                    // uni.setStorageSync('sessionId', 'b477011c669c4770812174d335c8226a')
+                    // try{
+                    if (accountRes.data.bnUserInfo.phone == "" || accountRes.data.bnUserInfo.phone == null) { //未绑定
+                        this.state = 2
+                        uni.navigateTo({
+                            url:'login'
+                        })
+                    }else{
+                        // uni.setStorageSync('userinfo', accountRes.data.bnUserInfo);
+                        this.findUser(accountRes.data.bnUserInfo.id,accountRes.data.bnUserInfo.avatarPath)
+                    }
+                })
+            },
+            
+            findUser:function(id,avatarPath){
+                const userObj = {
+                    userId: id,
+                }
+                api.findUserById({
+                    data:userObj
+                }).then(userRes => {
+                    console.log(userRes)
+                    if(userRes.status == 'OK'){
+                        userRes.data.avatarPath = avatarPath
+                        uni.setStorageSync('userinfo', userRes.data)
+                        if( userRes.data && userRes.data.followCommunityId && userRes.data.followCommunityId.length > 3 ){
+                            this.emchatLogin(id)
+                            // this.findCommunity(userRes.data.followCommunityId)
+                            console.log(this.pageUrl)
+                            if(this.pageUrl.search('index/index') != -1){
+                                uni.reLaunch({
+                                    url:this.pageUrl+'?communityid='+userRes.data.followCommunityId
+                                })
+                                uni.reLaunch({
+                                    url:'../index/index?communityid='+userRes.data.followCommunityId
+                                })
+                                // uni.reLaunch({
+                                //     url:'../index/index?communityid='+userRes.data.followCommunityId
+                                // })
+                            }else{
+                                uni.reLaunch({
+                                    url:this.pageUrl
+                                })
+                            }
+                            
+                        }else{      //跳转加入服务站
+                            console.log("dfghjk")
+                            // uni.reLaunch({
+                            //     url:this.pageUrl
+                            // })
+                        }
+                    }
+                })
+            },
+            emchatLogin:function(userid){
+                
+                var pwd = userid.substring(1,userid.length-1)
+                this.$conn.open({
+                	apiUrl: this.$im.config.apiURL,
+                	user: '12233344445',
+                	pwd: '123456',
+                    // user: userid,
+                    // pwd: pwd,
+                	grant_type: "password",
+                	appKey: this.$im.config.appkey
+                });
+            },
+            
+            onLoginSuccess(){
+            	// uni.hideToast();
+                console.log("hideToast")
+            	uni.navigateTo({
+            	    url: "../chat/chat"
+            	})
+            },
+            
+            ack(receiveMsg){
+            	// 处理未读消息回执
+            	var bodyId = receiveMsg.id;         // 需要发送已读回执的消息id
+            	var ackMsg = new this.$im.message("read", this.$im.conn.getUniqueId());
+            	ackMsg.set({
+            		id: bodyId,
+            		to: receiveMsg.from
+            	});
+            	this.$im.conn.send(ackMsg.body);
+            },
+            
+            onMessageError(err){
+            	if(err.type === "error"){
+            		uni.showToast({
+            			title: err.errorText
+            		});
+            		return false;
+            	}
+            	return true;
+            },
+            
+            getCurrentRoute(){
+            	let pages = getCurrentPages();
+            	let currentPage = pages[pages.length - 1];
+            	return currentPage.route;
+            },
+            calcUnReadSpot(message){
+            	let myName = uni.getStorageSync("myUsername");
+            	let members = uni.getStorageSync("member") || []; //好友
+            	var listGroups = uni.getStorageSync('listGroup')|| []; //群组
+            	let allMembers = members.concat(listGroups)
+            	let count = allMembers.reduce(function(result, curMember, idx){
+            		let chatMsgs;
+            		if (curMember.roomId) {
+            			chatMsgs = uni.getStorageSync(curMember.roomId + myName.toLowerCase()) || [];
+            		}else{
+            			chatMsgs = uni.getStorageSync(curMember.name.toLowerCase() + myName.toLowerCase()) || [];
+            		}
+            		return result + chatMsgs.length;
+            	}, 0);
+            	// this.$options.globalData.unReadMessageNum = count;
+            	disp.fire("em.xmpp.unreadspot", message);
+            }
+        }
+	}
+</script>
+
+<style>
+    
+	/*每个页面公共css */
+    button::after{ border: none;} 
+    .line{
+        width:100%;
+        height:2upx;
+    }
+	page{
+		height: 100%;
+		background-color: #EFF1F6;
+		line-height:1.8;
+		font-family:PingFang-SC-Medium,PingFang-SC;
+	}
+	view{
+		line-height:1.8;
+	}
+	.f1{
+	    flex:1
+	}
+	.u-f{
+	    display: flex;
+	    flex-direction: row;
+	}
+	.u-f-ac{
+	    display: flex;
+	    flex-direction: row;
+	    align-items:center ;
+	}
+	.u-f-jsb{
+	    display: flex;
+	    justify-content: space-between;
+	}
+	.u-f-jsa{
+	    display: flex;
+	    justify-content: space-around;
+	}
+	.u-f-ajc{
+	    display: flex;
+	    flex-direction: row;
+	    align-items:center;
+	    justify-content: center;
+	}
+	.u-column{
+	    flex-direction: column;
+	}
+	.u-row{
+	    flex-direction: row;
+	}
+</style>

@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "收藏",
+  "navigationBarBackgroundColor": "#fff",
+  "backgroundColor": "#008A67",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "uni-segmented-control": "/components/uni-segmented-control/uni-segmented-control",
+    "h-share-list": "/components/common/h-share-list",
+    "uni-load-more": "/components/uni-load-more/uni-load-more"
+  }
+}

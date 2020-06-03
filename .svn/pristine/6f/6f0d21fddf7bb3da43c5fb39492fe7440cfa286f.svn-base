@@ -1,0 +1,1333 @@
+<template>
+	<view class="content">
+        
+        <view v-if="state == 3" class="">
+            <view class="topBox">
+                <view class="wode" @click="clickMingwo">
+                    我的明我 <image :src="userinfo.avatarPath" mode=""></image>
+                </view>
+                <view class="topTitle">
+                    {{!community.province ? '' : community.province}} | {{!community.city ? '' : community.city}}
+                </view>
+                <view class="topTitle">
+                    用户数：{{!community.joinCount ? '' : community.joinCount}}<text style="font-size: 34upx;" @click="changeStation">切换服务站 ></text>
+                </view>
+                <view class="topTitle">
+                    <view class="">评价：
+                        <image v-if="community" v-for="(star,index) in 5" :key="index" :src="community.score && $util.round(community.score) > index?'../../static/image/img_star_14yellow.png':'../../static/image/img_star_14gray.png' " mode="">
+                    </view>
+                    <view class="joinBtn" @click="clickMark"> 
+                        <image :src="[!community.mark ? '../../static/image/home_yishoucang.png' : '../../static/image/weijiaru.png']" mode=""></image> 
+                        <view class="text">
+                            {{community.mark ? '已收藏' : '收藏'}}
+                        </view> 
+                    </view>
+                    <view class="joinBtn" @click="clickJoin"><image :src="[!community.join ? '../../static/image/home_yishoujiaru.png' : '../../static/image/weijiaru.png']" mode=""></image> 
+                    <view class="text">{{community.join ? '已加入' : '加入'}}</view></view>
+                </view>
+            </view>
+            <view class="communityBox">
+                <image :src="community.icon" mode=""></image>
+                <view class="" style="color: #16202E;font-weight: 600; font-size: 34upx;">
+                    {{!community.name ? '' : community.name}}
+                </view>
+                <view style="font-weight:500;">
+                    服务站类型：<text style="color: #01AC82;">{{!community.tagPName ? '' : community.tagPName}}</text>
+                </view>
+                <view class="" style="font-size: 26upx; margin-top: 20upx;">
+                    {{!community.tags ? '' : community.tags.join(" / ")}}
+                </view>
+                <view class="">
+                    站主：{{!community.companyName ? '' : community.companyName}}
+                </view>
+            </view>
+            <view class="btnBox">
+                <view class="fwqbtn">服务区</view>
+                <view class="jkscbtn" @click="clickMall" ><image src="../../static/image/jiankangshangcheng.png" mode=""></image>健康商城</view>
+            </view>
+            <view class="titleBox">
+                <view class="left"></view>
+                <image style="margin-top: 10upx;" src="../../static/image/home_guanjia.png" mode=""></image>
+                <view class="title">
+                    <text style="color: #03BE90; font-size: 29upx;font-weight:500;line-height: 44rpx;">健康管家服务区</text>
+                    <text style="color: #BBC5D7; font-size: 19upx">Health Butler Service Area</text>
+                </view>
+            </view>
+            <view class="doctorBox">
+                <image :src="community.mangerAvatar" mode=""></image>
+                <view >
+                    <view style="color: #16202E;">{{!community.mangerName ? '' : community.mangerName}}</view>
+                    <view class="">
+                        <text @tap="gocommunityManagerImage()" style="overflow: hidden;text-overflow: ellipsis;word-break: break-all;display: -webkit-box;-webkit-box-orient: vertical;-webkit-line-clamp: 1;">健康职业证：{{community.credentials}} </text>   <br>
+                        管家活跃榜第{{community.rank && community.rank < 100 ? community.rank : '100+'}}名
+                    </view>
+                </view>
+            </view>
+            <view class="btnBox">
+                <view class="gkfxbtn" @click="clickGuanjiaFenxiang">管家分享</view>
+                <view class="gkfxbtn" @click="clickZixun">管家咨询</view>
+            </view>
+
+            <view class="btnBox" style="margin-bottom: 80upx;" >
+                <view v-if="community.share" class="shareContent" @click="clickShare(community.share.id,community.share.type)" >
+                    <view v-if="community.share.type==4" class="zhiboicon">
+                         <!-- v-if="community.share.type==4" -->
+                        <view style="background: #D0021B;width:16upx;height:16upx; border-radius: 8upx; margin-left: 18upx; margin-right: 8upx;"></view>
+                        <view class="">
+                            直播中
+                        </view>
+                    </view>
+                    <view class="pre" v-if="community.share.type === 1">
+                        <view class="pre-tip">直播预告</view>
+                        <image :src="community.share.avatar" mode="aspectFill" class="pre-avatar"></image>
+                        <view class="pre-person">{{community.share.name}}</view>
+                        <view class="pre-title">{{community.share.title}}</view>
+                        <view class="pre-time">{{community.share.time}}</view>
+                        <view class="pre-btn">了解详细</view>
+                    </view>
+                    <template v-else>
+                        <image class="cover" :src="community.share.pic" mode=""></image>
+                        <view class="authorTitle">
+                            {{community.share.title}}
+                        </view>
+                        <view class="authorBox" >
+                            <image class="authorHeader" :src="community.share.avatar" mode="aspectFill"></image>
+                            <text style="margin-left: 10upx; flex: 1;">{{community.share.name}}</text>
+                            <image v-if="community.share.visitNum" src="../../static/image/home_yanjing.png" mode=""></image>
+                            <text v-if="community.share.visitNum" >{{community.share.visitNum}}</text>
+                        </view>
+                    </template>
+                </view>
+                <view v-else class="shareContent" style="text-align: center; ">
+                    <image style="width: 85upx; height: 104upx; margin-top: 188upx;" src="../../static/image/doc@2x.png" mode=""></image>
+                    <view style="color: #414449;font-size:29upx;line-height: 1.2;">
+                        精彩内容
+                    </view>
+                    <view style="color: #414449;font-size:29upx;line-height: 1.2;">
+                        敬请期待
+                    </view>
+                    <view style="color: #414449;font-size:29upx;">
+                        ······
+                    </view>
+                </view>
+                <view class="shareBtnBox">
+                    <view @click="clickMwozhibo" class="shareBtn">
+                        <image style="width: 48upx; height: 48upx;margin-bottom: 7upx;" src="../../static/image/home_zhibo.png" mode=""></image>
+                        <view class="">
+                            明我直播
+                        </view>
+                    </view>
+                    <view class="shareBtn" @click="clickMingyishuo" style="margin-top: 42upx;">
+                        <image style="width: 52upx; height: 54upx;margin-bottom: 7upx;" src="../../static/image/home_mingyishuo.png" mode=""></image>
+                        <view class="">
+                            明医说
+                        </view>
+                    </view>
+                    <view v-if="community.market" @click="gjziying" class="shareBtn cusstore" >
+                        <view class="cusstore-bg"></view>
+                        <image style="width: 56upx; height: 60upx;margin-bottom: 7upx;position: relative;z-index: 2;" src="../../static/image/home_shangcheng.png" mode=""></image>
+                        <view class="" style="position: relative;z-index: 2;">
+                            管家推荐
+                        </view>
+                    </view>
+                </view>
+              
+            </view>
+            <view v-if="community.expert.name" class="titleBox">
+                <view class="left"></view>
+                <image style="width: 48upx; height: 58upx;" src="../../static/image/home_yisheng_icon.png" mode=""></image>
+                <view class="title">
+                    <text style="color: #03BE90; font-size: 29upx;font-weight:500;line-height: 46rpx;">驻站医生服务区</text>
+                    <text style="color: #BBC5D7; font-size: 19upx">Station Doctor Service Area</text>
+                </view>
+            </view>
+            <image v-if="community.expert.name" style="width: 598upx; height: 352upx; margin-left: 77upx;" src="../../static/image/home_yisheng.png" mode=""></image>
+            <view v-if="community.expert.name" class="doctorBox">
+                <image :src="community.expert.pics" mode=""></image>
+                <view >
+                    <view style="color: #16202E; display: flex; flex-direction: row; margin-bottom: 10upx;">
+                        <view class="" style="line-height: 62upx;font-size: 35upx;">
+                            {{!community.expert.name ? '' : community.expert.name}}
+                        </view>
+                        <view class="jkscbtn" style="width: 150upx;font-size: 25upx;" @click="clickDoctor">
+                            医生简介
+                        </view>
+                    </view>
+                    <view class="" style="font-size: 29upx;">
+                        {{!community.expert.title ? '' : community.expert.title}} | {{!community.expert.rank ? '' : community.expert.rank}} 
+                    </view>
+                </view>
+            </view>
+            <view v-if="community.expert.name" class="btnBox">
+                <view class="gkfxbtn" @click="imageInterrogation" >图文问诊</view>
+                <view class="gkfxbtn" @click="videoInterrogation" >视频问诊</view>
+                <view class="jkscbtn" @click="clickReport('advisory_report','查看报告')" style="margin: 0upx;">查看报告</view>
+            </view>
+            <view v-if="community.expert.name" style="padding: 33upx; font-size:33upx;">
+                <view style="line-height: 25rpx">
+                    擅长
+                </view>
+                <view class="" style="font-size:29upx; color: #868E9D;margin-top: 20upx;line-height: 1.5;">
+                    {{!community.expert.speciality ? '': community.expert.speciality}}
+                </view>
+            </view>
+            <view class="titleBox">
+                <view class="left"></view>
+                <image style="width: 48upx; height: 58upx;" src="../../static/image/home_zhineng.png" mode=""></image>
+                <view class="title">
+                    <text style="color: #03BE90; font-size: 29upx;font-weight:500;line-height: 44rpx">智能服务区</text>
+                    <text style="color: #BBC5D7; font-size: 19upx">Intelligence Service Area</text>
+                </view>
+            </view>
+            <view class="doctorBox" style="margin:0upx">
+                <image class="al_pifu" src="../../static/image/home_alpifu.png" mode=""></image>
+                <view style="flex: 1;">
+                    <view class="" style="font-size: 35upx;color: #16202E;line-height: 34upx;">
+                        AI检测皮肤
+                    </view>
+                    <view class="" style="font-size: 27upx;margin: 16upx 111upx 16upx 0;line-height: 1.5;">
+                        科学检测，全方位掌控皮肤状态，及时改善皮肤。
+                    </view>
+                    <view style="color: #16202E; display: flex; flex-direction: row;">
+                        <view class="gkfxbtn" style="margin-right: 0upx;" @click="clickAL(0)" >AI测肤</view>
+                        <view class="jkscbtn" style="width: 200upx;font-size: 25upx;" @click="clickReport('face_check','查看报告')">
+                            查看报告
+                        </view>
+                    </view>
+                    
+                </view>
+            </view>
+            <view class="alal" >
+                <view class="alBox">
+                    <view style="line-height: 1;">
+                        体质智能辨识
+                    </view>
+                    <image src="../../static/image/home_shexiang.png" mode=""></image>
+                    <view class="gkfxbtn albtn" @click="clickAL(1)" >体质辨识</view>
+                    <view class="jkscbtn albtn" style=" margin-top: 24upx;" @click="clickReport('TONGUE','查看报告')">
+                        查看报告
+                    </view>
+                </view>
+                <view class="alBox">
+                    <view style="line-height: 1;">
+                        脏腑智能辨证
+                    </view>
+                    <image src="../../static/image/home_feifu.png" mode=""></image>
+                    <view class="gkfxbtn albtn" @click="clickAL(2)" >脏腑辨证</view>
+                    <view class="jkscbtn albtn" style=" margin-top: 24upx;" @click="clickReport('QUES','查看报告')">
+                        查看报告
+                    </view>
+                </view>
+                <view class="alBox">
+                    <view style="line-height: 1;">
+                        智能全科医生
+                    </view>
+                    <image src="../../static/image/home_alyisheng.png" mode=""></image>
+                    <view class="gkfxbtn albtn" @click="clickAL(3)" >智能问诊</view>
+					<view class="jkscbtn albtn" style=" margin-top: 24upx;"  @click="clickReport('znwz','查看报告')">
+                                        查看报告
+					</view>
+                </view>
+            </view>
+            <view class="evaluationBox">
+                <view style="font-weight:450;font-size:32upx; color: #868E9D;">
+                     服务站评价
+                </view>
+                <view class="evaluationStar">
+                    <image v-for="(star,index) in 5" :key="index" @click="clickStar(index)" :src="starNum>index?'../../static/image/img_star_28yellow.png':'../../static/image/img_star_28gray.png'" mode="">
+                </view>
+                <view style="color: #868E9D;font-size:26upx;">
+                    {{starInfo[starNum]}}
+                </view>
+                <view class="gkfxbtn " @click="clickAppraise" style="width: 270upx;margin-top: 40upx;margin-right: 0rpx;">提交</view>
+            </view>
+        </view>
+		<view v-if="mask" class="cpt-mask"></view>
+        <view v-if="mask" class="calendarBox">
+            <view style="padding: 63upx 108upx 42upx 108upx; text-align: center;">您还没有加入哦，<br>请加入服务站后再操作！</view>
+            <view class="btnBox">
+                <view class="gkfxbtn" style="margin-left: 40rpx;" @click="maskCancel">取消</view>
+                <view class="gkfxbtn" @click="clickJoin" >立即加入</view>
+            </view>
+        </view>
+        
+    </view>
+</template>
+
+
+<script>
+
+    import api from '../../common/api.js';
+	import util from '../../common/util.js';
+    
+	export default {
+		data() {
+			return {
+				state:0,     //0未知      1、未授权           2、未绑定       3、已登录
+                community:{tags:[]},
+                starNum:0,
+                mask:false,
+                
+                searchCommunityid:null,
+                userinfo:null,
+				starInfo:['您的好评是对我们服务最大的支持！','很不满意','不满意','一般','比较满意','非常满意']
+			}
+		},
+        onShow() {
+
+            this.userinfo = uni.getStorageSync('userinfo')
+            console.log('index userinfo:',this.userinfo)
+			
+            if(this.searchCommunityid){
+                this.findCommunity(this.searchCommunityid)
+            }else if(this.userinfo && this.userinfo.followCommunityId){
+                var _self = this
+                uni.checkSession({
+                    success() {
+                        // session_key 未过期，并且在本生命周期一直有效
+                        console.log("未过期");
+                        // getApp().wxlogin()
+                        // _self.findCommunity(_self.userinfo.followCommunityId)
+                    },
+                    fail() {
+                        console.log("过期");
+                        getApp().wxlogin()
+                    }
+                })                
+
+            }else if(this.userinfo && !this.userinfo.followCommunityId){
+			  uni.navigateTo({
+				  url: '/pages/serverStation/main'
+			  })
+            }else{
+                uni.reLaunch({
+                    url:"/pages/index/auth"
+                })
+            }
+			
+        },
+		onLoad(options) {
+            var _self = this
+            
+            this.searchCommunityid = options.communityid
+            uni.setNavigationBarColor({
+                frontColor: '#ffffff',
+                backgroundColor: '#F6F9FF',
+               
+            })
+            
+		},
+		methods: {
+			gocommunityManagerImage: function(){
+				uni.navigateTo({
+				    url:`/pages/butler-selection/imageList?communityId=${this.community.id}`
+				})
+			},
+            clickZixun:function(){
+				if(!this.isShowjoin()){
+				    return
+				}
+                uni.navigateTo({
+                    url:"chatRoom?chatType=1&to=" + this.community.id+"&communityId="
+                    + this.community.id +"&title=" + this.community.mangerName +"&topic=" + this.community.mangerAvatar
+                })
+            },
+            clickGuanjiaFenxiang:function(){
+                if(!this.isShowjoin()){
+                    return
+                }
+                uni.navigateTo({
+                    url:'../housekeeper-sharing/housekeeper-sharing?communityId='+this.community.id
+                })
+            },
+            clickMingyishuo:function(){
+                if(!this.isShowjoin()){
+                    return
+                }
+                uni.navigateTo({
+                    url:'../liveborad/famousDoctor?communityId=' + this.community.id
+                })
+                
+            },
+            clickMwozhibo:function(){
+                if(!this.isShowjoin()){
+                    return
+                }
+                uni.navigateTo({
+                    url:'../liveborad/liveList'
+                })
+            },
+            gjziying:function(){
+                if(!this.isShowjoin()){
+                    return
+                }
+                uni.navigateTo({
+                    url:'../health-mall-customer/health-mall-customer'
+                })
+            },
+            clickMall:function(){
+                if(!this.isShowjoin()){
+                    return
+                }
+                uni.navigateTo({
+                    url:'../health-mall-community/health-mall-community'
+                })
+            },
+            changeStation:function(){
+                // if(!this.isShowjoin()){
+                //     return
+                // }
+                uni.navigateTo({
+                    url:'../serverStation/stationList'
+                })
+            },
+            clickMingwo:function(){
+                // if(!this.isShowjoin()){
+                //     return
+                // }
+                uni.navigateTo({
+                    url:'../mine/index?communityId='+this.community.id
+                })
+            },
+            clickDoctor:function(){
+                if(!this.isShowjoin()){
+                    return
+                }
+                uni.navigateTo({
+                    url:"doctorInfo?doctorid="+this.community.expert.id
+                })
+            },
+            maskCancel:function(){
+                this.mask = false
+            },
+            clickJoin:function(){
+                if(this.community.join){
+                    var _self = this
+                    uni.showModal({
+                        // title: '提示',
+                        content: '是否取消服务站',
+                        success: function (res) {
+                            if (res.confirm) {
+                                console.log('发发发发发')
+                                api.canceljoincommunity({
+                                    communityId: _self.community.id
+                                }).then(res=>{
+                                    console.log(res)
+                                    if(res.status == 'OK'){
+                                        _self.community.join = !_self.community.join
+                                    }
+                                })
+                            }
+                        }
+                    });
+                    
+                }else{
+                    api.joincommunity({
+                        communityId: this.community.id
+                    }).then(res=>{
+                        console.log(res)
+                        if(res.status == 'OK'){
+                            this.community.join = !this.community.join
+							this.mask = false;
+                        }
+                    })
+                }    
+                
+            },
+            clickMark:function(){
+                if(this.community.mark){
+                    var _self = this
+                    uni.showModal({
+                        // title: '提示',
+                        content: '是否取消收藏',
+                        success: function (res) {
+                            if (res.confirm) {
+                                console.log('用户点击确定');
+                                api.cancelCommunityMark({
+                                    data:{
+                                        communityId:_self.community.id
+                                    }
+                                }).then(res=>{
+                                    console.log(res)
+                                    if(res.status == 'OK'){
+                                        _self.community.mark = !_self.community.mark
+                                    }
+                                })
+                            } 
+                        }
+                    });
+                }else{
+                    api.markCommunity({
+                        data:{
+                            communityId:this.community.id
+                        }
+                    }).then(res=>{
+                        console.log(res)
+                        if(res.status == 'OK'){
+                            this.community.mark = !this.community.mark
+                        }
+                    })
+                }
+            },
+            isShowjoin:function(){
+                if(!this.community.join){
+                    this.mask = true
+                    return false
+                }
+                return true
+                
+                
+                
+            },
+            imageInterrogation:function(){
+                if(!this.isShowjoin()){
+                    return
+                }
+                var data = {
+                    expertId:this.community.expert.id,
+                    type:'IMAGE',
+                    communityId:this.community.id
+                }
+                
+                api.addAdvisoryRecord({
+                    data:data
+                }).then(res=>{
+                    if(res.status == 'OK'){
+                        uni.navigateTo({
+                            url:"chatRoom?recordId=" + res.data.id +"&to=" + this.community.expert.id+"&communityId="
+                            + this.community.id +"&title=" + this.community.expert.name+"&topic=" + this.community.expert.pics
+                        })
+                    }
+                })
+            },
+            videoInterrogation:function(){
+                if(!this.isShowjoin()){
+                    return
+                }
+                var data = {
+                    expertId:this.community.expert.id,
+                    type:'VIDEO',
+                    communityId:this.community.id
+                }
+                api.addAdvisoryRecord({
+                    data:data
+                }).then(res=>{
+                    console.log(res)
+                    if(res.status == 'OK'){
+                        uni.navigateTo({
+                            url:"connectVideoInterrogation?recordId=" + res.data.id +"&to=" + this.community.expert.id
+                        })
+                    }
+                })
+                
+            },
+            clickAppraise:function(){
+                if(!this.isShowjoin()){
+                    return
+                }
+                if(this.starNum == 0){
+                    uni.showToast({
+                        title: "请先选择评分",
+                        icon: 'none',
+                        duration: 2000
+                    })
+                    return
+                }
+                var data = {
+                    "communityId": this.community.id,
+                    "score": this.starNum
+                }
+                
+                api.addCommunityAppraise({
+                    data:data
+                }).then(res=>{
+                    console.log(res)
+                    uni.showToast({
+                        title: "评分提交成功",
+                        icon: 'none',
+                        duration: 2000
+                    })
+                    this.starNum = 0
+                })
+            },
+            clickStar:function(index){
+                if(!this.isShowjoin()){
+                    return
+                }
+				this.starNum = index+1;
+            },
+            findCommunity:function(id){
+
+				this.$store.state.communityId = id;
+                const data = {
+                    id:id
+                }
+                api.findCommunityById({
+                    data:data
+                }).then(res => {
+                    if(res.status == 'OK'){
+                        this.community = res.data
+                        this.community.icon = JSON.parse(this.community.icon)[0].url
+                        this.community.mangerAvatar = JSON.parse(this.community.mangerAvatar)[0].url
+                        if(this.community.expert.pics && JSON.parse(this.community.expert.pics).length > 0){
+                            this.community.expert.pics = JSON.parse(this.community.expert.pics)[0].url
+                        }
+                        var share 
+                        var pic
+                        var avatar
+                        if(this.community.live){
+                            if(this.community.live.verticalCover && JSON.parse(this.community.live.verticalCover ).length > 0){
+                                pic = JSON.parse(this.community.live.verticalCover)[0].url
+                            }
+                            if(this.community.live.avatar && JSON.parse(this.community.live.avatar ).length > 0){
+                                avatar = JSON.parse(this.community.live.avatar)[0].url
+                            }
+                            var type = 1
+                            var liveId = this.community.live.id
+                            if(this.community.live.status == 2){
+                                type = 4
+                                liveId = this.community.live.roomNumber
+                            }
+                            share = {
+                                pic:pic,
+                                title:this.community.live.title,
+                                name:this.community.live.name,
+                                avatar:avatar,
+                                id:liveId,
+                                type:type,
+                                visitNum:null
+                            }
+							if (share.type === 1) {
+								share.time = util.formatTimestamp(this.community.live.startTime, 'yyyy年MM月dd日 hh:mm')
+							}
+                        }else if(this.community.material){
+                            if(this.community.material.pics && JSON.parse(this.community.material.pics ).length > 0){
+                                pic = JSON.parse(this.community.material.pics)[0].url
+                            }
+                            var type = 2
+                            if(this.community.material.type == 'IMAGE'){
+                                type = 3
+                            }
+                            share = {
+                                pic:pic,
+                                title:this.community.material.title,
+                                name:this.community.mangerName,
+                                avatar:this.community.mangerAvatar,
+                                id:this.community.material.id,
+                                type:type,
+                                visitNum:this.community.material.visitNum
+                            }
+                        }
+                        if(this.community.credentialsDtos.length){
+                            var credentials = ''
+
+                            this.community.credentialsDtos.forEach((item,index)=>{
+								if(item.name){
+									credentials += item.name + " ";
+								}
+                            });
+							this.community.credentials = credentials.trim();
+                            
+                        }else{
+							this.community.credentials = '--'
+						}
+                        if(this.community.score){
+                            this.community.score = Math.round(this.community.score)
+                        }
+                        this.community.share = share
+                        uni.setNavigationBarColor({
+                            frontColor: '#ffffff',
+                            backgroundColor: '#008A67',
+                           
+                        })
+                        this.state = 3
+                    }
+                })
+            },
+            clickAL:function(tag){
+                if(!this.isShowjoin()){
+                    return
+                }
+                if(tag == 0){
+                    uni.navigateTo({
+                        url:'alskin/welcome?communityId='+this.community.id
+                    })
+                }else if(tag == 1){
+                    uni.navigateTo({
+                        url:'aldiscriminate/index'
+                    })
+                }else if(tag == 2){
+                    uni.navigateTo({
+                        url:'aldiscriminate/basicInfo?type=2'
+                    })
+                }else{
+                    uni.navigateTo({
+                        url:'mwwebview?communityId='+this.community.id
+                    })
+                }
+                
+            },
+            clickReport:function(type,title){
+				if(!this.isShowjoin()){
+				    return
+				}
+                uni.navigateTo({
+                    url:'../mine/reportList?type='+type +'&communityId='+this.community.id + '&title='+title
+                })
+            },
+            clickShare:function(id,type){
+                console.log(id,type)
+                if(!this.isShowjoin()){
+                    return
+                }
+                if(type == 1){
+                    uni.navigateTo({        //直播
+                        url:'../liveborad/noticeInfo?id='+id
+                    })
+                }else if(type == 2){    //  分享视频
+                    uni.navigateTo({
+                        url:'../housekeeper-sharing-video/housekeeper-sharing-video?id='+id
+                    })
+                }else if(type == 4){
+                    let roomId = id // 填写具体的房间号，可通过下面【获取直播房间列表】 API 获取
+                    uni.navigateTo({
+                    	url: `plugin-private://wx2b03c6e691cd7370/pages/live-player-plugin?room_id=${roomId}`
+                    })
+                }else{   //  分享图文
+                    uni.navigateTo({
+                        url:'../housekeeper-sharing-img/housekeeper-sharing-img?id='+id
+                    })
+                }
+            }
+		}
+	}
+</script>
+
+
+
+<style lang="scss" scoped>
+    page{
+        background: #F6F9FF;
+    }
+	.content {
+		display: flex;
+		flex-direction: column;
+		/* align-items: center; */
+		/* justify-content: center; */
+        font-size:29upx;
+	}
+   
+    .calendarBox{
+        background: #FFFFFF;
+        opacity: 1;
+        position:fixed;
+        top: 25%;
+        left: 94upx;
+        height: 313upx;
+        width: calc(100% - 188upx);
+        z-index: 100;  
+        border-radius: 30upx;
+        color: #6D7480;
+        font-size: 30upx;
+	}
+    .zhiboicon{
+        position: absolute;
+        top: 21upx;
+        right: 21upx;
+        width:125upx;
+        height:54upx;
+        background:rgba(0,0,0,0.3);
+        box-shadow:0px 6upx 31upx 0px rgba(65,68,73,0.2);
+        border-radius:10upx;
+        display: flex;
+        flex-direction: row;
+        color: #FFFFFF;
+        font-size:25upx;
+        align-items: center;
+    }
+    .cpt-mask {
+        position: fixed;  
+        top: 0;  
+        left: 0;  
+        width: 100%; 
+        height: 100%;  
+        background-color: #000000;  
+        opacity: 0.5;
+        z-index: 99;  
+    }  
+    .calendarBox{
+        background: #FFFFFF;
+        opacity: 1;
+        position:fixed;
+        top: 25%;
+        left: 94upx;
+        height: 313upx;
+        width: calc(100% - 188upx);
+        z-index: 100;  
+        border-radius: 30upx;
+        color: #6D7480;
+        font-size: 30upx;
+    }
+    .login-btn {
+        margin-left: 125upx;
+        margin-right: 125upx;
+        margin-top: 83upx;
+        height: 104upx;
+        line-height: 104upx;
+        border-radius: 52upx;
+        width: calc(100% - 250upx);
+        color: #FFFFFF;
+        font-size: 31upx;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+        box-shadow:0px 6upx 31upx 0px rgba(3,190,144,0.3);
+    }
+    .evaluationBox{
+        display: flex;
+        flex-direction: column;
+        align-items: center; 
+        justify-content: center;
+        margin:110upx 33upx;
+        width:683upx;
+        height:410upx;
+        background:rgba(255,255,255,1);
+        box-shadow:0px 6upx 31upx 0px rgba(65,68,73,0.2),0px 10px 208px 42px rgba(65,68,73,0);
+        border-radius:42upx;
+        color: #414449;
+    }
+    .evaluationStar{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        /* margin: 10upx 0upx; */
+        width: 65%;
+    }
+    .evaluationStar image{
+        width: 92upx;
+        height: 92upx;
+    }
+    .alBox{
+        width: 33.33%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size:29upx;
+        color:rgba(22,32,46,1);
+    }
+    .alal{
+        display: flex;
+        flex-direction: row;
+    }
+    .authorBox{
+        
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin:25upx 28upx;
+        font-size:25upx;
+        color: #868E9D;
+    }
+    
+    .shareContent{
+        flex: 1; 
+        background: #FFFFFF;
+        height: 667upx;
+        border-radius:17upx;
+        position: relative;
+    }
+	.pre{
+		text-align: center;
+		.pre-tip{
+			margin-top: 48rpx;
+			color: #01AC82;
+			font-size: 28rpx;
+		}
+		.pre-avatar{
+			height: 50rpx;
+			width: 50rpx;
+			margin-top: 20rpx;
+			border-radius: 50%;
+		}
+		.pre-person{
+			font-size: 24rpx;
+			color: #868E9D;
+			margin-top: 10rpx;
+		}
+		.pre-title{
+			color: #16202E;
+			font-size: 28rpx;
+			margin-top: 18rpx;
+			padding: 0 40rpx;
+		}
+		.pre-time{
+			color: #868E9D;
+			font-size: 28rpx;
+			marign-top: 42px;
+		}
+		.pre-btn{
+			width: 260rpx;
+			height: 64rpx;
+			color: white;
+			font-size: 28rpx;
+			line-height: 64rpx;
+			border-radius: 32rpx;
+			margin: 56rpx auto 0;
+			background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+			box-shadow:0px 6px 30px 0px rgba(65,68,73,0.2),0px 6px 30px 0px rgba(3,190,144,0.3);
+		}
+	}
+    .shareContent .cover{
+        width: 100%;
+        height:452upx;
+        border-radius: 17upx;
+    }
+    .shareBtnBox{
+        margin-left: 46upx;
+        width: 200upx;
+        height: 667upx;
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+    }
+    
+    .authorTitle{
+        margin:10upx 28upx 0upx;
+        font-size:28upx;
+        margin-left: 10upx; 
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        word-break: break-all;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+    .shareBtn{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: #868E9D;
+        font-size:29upx;
+        width: 100%;
+        height: 146upx;
+        background:rgba(255,255,255,1);
+        box-shadow:0px 6upx 31upx 0px rgba(65,68,73,0.2);
+        border-radius:17upx;
+    }
+    .gkfxbtn{
+        width:197upx;
+        height:67upx;
+        background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+        box-shadow:0px 6upx 31upx 0px rgba(3,190,144,0.3);
+        border-radius:33upx;
+        line-height: 67upx;
+        text-align: center;
+        color: #FFFFFF;
+        margin-right: 46upx;
+    }
+    .doctorBox{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin:0upx 33upx 33upx 33upx;
+        font-size:23upx;
+        font-weight:400;
+        color: #868E9D;
+    }
+    .doctorBox image{
+        width: 133upx;
+        height: 133upx;
+        background: #F8F8F8;
+        border-radius: 50%;
+        margin-right: 20upx;
+    }
+    .titleBox{
+        margin:30upx 33upx;
+        width:438upx;
+        height:108upx;
+        background:rgba(255,255,255,1);
+        box-shadow:0px 0px 15upx 0px rgba(198,198,198,0.5);
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+    .titleBox image{
+        width: 64upx;
+        height: 46upx;
+        margin-left: 20upx;
+    }
+    .titleBox .title{
+        display: flex;
+        flex-direction: column;
+        margin-left: 10upx;
+    }
+    .titleBox .left{
+        width:15upx;
+        height:100%;
+        background:linear-gradient(360deg,rgba(140,227,154,1) 0%,rgba(14,193,149,1) 100%);
+        box-shadow:0px 0px 15px 0px rgba(198,198,198,0.5);
+    }
+    .btnBox{
+        display: flex;
+        align-items: flex-start;
+        margin: 23upx 33upx;
+        width: calc(100% - 66upx);
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+    .fwqbtn{
+        width:188upx;
+        height:75upx;
+        background:rgba(3,190,144,1);
+        box-shadow:0px 0px 17upx 6upx rgba(0,0,0,0.07);
+        border-radius:15upx;
+        line-height: 75upx;
+        text-align: center;
+        color: #FFFFFF;
+    }
+    .jkscbtn{
+        width: 222upx;
+        margin-left: 30upx;
+        height: 62upx;
+        background: #FFFFFF;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        box-shadow:0px 0px 17upx 6upx rgba(0,0,0,0.07);
+        border-radius:38upx;
+        color: #03BE90;
+        font-size:30upx;
+    }
+    .jkscbtn image{
+        width: 29upx;
+        height: 35upx;
+        margin-right: 8upx;
+    }
+    .login-btn {
+        margin-left: 125upx;
+        margin-right: 125upx;
+        margin-top: 83upx;
+        height: 104upx;
+        line-height: 104upx;
+        border-radius: 52upx;
+        width: calc(100% - 250upx);
+        color: #FFFFFF;
+        font-size: 31upx;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+        box-shadow:0px 6upx 31upx 0px rgba(3,190,144,0.3);
+    }
+    .evaluationBox{
+        display: flex;
+        flex-direction: column;
+        align-items: center; 
+        justify-content: center;
+        margin:110upx 33upx;
+        width:683upx;
+        height:410upx;
+        background:rgba(255,255,255,1);
+        box-shadow:0px 6upx 31upx 0px rgba(65,68,73,0.2),0px 10px 208px 42px rgba(65,68,73,0);
+        border-radius:42upx;
+        color: #868E9D;
+        font-size: 32upx;
+    }
+    .evaluationStar{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        /* margin: 10upx 0upx; */
+        width: 65%;
+    }
+    .evaluationStar image{
+        width: 92upx;
+        height: 92upx;
+    }
+    .alBox{
+        width: 33.33%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size:29upx;
+        color:rgba(22,32,46,1);
+    }
+    .alal{
+        display: flex;
+        flex-direction: row;
+        margin-top: 30upx;
+    }
+    .authorBox{
+        
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin:15upx 28upx;
+        font-size:25upx;
+        color: #868E9D;
+    }
+    
+    .shareContent{
+        flex: 1; 
+        background: #FFFFFF;
+        height: 667upx;
+        border-radius:17upx;
+    }
+    .shareContent .cover{
+        width: 100%;
+        height:452upx;
+        border-radius: 17upx 17upx 0 0;
+    }
+    .shareBtnBox{
+        margin-left: 46upx;
+        width: 200upx;
+        height: 667upx;
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+    }
+    .shareBtn{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: #868E9D;
+        font-size:29upx;
+        width: 100%;
+        height: 146upx;
+        background:rgba(255,255,255,1);
+        box-shadow:0px 6upx 31upx 0px rgba(65,68,73,0.2);
+        border-radius:17upx;
+    }
+    .gkfxbtn{
+        width:197upx;
+        height:67upx;
+        background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+        box-shadow:0px 6upx 31upx 0px rgba(3,190,144,0.3);
+        border-radius:33upx;
+        line-height: 67upx;
+        text-align: center;
+        color: #FFFFFF;
+        margin-right: 46upx;
+    }
+    .doctorBox{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin:0upx 33upx 33upx 33upx;
+        font-size:23upx;
+        font-weight:400;
+        color: #868E9D;
+    }
+    .doctorBox image{
+        width: 133upx;
+        height: 133upx;
+        background: #F8F8F8;
+        border-radius: 50%;
+        margin-right: 20upx;
+    }
+    .titleBox{
+        margin:30upx 33upx;
+        width:438upx;
+        height:108upx;
+        background:rgba(255,255,255,1);
+        box-shadow:0px 0px 15upx 0px rgba(198,198,198,0.5);
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        border-radius: 8upx;
+    }
+    .titleBox image{
+        width: 64upx;
+        height: 46upx;
+        margin-left: 20upx;
+    }
+    .titleBox .title{
+        display: flex;
+        flex-direction: column;
+        margin-left: 10upx;
+    }
+    .titleBox .left{
+        width:15upx;
+        height:100%;
+        background:linear-gradient(360deg,rgba(140,227,154,1) 0%,rgba(14,193,149,1) 100%);
+        box-shadow:0px 0px 15px 0px rgba(198,198,198,0.5);
+    }
+    .btnBox{
+        display: flex;
+        align-items: flex-start;
+        margin: 23upx 33upx;
+        width: calc(100% - 66upx);
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+    .fwqbtn{
+        width:188upx;
+        height:75upx;
+        background:rgba(3,190,144,1);
+        box-shadow:0px 0px 17upx 6upx rgba(0,0,0,0.07);
+        border-radius:15upx;
+        line-height: 75upx;
+        text-align: center;
+        color: #FFFFFF;
+        font-weight: bold;
+    }
+    .jkscbtn{
+        width: 222upx;
+        margin-left: 30upx;
+        height: 62upx;
+        background: #FFFFFF;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        box-shadow:0px 0px 17upx 6upx rgba(0,0,0,0.07);
+        border-radius:38upx;
+        color: #03BE90;
+        font-size:30upx;
+    }
+    .jkscbtn image{
+        width: 29upx;
+        height: 35upx;
+        margin-right: 8upx;
+    }
+    .topBox{
+        width: 100%;
+        height:563upx;
+        padding-top: 24upx ;
+        background: #008A67;
+        color: #FFFFFF;
+        font-size:30upx;
+    }
+    .topTitle{
+        margin:0upx 64upx 20upx 64upx;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        line-height: 30upx;
+    }
+    .topTitle image{
+        width: 28upx;
+        height: 26upx;
+        background: transparent;
+        margin-top: 4upx;
+        margin-left: 8upx;
+    }
+    .joinBtn{
+        width: 122upx;
+        height: 64upx;
+        text-align: right;
+        
+        border-radius:30upx;
+        /* opacity:0.5; */
+        background: #008A67;
+        position: relative;
+        
+    }
+    .joinBtn .text{
+        position: absolute;
+        padding-right: 28upx;
+        border-radius: 32upx;
+        color: #FFFFFF;
+        line-height: 64upx;
+        width: 100%;
+        height: 100%;
+    }
+    .communityBox{
+        background: url(../../static/image/communitybg.png) no-repeat;
+        background-size:100% 100%;
+        margin-top: -310upx;
+        margin-left: 64upx;
+        width: calc(100% - 128upx);
+        height: 400upx;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size:23upx;
+        font-weight:400;
+        color: #868E9D;
+        text-align: center;
+    }
+    .communityBox image{
+        width: 104upx;
+        height: 104upx;
+        background: #F8F8F8;
+        margin-top: 20upx;
+        margin-bottom: 14upx;
+        border-radius: 10upx;
+    }
+    .authorBox image{
+       width: 98upx;
+       height: 64upx;
+       margin-top: 10upx;
+    }
+    .authorBox .authorHeader{
+        width: 52upx;
+        height: 52upx;
+        background: #F8F8F8;
+        border-radius: 50%;
+        margin-top: 0upx;
+    }
+    .doctorBox .al_pifu{
+        width: 280upx; 
+        height: 280upx;
+        border-radius: 0;
+        background: transparent;
+    }
+    .alBox image{
+        width: 100%;
+        height: 250upx;
+    
+    }
+    .albtn{
+        width: 177upx;
+        height: 70upx;
+        font-size: 25upx;
+        margin: 0upx;
+    }
+    .joinBtn image{
+        width: 150upx;
+        height: 64upx;
+        position: absolute;
+        left: 0;
+        top: 0;
+        margin-top: 0rpx;
+        margin-left: 0rpx;
+    }
+    .wode{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+        margin: 0upx 63upx;
+    }
+    .wode image{
+        width: 42upx;
+        height: 42upx;
+        margin-left: 8upx;
+        border-radius: 50%;
+    }
+	.cusstore{
+		position: relative;
+		height: 292upx;
+		margin-top: 42upx;
+		/* background-image: url(../../static/image/cusstore.png); */
+	}
+	.cusstore-bg{
+		position: absolute;
+		z-index: 1;
+		width: 100%;
+		height: 100%;
+		top: 0;
+		left: 0;
+		background-color: #FFFFFF;
+		opacity: 0.8;
+        border-radius: 17upx;
+	}
+</style>

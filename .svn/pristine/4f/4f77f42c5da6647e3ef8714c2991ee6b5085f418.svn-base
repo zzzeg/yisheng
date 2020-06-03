@@ -1,0 +1,230 @@
+<template>
+
+	<view class="cont" >
+		<!--名医说-->
+		
+		<view v-if="videoList.length>0" class="living">
+			<view class="box" v-for="(item, index) in videoList" :key="index">
+				<view class="disinline" style="font-weight: 500; line-height: 1.3;" @tap="goInfo(item.id)">
+					{{ item.title }}
+				</view>
+				<view class="videos">
+					<view style="position: relative;">
+                        <image @click="clickPlay(index)" style="position: absolute; top:calc(50% - 75upx); left: calc(50% - 75upx); width: 150upx; height: 150upx;" src="/static/healthy-mall/play.png" mode=""></image>
+                        <image v-if="!item.play" class="myVideo" :src="item.cover" @click="clickPlay(index)" mode="widthFix"></image>
+						<video v-if="item.play" class="myVideo" :id="'myVideo' + index" autoplay :data-index="index" @play="onPlay" :src="item.videoUrl" @click="getMyhvideo(item.id)" @error="videoErrorCallback" controls></video>
+					</view>
+					<!-- <view class="time">{{ item.videoDuration }}</view> -->
+				</view>
+				<view class="disinline color_gray" style="font-size:24rpx; vertical-align: middle;">
+					{{ '来源：' + item.website }}
+				</view>
+				<view class="disinline color_gray nums">
+					<image style="margin-right: 10upx;" src="../../static/image/eyes@2x.png" class="disinline"></image>
+					{{ item.viewNum }}
+				</view>
+				<view style="font-size:24rpx; float:right;margin-top: 6upx;">
+					<image src="../../static/image/zan@2x.png" class="disinline zanico" @tap="praiseAdd(item.id, index)" v-if="!item.praiseStatus"></image>
+					<image src="../../static/image/zangreen@2x.png" class="disinline zanico" @tap="praiseCancel(item.id, index)" v-if="item.praiseStatus"></image>
+					<image src="../../static/image/start@2x.png" class="disinline zanico" @tap="videoMarkAdd(item.id, index)" v-if="!item.markStatus"></image>
+					<image src="../../static/image/startgreen@2x.png" class="disinline zanico" @tap="videoMarkCancel(item.id, index)" v-if="item.markStatus"></image>
+					<button open-type="share" :data-item="item" class="disinline zanico"></button>
+				</view>
+			</view>
+		</view>
+        <view class="empty" v-else>
+        	<image class="empty-img" src="../../static/image/img_zwnr@3x.png"></image>
+        	<view class="empty-tips">暂无明医说内容~</view>
+        </view>
+	</view>
+</template>
+
+<script>
+	import api from '../../common/api.js';
+	import uniLoadMore from "../../components/uni-load-more/uni-load-more.vue"
+	export default{
+	    components: {uniLoadMore},
+		data() {
+			return {
+	            ismore:false,
+	            contentText: {
+	                contentdown: '查看更多',
+	                contentrefresh: '加载中',
+	                contentnomore: '没有更多',
+	            },
+	            page:1,
+	            size:10,
+                
+				communityId: '',        //424856479015406202
+				id: uni.getStorageSync('userinfo').id,
+				videoList: [],
+				curIdx: null
+			}
+		},
+		onLoad(option) {
+			this.communityId = option.communityId
+			this.getMyvideoList()
+		},
+        onPullDownRefresh() {
+            this.page = 1
+            this.getMyvideoList()
+            
+        },
+        onReachBottom() {
+            this.status = 'loading'
+            uni.showNavigationBarLoading()
+            
+            this.page++
+            this.getMyvideoList()
+        },
+		methods: {
+            clickPlay:function(index){
+                // this.videoList[index].play = true
+                console.log(index)
+                this.videoList.forEach((i, idx) => {
+                	if (index !== idx) {
+                        i.play = false
+                		var videoContextOther = wx.createVideoContext('myVideo' + idx)
+                		videoContextOther.pause()
+                	}else{
+                        i.play = true
+                        this.$nextTick(function(){
+                            var videoContextOther = wx.createVideoContext('myVideo' + idx)
+                            videoContextOther.play()
+                        })
+                        
+                    }
+                })
+            },
+			getMyvideoList() {
+				api.getMyvideoList({
+                    page:this.page,
+                    size:this.size,
+					communityId: this.communityId
+				}).then(res=>{
+                    if(res.status == 'OK'){
+                        if(this.page == 1){
+                            this.videoList = []
+                            if(res.list.length>=this.size){
+                                this.ismore = true
+                            }
+                        }
+                        res.list.map(item => {
+                            item.play = false
+                            this.videoList.push(item)
+                        })
+                    }
+					uni.stopPullDownRefresh();
+					uni.hideNavigationBarLoading()
+				})
+			},
+			praiseAdd(id, index) {
+				api.praiseAdd({
+					videoId: id
+				}).then(res=>{
+					// this.getMyhvideo()
+					this.videoList[index].praiseStatus = !this.videoList[index].praiseStatus
+				})
+			},
+			praiseCancel(id, index) {
+				api.praiseCancel({
+					videoId: id
+				}).then(res=>{
+					// this.getMyhvideo()
+					this.videoList[index].praiseStatus = !this.videoList[index].praiseStatus
+				})
+			},
+			videoMarkAdd(id, index) {
+				api.videoMarkAdd({
+					videoId: id
+				}).then(res=>{
+					// this.getMyhvideo()
+					this.videoList[index].markStatus = !this.videoList[index].markStatus
+				})
+			},
+			videoMarkCancel(id, index) {
+				api.videoMarkCancel({
+					videoId: id
+				}).then(res=>{
+					// this.getMyhvideo()
+					this.videoList[index].markStatus = !this.videoList[index].markStatus
+				})
+			},
+			videoErrorCallback: function(e) {
+                console.log(e.target.errMsg)
+				// uni.showModal({
+				// 	content: e.target.errMsg,
+				// 	showCancel: false
+				// })
+			},
+			goInfo(id) {
+				uni.navigateTo({
+					url: `/pages/liveborad/liveInfo?id=${id}`
+				})
+			},
+			onShareAppMessage (options) {
+				let item = options.target.dataset.item
+				return {
+					title: item.title,
+					path: `pages/liveborad/share?id=${item.id}&communityId=${this.communityId}`,
+					imageUrl: item.cover
+				}
+			},
+			getMyhvideo(id) {
+				api.getMyhVideo({
+					id: id
+				}).then(res=>{
+					this.formData = res.data
+				})
+			},
+			onPlay (e) {
+				let curIdx = e.target.dataset.index
+				this.videoList.forEach((i, idx) => {
+					if (curIdx !== idx) {
+                        i.play = false
+						var videoContextOther = wx.createVideoContext('myVideo' + idx)
+						videoContextOther.pause()
+					}else{
+                        i.play = true
+                    }
+				})
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.disinline{ display:inline-block; vertical-align: top; }
+	.cont{ overflow:auto; background:#EFF1F6; box-sizing:border-box; padding:20rpx 32rpx; }
+	.color_gre{ color:#03BE90 }
+	.color_gray{ color:#868E9D }
+	.living { 
+		overflow: hidden;
+		.box{ background:rgba(255,255,255,1);box-shadow:0px 4rpx 20rpx 0px rgba(85,112,105,0.1);border-radius:20rpx; padding:24rpx;margin:20rpx 0 32rpx 0;
+		overflow: hidden;
+			> .disinline{ font-size:28rpx; line-height:1.8; }
+			.videos{ position: relative; z-index:1;  background:#ddd; margin:20rpx 0;font-size:24rpx; min-height:360rpx;
+				.myVideo{ width:100%; }
+				.time{ position:absolute; color:#fff; bottom:22rpx; right:16rpx; background:rgba(0,0,0,0.3);border-radius:40rpx; padding: 10rpx 20rpx; }
+			 }
+			 .nums{ vertical-align: middle; margin-left:20rpx; 
+				image{ width:40rpx; height:26rpx; vertical-align: middle; margin-bottom:8rpx; }
+			 }
+			 button.zanico{ width:36rpx; height:36rpx; margin-left:26rpx; vertical-align: middle;padding: 0; background: url('../../static/image/share@2x.png') no-repeat center / 34rpx 34rpx;}
+			 .zanico{ width:36rpx; height:36rpx; margin-left:26rpx; vertical-align: middle; }
+		}
+	}
+    .empty{
+    	text-align: center;
+    	.empty-img{
+    		margin-top: 52rpx;
+    		width: 360rpx;
+    		height: 320rpx;
+    	}
+    	.empty-tips{
+    		color: #A2A9BA;
+    		font-size: 32rpx;
+    		line-height: 48rpx;
+    	}
+    }
+</style>

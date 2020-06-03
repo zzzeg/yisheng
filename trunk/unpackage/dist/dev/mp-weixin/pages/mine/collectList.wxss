@@ -1,0 +1,233 @@
+@charset "UTF-8";
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+view.data-v-46293ce4 {
+  line-height: 1.7;
+}
+.empty.data-v-46293ce4 {
+  text-align: center;
+}
+.empty .empty-img.data-v-46293ce4 {
+  margin-top: 52rpx;
+  width: 360rpx;
+  height: 320rpx;
+}
+.empty .empty-tips.data-v-46293ce4 {
+  color: #A2A9BA;
+  font-size: 32rpx;
+  line-height: 48rpx;
+}
+.guanjianame.data-v-46293ce4 {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.segmented-control.data-v-46293ce4 {
+  background-color: #FFFFFF;
+  position: fixed;
+  width: 100%;
+  height: 90rpx;
+  top: 0;
+  z-index: 99;
+}
+.content.data-v-46293ce4 {
+  margin-top: 110rpx;
+}
+.productBox.data-v-46293ce4 {
+  margin: 31rpx 33rpx 31rpx;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+          flex-direction: row;
+  background-color: #FFFFFF;
+  border-radius: 31rpx;
+}
+.productBox image.data-v-46293ce4 {
+  width: 167rpx;
+  height: 167rpx;
+  margin: 21rpx;
+  background: #F8F8F8;
+  border-radius: 15rpx;
+}
+.segmented-control.data-v-46293ce4 {
+  background-color: #FFFFFF;
+}
+.xiegang.data-v-46293ce4 {
+  display: inline-block;
+  vertical-align: middle;
+}
+.xiegang.data-v-46293ce4:after {
+  content: '/';
+  display: inline-block;
+}
+.xiegang.data-v-46293ce4:last-child:after {
+  content: '';
+}
+.disinline.data-v-46293ce4 {
+  display: inline-block;
+  vertical-align: top;
+}
+.serverlists.data-v-46293ce4 {
+  height: 218rpx;
+  padding: 30rpx 0rpx 30rpx 26rpx;
+  background: white;
+  -webkit-box-shadow: 0px 2px 10px 0px rgba(85, 112, 105, 0.1);
+          box-shadow: 0px 2px 10px 0px rgba(85, 112, 105, 0.1);
+  border-radius: 10px;
+  margin: 0 30rpx 40rpx 30rpx;
+}
+.h-wrap.data-v-46293ce4 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+          flex-direction: row;
+  -webkit-flex-wrap: wrap;
+          flex-wrap: wrap;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+          justify-content: space-between;
+}
+.title.data-v-46293ce4 {
+  font-size: 28rpx;
+  font-weight: 500;
+}
+.color_gre.data-v-46293ce4 {
+  color: #03BE90;
+}
+.living.data-v-46293ce4 {
+  overflow: hidden;
+}
+.living .box.data-v-46293ce4 {
+  background: white;
+  -webkit-box-shadow: 0px 4rpx 20rpx 0px rgba(85, 112, 105, 0.1);
+          box-shadow: 0px 4rpx 20rpx 0px rgba(85, 112, 105, 0.1);
+  border-radius: 20rpx;
+  padding: 24rpx;
+  margin: 20rpx 0 32rpx 0;
+  overflow: hidden;
+}
+.living .box > .disinline.data-v-46293ce4 {
+  font-size: 28rpx;
+  line-height: 1.8;
+}
+.living .box .videos.data-v-46293ce4 {
+  position: relative;
+  z-index: 1;
+  background: #ddd;
+  margin: 20rpx 0;
+  font-size: 24rpx;
+  min-height: 360rpx;
+}
+.living .box .videos .myVideo.data-v-46293ce4 {
+  width: 100%;
+}
+.living .box .videos .time.data-v-46293ce4 {
+  position: absolute;
+  color: #fff;
+  bottom: 22rpx;
+  right: 16rpx;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 40rpx;
+  padding: 10rpx 20rpx;
+}
+.living .box .nums.data-v-46293ce4 {
+  vertical-align: middle;
+  margin-left: 20rpx;
+}
+.living .box .nums image.data-v-46293ce4 {
+  width: 40rpx;
+  height: 26rpx;
+  vertical-align: middle;
+  margin-bottom: 8rpx;
+}
+.living .box button.zanico.data-v-46293ce4 {
+  width: 36rpx;
+  height: 36rpx;
+  margin-left: 26rpx;
+  vertical-align: middle;
+  padding: 0;
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAAAaVBMVEVMaXE5P19BTVtCTV5CTV1DTl9DTF9CTltCTV1FTWZCTV1CTV5CTl4/S15CTl5DTV05T19CTV5CTl1CTF9CTV5CTV9ETl5BTl1CTV5CTl1CTV5CTV5DTV1CTl1ETV5DTl1GUF9DTl1DTl4C2CKKAAAAInRSTlMABR6y0m41KvoDg+fhFaV0DMjYR/xRJ3tlq/Scu0KKiDOTKH6nDAAAANpJREFUeNqt08mOgzAQRdHCE2VsZjKRpIf3/x/ZTpARhcKu78YlHcurMpG3hpHr6V3RG0Upr7Ep+gUDhjqdFly5MtfR0s+MPs0GFX3oyXgUxHB76J729xaAhoBSSN32jKWwQ3V/SXjcLwOmUaKdAdOe03QFWtpi0SQa36NjNCTwBnwXy7UI0wm8ANf8xhAVbfHM+KI1TwI1Bk+yFdWEEx1hi+ClqHpFjUZaPccVI6zEElhxxukYJ4zHqIM6xtQ/olgTkQOLBRNVMHk197mKYcVSy7TP32EfG+vpD8n1HO4i0clcAAAAAElFTkSuQmCC) no-repeat center/34rpx 34rpx;
+}
+.living .box .zanico.data-v-46293ce4 {
+  width: 36rpx;
+  height: 36rpx;
+  margin-left: 26rpx;
+  vertical-align: middle;
+}
+.btnBox.data-v-46293ce4 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-align: start;
+  -webkit-align-items: flex-start;
+          align-items: flex-start;
+  margin: 23rpx 33rpx;
+  width: calc(100% - 66rpx);
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+          flex-direction: row;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+          align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+          justify-content: center;
+  margin-top: 130rpx;
+}
+.gkfxbtn.data-v-46293ce4 {
+  width: 197rpx;
+  height: 67rpx;
+  background: -webkit-linear-gradient(217deg, #88e296 0%, #03be90 100%);
+  background: linear-gradient(233deg, #88e296 0%, #03be90 100%);
+  -webkit-box-shadow: 0px 6rpx 31rpx 0px rgba(3, 190, 144, 0.3);
+          box-shadow: 0px 6rpx 31rpx 0px rgba(3, 190, 144, 0.3);
+  border-radius: 33rpx;
+  line-height: 67rpx;
+  text-align: center;
+  color: #FFFFFF;
+}
+.calendarBox.data-v-46293ce4 {
+  background: #FFFFFF;
+  opacity: 1;
+  position: fixed;
+  top: 25%;
+  left: 94rpx;
+  height: 313rpx;
+  width: calc(100% - 188rpx);
+  z-index: 100;
+  border-radius: 30rpx;
+  color: #6D7480;
+  font-size: 30rpx;
+}
+

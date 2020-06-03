@@ -1,0 +1,319 @@
+@charset "UTF-8";
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.cont {
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+          flex: 1;
+  height: 45px;
+  line-height: 45px;
+  padding: 0 15px;
+  position: relative;
+  background-color: #fff;
+  font-size: 15px;
+  border-bottom-color: #F5F5F5;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+}
+.cart-list {
+  overflow: hidden;
+  padding: 20rpx;
+}
+.container {
+  padding-bottom: 134rpx;
+  /* 空白页 */
+}
+.container .empty {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  padding-bottom: 100rpx;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+          justify-content: center;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+          align-items: center;
+}
+.container .empty image {
+  width: 236rpx;
+  height: 188rpx;
+  margin-bottom: 30rpx;
+}
+.container .empty .empty-tips {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  font-size: 26rpx;
+  color: #A2A9BA;
+}
+.container .empty .empty-tips .navigator {
+  color: #007aff;
+  margin-left: 16rpx;
+}
+/* 购物车列表项 */
+.cart-item {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+          align-items: center;
+  position: relative;
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+          flex: 1;
+  padding: 30rpx 20rpx;
+  border-radius: 15px;
+  background-color: #FFFFFF;
+  overflow: hidden;
+}
+.cart-item .image-wrapper {
+  margin-left: 20rpx;
+  width: 156rpx;
+  height: 156rpx;
+  -webkit-flex-shrink: 0;
+          flex-shrink: 0;
+  position: relative;
+}
+.cart-item .image-wrapper image {
+  border-radius: 8rpx;
+  width: 100%;
+  height: 100%;
+  -webkit-transition: .6s;
+  transition: .6s;
+  opacity: 0;
+}
+.cart-item .image-wrapper image.loaded {
+  opacity: 1;
+}
+.cart-item .checkbox {
+  position: absolute;
+  left: -16rpx;
+  top: -16rpx;
+  z-index: 8;
+  font-size: 44rpx;
+  line-height: 1;
+  padding: 4rpx;
+  color: #A2A9BA;
+  background: #fff;
+  border-radius: 50px;
+}
+.cart-item .item-right {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+          flex: 1;
+  overflow: hidden;
+  position: relative;
+  padding-left: 30rpx;
+}
+.cart-item .item-right .title {
+  font-size: 30rpx;
+  color: #2A3441;
+  height: 40rpx;
+  line-height: 40rpx;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cart-item .item-right .attr {
+  font-size: 26rpx;
+  color: #A2A9BA;
+  height: 50rpx;
+  line-height: 50rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cart-item .item-right .price {
+  font-size: 30rpx;
+  color: #16202E;
+  line-height: 40rpx;
+}
+.cart-item .item-right .price {
+  height: 50rpx;
+  line-height: 50rpx;
+}
+.cart-item .item-right .item-right-bottom {
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+          justify-content: space-between;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+          align-items: center;
+}
+.cart-item .del-btn {
+  padding: 4rpx 10rpx;
+  font-size: 34rpx;
+  height: 50rpx;
+  color: #4cd964;
+}
+/* 底部栏 */
+.delivery-fee {
+  font-size: 24rpx;
+  color: #2A3441;
+  position: fixed;
+  bottom: 120rpx;
+  height: 56rpx;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+          align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+          justify-content: center;
+  padding: 0 20rpx;
+  border-radius: 14px;
+  background-color: #FFFFFF;
+  -webkit-transform: translateX(-50%);
+          transform: translateX(-50%);
+  left: 50%;
+}
+.action-section {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  z-index: 95;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+          align-items: center;
+  width: 750rpx;
+  height: 110rpx;
+  padding: 0 30rpx;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.9);
+}
+.action-section .checkbox {
+  position: relative;
+  color: #2A3441;
+  font-size: 28rpx;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+          align-items: center;
+}
+.action-section .checkbox image {
+  width: 52rpx;
+  height: 100%;
+  position: relative;
+  z-index: 5;
+}
+.action-section .clear-btn {
+  position: absolute;
+  left: 26rpx;
+  top: 0;
+  z-index: 4;
+  width: 0;
+  height: 52rpx;
+  line-height: 52rpx;
+  padding-left: 38rpx;
+  font-size: 24rpx;
+  color: #fff;
+  background: #A2A9BA;
+  border-radius: 0 50px 50px 0;
+  opacity: 0;
+  -webkit-transition: .2s;
+  transition: .2s;
+}
+.action-section .clear-btn.show {
+  opacity: 1;
+  width: 120rpx;
+}
+.action-section .total-box {
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+          flex: 1;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+          flex-direction: row;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+          align-items: center;
+  padding: 0 30rpx;
+  font-size: 20rpx;
+  color: #A2A9BA;
+}
+.action-section .total-box .price {
+  font-size: 32rpx;
+  color: #03BE90;
+}
+.action-section .total-box .coupon {
+  color: #2A3441;
+  margin-right: 40rpx;
+}
+.action-section .total-box .coupon text {
+  color: #03BE90;
+}
+.action-section .confirm-btn {
+  padding: 0 38rpx;
+  margin: 0;
+  border-radius: 100px;
+  width: 200rpx;
+  height: 76rpx;
+  line-height: 76rpx;
+  font-size: 28rpx;
+  background: -webkit-linear-gradient(217deg, #88e296 0%, #03be90 100%);
+  background: linear-gradient(233deg, #88e296 0%, #03be90 100%);
+  -webkit-box-shadow: 0px 3px 15px 0px rgba(3, 190, 144, 0.3);
+          box-shadow: 0px 3px 15px 0px rgba(3, 190, 144, 0.3);
+}
+.radius {
+  border-radius: 15px;
+  overflow: hidden;
+  margin-bottom: 15px;
+}
+

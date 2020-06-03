@@ -1,0 +1,101 @@
+<template>
+	<view class="cont">
+		<view class="items" v-for="(item, index) in reportList" :key="index" v-if="reportList.length > 0">
+			<view class="liner">
+				<view class="disinline">
+					{{ item.communityName }}
+				</view>
+				<view class="disinline fr" v-if="type == 'zhuzhan'">
+					驻站医生：{{ item.expertName }}
+				</view>
+			</view>
+			
+			<view class="liner">
+				<view class="disinline color_gray">
+					<image src="../../static/image/icon_sy_sj@2x.png" class="disinline" style="width:36rpx; height:36rpx; vertical-align: middle; margin:0rpx 20rpx 8rpx 0" mode=""></image>
+					{{ '2020-02-02  12:43' }}
+				</view>
+				<view class="disinline fr color_gray">
+					{{ '方案已实施' }}
+				</view>
+			</view>
+			
+			<view class="titles">
+				{{ '健康调理报告' }}
+			</view>
+		</view>
+		<view style="text-align: center;">
+			<view style="margin:100rpx 0 40rpx 0;">
+				<image src="../../static/image/img_zwbzjl@2x.png" class="disinline" style="width:232rpx; height:232rpx;"></image>
+			</view>
+			<view style="font-size:32rpx; line-height:48rpx; ">
+				您登录的手机号码上还没有健康报告
+			</view>
+			<view class="color_gray" style="font-size:28rpx; line-height:40rpx;">
+				请前往服务站做相关的健康分析
+			</view>
+			<view class="">
+				<button class="btn" @tap="goserverStation()">前往服务站</button>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import api from '../../common/api.js';
+	export default{
+		data() {
+			return {
+				type: 'zhuzhan',  // zhuzhan驻站医生，zhineng 智能医生
+				reportList: [],
+				page: 1,
+				size: 10,
+			}
+		},
+		onLoad(option) {
+			this.type = option.type
+			this.getReportList()
+		},
+		methods: {
+			goserverStation() {
+				uni.navigateTo({
+				    url: '/pages/serverStation/main'
+				})
+			},
+			getReportList() {
+				api.getReportView({
+					size: this.size,
+					page: this.page,
+					communityId: '',
+					bought: 1,
+					type: this.type == 'zhuzhan' ? 'advisory_report' : this.type == 'zhineng' ? 'TONGUE_QUES,QUES,TONGUE,face_check' : ''
+				}).then(res=>{
+					this.reportList = res.list
+				})
+			},
+		},
+		onReachBottom() {
+			// 翻到底下的时候触发加载新内容
+		}
+	}
+</script>
+
+<style scoped lang="scss">
+	.cont{ background:#EFF1F6; height:100vh; overflow:auto; box-sizing:border-box; 
+		.items{
+			padding:30rpx 30rpx 40rpx 30rpx;
+			margin:30rpx 32rpx 0 32rpx;
+			background:#fff;
+			box-shadow:0px 4rpx 20rpx 0px rgba(85,112,105,0.1);
+			border-radius:10px;
+			font-size:28rpx; line-height:40rpx;
+			.liner{ overflow:hidden; margin:0rpx 0 16rpx 0; }
+			.titles{ font-size:32rpx; line-height:40rpx; color:#16202E; }
+		}
+	}
+	.fr{ float:right; }
+	.disinline{ display:inline-block; vertical-align: top; }
+	.color_gray{ color:#A2A9BA; }
+	.btn{ color:#fff; font-size:30rpx; line-height:44rpx; padding: 20rpx 0; background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);box-shadow:0px 6rpx 30rpx 0px rgba(3,190,144,0.3);
+border-radius:86rpx; margin: 40rpx 120rpx; }
+</style>

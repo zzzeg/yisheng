@@ -1,0 +1,320 @@
+<template>
+	<view>
+		<view class="segmented-control">
+			<uni-segmented-control :current="current" :values="items" style-type="text" active-color="#03BE90" @clickItem="onClickItem" />
+		</view>
+		<view class="content">
+			<view v-if="current === 0">
+				<view class="u-f u-column record-item">
+					<view class="u-f-jsb doctor">
+						<text>服务站名称</text>
+						<text>驻站医生：陈燕冰</text>
+					</view>
+					<view class="u-f-ac time">
+						<image src="/static/image/icon_dd_sj@2x.png" mode="aspectFit"></image>
+						<text>2020-02-02 12:43</text>
+					</view>
+					<view class="name">
+						健康调理报告
+					</view>
+					<view class="u-f-jsb status">
+						<view> 方案未实施 </view>
+						<view class="u-f-ac" @tap="goNow"> 立即实施 </view>
+					</view>
+				</view>
+			</view>
+			<view v-if="current === 1">
+				<!-- 商品列表 -->
+				<view class="goods-section shape">
+					<view class="header">
+						服务站名称
+					</view>
+					<view class="u-f-jsb delivery-status">
+						<text>2020-02-17 15:20:21</text>
+						<text>已收货</text>
+					</view>
+					<block v-for="(item, index) in goodsList" :key="item.id">
+						<view class="cart-item">
+							<view class="image-wrapper">
+								<image :src="item.image" :class="[item.loaded]" mode="aspectFill" lazy-load @load="onImageLoad('goodsList', index)"
+								 @error="onImageError('goodsList', index)"></image>
+							</view>
+							<view class="item-right">
+								<text class="title">{{item.title}}</text>
+								<text class="attr">{{item.attr_val}}</text>
+								<view class="u-f item-right-bottom">
+									<text class="price">¥{{item.price|toFixed}}</text>
+									<text class="price">x{{item.number}}</text>
+								</view>
+							</view>
+						</view>
+					</block>
+					<view class="yt-list">
+						<view class="yt-list-cell b-b">
+							<text class="cell-tit">收货人：张三    共<text class="base">3</text> 件 订单总额：</text>
+							<text class="cell-tip">￥12365.00</text>
+						</view>
+						<view class="yt-list-cell b-b">
+							<view class="btn primary"> 订单详情 </view>
+							<view class="btn filled"> 查看报告 </view>
+						</view>
+					</view>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				items: ['报告记录', '消费记录'],
+				current: 0,
+				goodsList: [{
+						id: 1,
+						image: '/static/healthy-mall/img_ssb.png',
+						attr_val: '建议服用2个周期',
+						stock: 15,
+						title: '膳食包膳食包膳食包XXXXXXXXX',
+						price: 278.50,
+						number: 1
+					},
+					{
+						id: 3,
+						image: '/static/healthy-mall/img_ssb.png',
+						attr_val: '建议服用2个周期',
+						stock: 3,
+						title: '定制抗病毒茶',
+						price: 1348.00,
+						number: 5
+					}
+				],
+			};
+		},
+		methods: {
+			onClickItem(e) {
+				if (this.current !== e.currentIndex) {
+					this.current = e.currentIndex
+				}
+			},
+			goNow() {
+
+			},
+			//监听image加载失败
+			onImageError(key, index) {
+				this[key][index].image = '/static/healthy-mall/errorImage.jpg';
+			},
+			//监听image加载完成
+			onImageLoad(key, index) {
+				this.$set(this[key][index], 'loaded', 'loaded');
+			},
+		},
+		filters: {
+			toFixed: function(value) {
+				return value.toFixed(2);
+			}
+		},
+	}
+</script>
+
+<style lang="scss">
+	.segmented-control {
+		background-color: #FFFFFF;
+	}
+
+	.record-item {
+		font-size: 28rpx;
+		margin: 30rpx;
+		padding: 30rpx;
+		border-radius: 10px;
+		background-color: #FFFFFF;
+
+		.name {
+			color: #16202E;
+			font-size: 32rpx;
+		}
+
+		.doctor {
+			color: #434E5E;
+
+		}
+
+		.time {
+			color: #A2A9BA;
+			margin-top: 20rpx;
+			margin-bottom: 12rpx;
+
+			image {
+				width: 36rpx;
+				height: 36rpx;
+			}
+		}
+
+		.status {
+			margin-top: 20rpx;
+			color: #03BE90;
+
+			view:nth-child(2) {
+				font-size: 24rpx;
+				color: #FFFFFF;
+				padding: 0 20rpx;
+				background: linear-gradient(315deg, rgba(136, 226, 150, 1) 0%, rgba(3, 190, 144, 1) 100%);
+				border-radius: 14px;
+			}
+
+		}
+	}
+
+
+	.goods-section {
+		background: #fff;
+		padding-bottom: 1px;
+		margin: 0 30rpx;
+		margin-top: 30rpx;
+		padding: 30rpx;
+		background-color: #FFFFFF;
+		border-radius: 10px;
+		.header{
+			font-size: 28rpx;
+			color: #434E5E;
+		}
+		.delivery-status{
+			font-size: 26rpx;
+			margin: 20rpx 0;
+			text:nth-child(1){
+				color:#A2A9BA ;
+			}
+			text:nth-child(2){
+				color:#03BE90 ;
+			}
+		}
+		.cart-item {
+			display: flex;
+			align-items: center;
+			position: relative;
+			border-bottom: 1px solid #EFF1F6;
+			overflow: hidden;
+			padding: 30rpx 0;
+			.image-wrapper {
+				width: 156rpx;
+				height: 156rpx;
+				flex-shrink: 0;
+				position: relative;
+
+				image {
+					border-radius: 8upx;
+					width: 100%;
+					height: 100%;
+					transition: .6s;
+					opacity: 0;
+
+					&.loaded {
+						opacity: 1;
+					}
+				}
+			}
+
+			.item-right {
+				display: flex;
+				flex-direction: column;
+				flex: 1;
+				overflow: hidden;
+				position: relative;
+				padding-left: 30rpx;
+
+				.title {
+					font-size: 30rpx;
+					color: #2A3441;
+					height: 40rpx;
+					line-height: 40rpx;
+					text-overflow: ellipsis;
+					overflow: hidden;
+					white-space: nowrap;
+				}
+
+				.price {
+					font-size: 30rpx;
+					color: #16202E;
+					line-height: 40rpx;
+				}
+
+				.attr {
+					font-size: 26rpx;
+					color: #A2A9BA;
+					height: 50rpx;
+					line-height: 50rpx;
+				}
+
+				.price {
+					height: 50rpx;
+					line-height: 50rpx;
+				}
+
+				.item-right-bottom {
+					justify-content: space-between;
+					align-items: center;
+				}
+			}
+		}
+	}
+
+	.yt-list {
+		background: #fff;
+	}
+
+	.yt-list-cell {
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+		padding: 10rpx 0rpx 10rpx 40rpx;
+		line-height: 70rpx;
+		position: relative;
+
+		&.cell-hover {
+			background: #fafafa;
+		}
+
+		&.b-b:after {
+			left: 30rpx;
+		}
+		.cell-tit {
+			font-size: 26rpx;
+			color: #2A3441;
+			margin-right: 10rpx;
+
+			.base {
+				color: #03BE90;
+			}
+		}
+
+		.cell-tip {
+			font-size: 28rpx;
+			color: #2A3441;
+
+			&.base {
+				color: #03BE90;
+			}
+
+			&.smalltip {
+				color: #A2A9BA;
+				font-size: 20rpx;
+			}
+		}
+		.btn{
+			padding:0rpx 20rpx;
+			border-radius: 15px;
+			font-size: 26rpx;
+			font-family:Helvetica;
+			&.primary{
+				border:1px solid rgba(3,190,144,1);
+				color: #03BE90;
+				margin-right: 20rpx;
+			}
+			&.filled{
+				color: #FFFFFF;
+				background:linear-gradient(315deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+			}
+		}
+	}
+</style>

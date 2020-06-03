@@ -1,0 +1,97 @@
+
+page{
+    background: #EFF1F6;
+}
+.content{
+    text-align: center;
+    font-size:29rpx;
+    color: #434E5E;
+}
+.logo {
+	height: 488rpx;
+	width: 100%;
+    position: absolute;
+    left: 0rpx;
+    top: 0rpx;
+    z-index: -99;
+}
+.boxTop{
+    margin: 30rpx 33rpx;
+    width:683rpx;
+    background:rgba(255,255,255,1);
+    -webkit-box-shadow:0px 4rpx 21rpx 0px rgba(85,112,105,0.1);
+            box-shadow:0px 4rpx 21rpx 0px rgba(85,112,105,0.1);
+    border-radius:21rpx;
+    font-size: 30rpx;
+    color: #868E9D;
+    text-align: left;
+}
+.titleBox{
+    padding-top: 32rpx;
+    margin: 0rpx 32rpx;
+    height: 78rpx;
+    border-bottom: 2rpx dashed #C6CAD4;
+    color: #16202E;
+    font-size: 38rpx;
+}
+.btnBox{
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: row;
+            flex-direction: row;
+    margin: 70rpx 123rpx 90rpx 123rpx;
+    -webkit-box-pack: justify;
+    -webkit-justify-content: space-between;
+            justify-content: space-between;
+}
+.gkfxbtn{
+    width:197rpx;
+    height:67rpx;
+    background:-webkit-linear-gradient(217deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+    background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+    -webkit-box-shadow:0px 6rpx 31rpx 0px rgba(3,190,144,0.3);
+            box-shadow:0px 6rpx 31rpx 0px rgba(3,190,144,0.3);
+    border-radius:33rpx;
+    line-height: 67rpx;
+    text-align: center;
+    color: #FFFFFF;
+}
+.login-box{
+    width: 683rpx;
+    height: 503rpx;
+    /* margin-top: -310upx; */
+    position: relative;
+    margin-top: 238rpx;
+    margin-left: 33rpx;
+}
+.boxxxx{
+    position: absolute;
+    z-index: -97;
+    width: 100%;
+    background:#FFFFFF;
+    -webkit-box-shadow:0rpx 42rpx 208rpx 0rpx rgba(22,32,46,0.15);
+            box-shadow:0rpx 42rpx 208rpx 0rpx rgba(22,32,46,0.15);
+    border-radius:31rpx;
+    height: 419rpx;
+    top: 84rpx;
+}
+.headerBox{
+    width: 168rpx;
+    height: 168rpx;
+    margin-top: -84rpx;
+    background: #FFFFFF;
+    border-radius: 50%;
+    margin-left: calc(50% - 84rpx);
+}
+.headerBox image{
+    margin: 8rpx;
+    width: 152rpx;
+    height: 152rpx;
+    border-radius: 50%;
+    background: #F8F8F8;
+}
+
+

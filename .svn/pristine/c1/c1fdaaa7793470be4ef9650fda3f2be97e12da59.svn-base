@@ -1,0 +1,179 @@
+<template>
+	<view class="sharing-detail">
+		<uni-swiper-dot :info="info" :current="current" :mode="mode" :dots-styles="dotsStyles" field="content">
+			<swiper class="swiper-box" @change="change">
+				<swiper-item v-for="(item, index) in info" :key="index">
+					<view :class="item.colorClass" class="swiper-item">
+						<image class="image" :src="item.url" mode="aspectFill" />
+					</view>
+				</swiper-item>
+			</swiper>
+		</uni-swiper-dot>
+		<view class="content">
+			<view class="content-title">
+				拯救熬夜肌的美容护肤方法，对这些美容护肤知识感兴趣的MM不妨一起来了解一下吧!
+			</view>
+			<view class="content-desc">
+				美容护肤专家称，很多MM等到要睡觉之前才清洁肌肤，这种做法是不对的。这样才能减少肌肤的负担，预防痘痘粉刺。 这样才能减少肌肤的负担，预防痘痘粉刺。<br />
+				专家还说熬夜MM美容护肤洁面是如果能同时使用清洁和卸妆的二合一的洁肤乳最好，减少肌肤毛孔的废物的堆积，也能告别疲惫的气色哟!
+			</view>
+			<view class="content-time">
+				<text>5-16</text>
+				<uni-icons type="eye" size="15" color="#868E9D"></uni-icons>
+				<text>3.5万</text>
+			</view>
+		</view>
+		<view class="comment-box">
+			<view class="comment-allnum">
+				共24条评论
+			</view>
+			<view class="">
+				<block v-for="(item,index) in commentListData" :key="index">
+					<h-comment-list :item="item" :index="index" @ding="ding"></h-comment-list>
+				</block>
+			</view>
+		</view>
+		<view class="comment-box-bottom">
+			<!-- <h-comment-bottom :detail="articleDetail" @send="comment" @icon-click="iconClick">
+			</h-comment-bottom> -->
+		</view>
+	</view>
+</template>
+
+<script>
+	const commentList = [{
+			name: '小灰灰',
+			content: '我试着做了汤羹，喝了感觉效果不错。推荐大家食用，你也可以美美哒~ 。',
+			avatar: '/static/healthy-mall/icon_jksc_ddshdz.png',
+			like: 0, //是否点赞 0未点  1点了
+			goodNum: 15000
+		},
+		{
+			name: '小灰灰',
+			content: '我试着做了汤羹，喝了感觉效果不错。推荐大家食用，你也可以美美哒~ 。',
+			avatar: '/static/healthy-mall/icon_jksc_ddshdz.png',
+			like: 1, //是否点赞 0未点  1点了
+			goodNum: 15000
+		}
+	]
+	export default {
+		data() {
+			return {
+				info: [{
+						url: '/static/healthy-mall/123.jpg'
+					},
+					{
+						url: '/static/healthy-mall/123.jpg'
+					},
+					{
+						url: '/static/healthy-mall/123.jpg'
+					}
+				],
+				dotsStyles: {
+					width: 4,
+					height: 4,
+					bottom: -15,
+					backgroundColor: 'rgba(236,239,244,1)',
+					border: '1px rgba(236,239,244,1) solid',
+					color: '#fff',
+					selectedBackgroundColor: 'rgba(3, 190, 144, 1)',
+					selectedBorder: '1px rgba(3, 190, 144, 1) solid'
+				},
+				articleDetail: {
+					dingNum: 2696,
+					dingStatus: 1,
+					collectNum: 456,
+					collectStatus: 0,
+					commentNum: 996
+				},
+				mode: 'dot',
+				commentListData: commentList
+			};
+		},
+		methods: {
+			ding(index) {
+				console.log(`当前第${index}个评论被点击`);
+			},
+			comment(msg) {
+				console.log(msg);
+			},
+			iconClick(type) {
+				console.log(type);
+				switch (type) {
+					case 'ding':
+					// console.log(type);
+						break;
+					case 'collect':
+					// console.log(type);
+						break;
+					case 'comment':
+						break;
+				}
+			},
+			
+		},
+	}
+</script>
+
+<style lang="scss">
+	.sharing-detail {
+		background-color: #FFFFFF;
+		min-height: 100%;
+		padding-bottom: 130rpx;
+	}
+
+	.swiper-box {
+		flex: 1;
+		height: 960rpx;
+	}
+
+	.swiper-item {
+		display: flex;
+		flex-direction: row;
+		height: 100%;
+		overflow: hidden;
+	}
+
+	.image {
+		width: 750rpx;
+	}
+
+	.content {
+		margin: 0 32rpx;
+		margin-top: 30px;
+		border-bottom: 1px solid #E7E7E7;
+
+		&-title {
+			font-size: 32rpx;
+			font-family: PingFang-SC-Bold, PingFang-SC;
+			font-weight: bold;
+			color: rgba(22, 32, 46, 1);
+		}
+
+		&-desc {
+			padding-top: 20rpx;
+			font-size: 28rpx;
+			font-family: PingFang-SC-Medium, PingFang-SC;
+			font-weight: 500;
+			color: rgba(67, 78, 94, 1);
+		}
+
+		&-time {
+			padding-top: 60rpx;
+			font-size: 22rpx;
+			color: #868E9D;
+			display: flex;
+			align-items: center;
+
+			&>text {
+				margin-right: 20rpx;
+			}
+		}
+	}
+
+	.comment-box-bottom {
+		position: fixed;
+		width: 750rpx;
+		bottom: 0;
+	}
+</style>

@@ -1,0 +1,227 @@
+<template>
+	<view class="comment" >
+		<view class="u-f-ac comment-bottom" :style="{backgroundColor:defaultIconColor.backgroundColor}" v-if="!show">
+			<view class="u-f-ajc comment-bottom-input" @tap='click' :style="{backgroundColor:defaultInputColor.showBgColor}">
+				<uni-icons type="compose" color="#868E9D" size="20"></uni-icons>
+				发评论···
+			</view>
+			<view class="fun">
+				<uni-icons 
+					:type="info.dingStatus==1?'hand-thumbsup-filled':'hand-thumbsup'"  
+					:color="info.dingStatus==1?defaultIconColor.selectedColor: defaultIconColor.color" 
+					size="20"
+					@tap="emitFun('ding')"
+					></uni-icons>
+				<text>{{info.dingNum}}</text>
+				<uni-icons 
+					:type="info.collectStatus==1?'star-filled':'star'" 
+					:color="info.collectStatus==1?defaultIconColor.selectedColor: defaultIconColor.color" 
+					size="20"
+					@tap="emitFun('collect')"
+					></uni-icons>
+				<text>{{info.collectNum}}</text>
+				<uni-icons type="chat" :color="defaultIconColor.color" size="20" @tap="emitFun('comment')"></uni-icons>
+				<text>{{info.commentNum}}</text>
+			</view>
+		</view>
+		<uni-popup ref="showpopup" type="bottom" @change="change">
+			<view class="content" style="background-color: #FFFFFF;">
+				<view class="u-f-ajc comment-allnum">
+					共24条评论
+				</view>
+				<scroll-view scroll-y class="srcoll-view">
+					<block v-for="(item,index) in commentListData" :key="index">
+						<h-comment-list :item="item" :index="index" @ding="ding"></h-comment-list>
+					</block>
+				</scroll-view>
+				<view class="u-f-ajc comment-input">
+					<view class="comment-input-box">
+						<input 
+						type="text" 
+						v-model.trim="inputMsg" 
+						placeholder-style="color:#868E9D" 
+						placeholder="喜欢TA的分享就评论支持下吧！"
+						/>
+					</view>
+					<view class="comment-input-send" @tap="send">发送</view>
+				</view>
+			</view>
+		</uni-popup>
+	</view>
+	
+</template>
+
+<script>
+	const commentList = [{
+			name: '小灰灰',
+			content: '我试着做了汤羹，喝了感觉效果不错。推荐大家食用，你也可以美美哒~ 。',
+			avatar: '/static/healthy-mall/icon_jksc_ddshdz.png',
+			like: 0, //是否点赞 0未点  1点了
+			goodNum: 15000
+		},
+		{
+			name: '小灰灰',
+			content: '我试着做了汤羹，喝了感觉效果不错。推荐大家食用，你也可以美美哒~ 。',
+			avatar: '/static/healthy-mall/icon_jksc_ddshdz.png',
+			like: 1, //是否点赞 0未点  1点了
+			goodNum: 15000
+		}
+	]
+	export default {
+		props: {
+			detail:Object,
+			iconColor:{
+				type:Object,
+				default:()=>{}
+			},
+			inputColor:{
+				type:Object,
+				default:()=>{}
+			}
+		},
+		data() {
+			return {
+				info:{},
+				flag:false,
+				show:false,
+				inputMsg:'',
+				defaultIconColor:{
+					color: '#434E5E',
+					selectedColor: '#03be90',
+					backgroundColor: '#FFFFFF'
+				},
+				defaultInputColor:{
+					showBgColor: '#EFF1F6'
+				},
+				commentListData: commentList
+			};
+		},
+		mounted(){
+			this.info = Object.assign({},this.detail)
+			this.defaultIconColor = Object.assign(this.defaultIconColor,this.iconColor)
+			this.defaultInputColor = Object.assign(this.defaultInputColor,this.inputColor)
+		},
+		methods: {
+			send() {
+				if(this.inputMsg=='') return
+				this.$emit('send',this.inputMsg)
+			},
+			emitFun(type){
+				switch (type){
+					case 'ding':
+						if(this.info.dingStatus==0){
+							this.info.dingStatus=1
+							this.info.dingNum++
+						}else{
+							this.info.dingStatus=0
+							this.info.dingNum--
+						}
+						break;
+					case 'collect':
+						if(this.info.collectStatus==0){
+							this.info.collectStatus=1
+							this.info.collectNum++
+						}else{
+							this.info.collectStatus=0
+							this.info.collectNum--
+						}
+						break;
+				}
+				this.$emit('iconClick',type)
+			},
+			click(){
+				this.$nextTick(() => {
+					this.$refs['showpopup'].open()
+				})
+			},
+			change(e) {
+				console.log('是否打开:' + e.show)
+				if(e.show){
+					this.show = true
+				}else{
+					this.show = false
+				}
+			},
+			showInput(){
+				console.log('showInput');
+				this.flag = true
+			}
+		},
+		onReady() {
+			console.log(this.detail);
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	// .comment{
+	// 	background-color: #FFFFFF;
+	// }
+	.comment-bottom{
+		justify-content: space-between;
+		padding:20rpx 40rpx;
+		.comment-bottom-input{
+			height: 60rpx;
+			width: 300rpx;
+			color: #868E9D;
+			border-radius:15px;
+			font-size:30rpx;
+		}
+		.fun{
+			flex: 1;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-left: 40rpx;
+			&>text{
+				font-size:26rpx ;
+				color: #434E5E;
+				font-family:PingFang-SC-Bold,PingFang-SC;
+				font-weight:bold;
+			}
+		}
+	}
+	.content{
+		// position: absolute;
+		background-color: #fff;
+		width: 750rpx;
+		// bottom: 0;
+		height: 1000rpx;
+		display: flex;
+		flex-direction: column;
+		border-top-left-radius:15px ;
+		border-top-right-radius:15px ;
+		.comment-allnum{
+			font-size:30rpx;
+			font-weight:500;
+			color: #16202E;
+			height: 90rpx;
+			border-bottom: 1px solid #F6F6F6;
+		}
+		.srcoll-view{
+			flex: 1;
+		}
+		.comment-input{
+			display: flex;
+			background-color: #FFFFFF;
+			padding: 30rpx 17rpx;
+			box-shadow:0px 2px 4px 0px rgba(0,0,0,0.5);
+			.comment-input-box{
+				border-radius:15px;
+				border:1px solid rgba(156,156,156,1);
+				padding: 16rpx;
+				flex: 1;
+				font-size: 26rpx;
+				line-height: 30rpx;
+			}
+			.comment-input-send{
+				color: #03BE90;
+				font-size: 30rpx;
+				width: 80rpx;
+				text-align: center;
+			}
+		}
+	}
+	
+	
+</style>

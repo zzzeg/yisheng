@@ -1,0 +1,130 @@
+<template>
+	<view class="cont">
+		<!--名医说-->
+		
+		<view class="living">
+			<view class="box" v-for="(item, index) in videoList" :key="index">
+				<view class="disinline" style="font-weight: 500;" @tap="goInfo(item.id)">
+					{{ item.title }}
+				</view>
+				<view class="videos">
+					<view>
+						<video class="myVideo" :src="item.videoUrl" @error="videoErrorCallback" controls></video>
+					</view>
+					<view class="time">{{ item.videoDuration }}</view>
+				</view>
+				<view class="disinline color_gray" style="font-size:24rpx; vertical-align: middle;">
+					{{ '来源：' + item.website }}
+				</view>
+				<view class="disinline color_gray nums">
+					<image src="../../static/image/eyes@2x.png" class="disinline"></image>
+					{{ item.viewNum }}
+				</view>
+				<view style="font-size:24rpx; float:right;">
+					<image src="../../static/image/zan@2x.png" class="disinline zanico" @tap="praiseAdd(item.id, index)" v-if="!item.praiseStatus"></image>
+					<image src="../../static/image/zangreen@2x.png" class="disinline zanico" @tap="praiseCancel(item.id, index)" v-if="item.praiseStatus"></image>
+					<image src="../../static/image/start@2x.png" class="disinline zanico" @tap="videoMarkAdd(item.id, index)" v-if="!item.markStatus"></image>
+					<image src="../../static/image/startgreen@2x.png" class="disinline zanico" @tap="videoMarkCancel(item.id, index)" v-if="item.markStatus"></image>
+					<image src="../../static/image/share@2x.png" class="disinline zanico"></image>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import api from '../../common/api.js';
+	export default {
+		data() {
+			return {
+				communityId: '424856479015406202',
+				id: uni.getStorageSync('userinfo').id,
+				videoList: [{
+					label: '1'
+				},{
+					label: '1'
+				},{
+					label: '1'
+				}],
+			}
+		},
+		onLoad(option) {
+			// this.communityId = option.communutyId
+			this.getMyvideoList(this.communityId)
+		},
+		methods: {
+			getMyvideoList(communityId) {
+				api.getMyvideoList({
+					communityId: communityId
+				}).then(res=>{
+					this.videoList = res.list
+				})
+			},
+			praiseAdd(id, index) {
+				api.praiseAdd({
+					videoId: id
+				}).then(res=>{
+					// this.getMyhvideo()
+					this.videoList[index].praiseStatus = !this.videoList[index].praiseStatus
+				})
+			},
+			praiseCancel(id, index) {
+				api.praiseCancel({
+					videoId: id
+				}).then(res=>{
+					// this.getMyhvideo()
+					this.videoList[index].praiseStatus = !this.videoList[index].praiseStatus
+				})
+			},
+			videoMarkAdd(id, index) {
+				api.videoMarkAdd({
+					videoId: id
+				}).then(res=>{
+					// this.getMyhvideo()
+					this.videoList[index].markStatus = !this.videoList[index].markStatus
+				})
+			},
+			videoMarkCancel(id, index) {
+				api.videoMarkCancel({
+					videoId: id
+				}).then(res=>{
+					// this.getMyhvideo()
+					this.videoList[index].markStatus = !this.videoList[index].markStatus
+				})
+			},
+			videoErrorCallback: function(e) {
+				uni.showModal({
+					content: e.target.errMsg,
+					showCancel: false
+				})
+			},
+			goInfo(id) {
+				uni.navigateTo({
+					url: `/pages/liveborad/liveInfo?id=${id}`
+				})
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.disinline{ display:inline-block; vertical-align: top; }
+	.cont{ height:100vh; overflow:auto; background:#EFF1F6; box-sizing:border-box; padding:20rpx 32rpx; }
+	.color_gre{ color:#03BE90 }
+	.color_gray{ color:#868E9D }
+	.living { 
+		overflow: hidden;
+		.box{ background:rgba(255,255,255,1);box-shadow:0px 4rpx 20rpx 0px rgba(85,112,105,0.1);border-radius:20rpx; padding:24rpx;margin:20rpx 0 32rpx 0;
+		overflow: hidden;
+			> .disinline{ font-size:28rpx; line-height:1.8; }
+			.videos{ position: relative; z-index:1;  background:#ddd; margin:20rpx 0;font-size:24rpx; min-height:360rpx;
+				.myVideo{ width:100%; }
+				.time{ position:absolute; color:#fff; bottom:22rpx; right:16rpx; background:rgba(0,0,0,0.3);border-radius:40rpx; padding: 10rpx 20rpx; }
+			 }
+			 .nums{ vertical-align: middle; margin-left:20rpx; 
+				image{ width:40rpx; height:26rpx; vertical-align: middle; margin-bottom:8rpx; }
+			 }
+			 .zanico{ width:36rpx; height:36rpx; margin-left:26rpx; vertical-align: middle; }
+		}
+	}
+</style>

@@ -1,0 +1,164 @@
+<template>
+	<view class="page">
+		 <video class="video" id="myVideo" 
+		 :controls="false"
+		 :autoplay="true"
+		 :show-fullscreen-btn="false"
+		 :enable-play-gesture="true"
+		 :show-center-play-btn="true"
+		 play-btn-position="center"
+		 :src="info.src" 
+		 @error="videoErrorCallback" 
+		 :loop="true"
+		 ></video>
+		
+		<view class="video-center">
+			<view class="u-f-ac avatar">
+				<image class="image" :src="info.avatar" mode="scaleToFill"></image>
+				<view>{{info.name}}</view>
+			</view>
+			<view class="video-content">{{info.content}}</view>
+			<view class="u-f-ac location">
+				<image  class="image" :src="info.serviceIcon" mode="scaleToFill"></image>
+				<view>{{info.servicename}}</view>
+			</view>
+		</view>
+		<view class="video-bottom">
+			<h-comment-bottom :detail="articleDetail" @send="comment" :iconColor="iconColor" :inputColor="inputColor" @icon-click="iconClick">
+			</h-comment-bottom>
+		</view>
+	</view>
+</template>
+<script>
+	const videoData = {
+			src: 'https://img-cdn-qiniu.dcloud.net.cn/hello-nvue-swiper-vertical-01.mp4',
+			avatar:'/static/healthy-mall/123.jpg',
+			name:'蓝色精灵',
+			content:'喝它，肌肤就像剥了壳的荔枝，光滑白皙水嫩好皮肤是要投资的，这款汤羹投入的叫这款汤羹时间喝它，肌肤就像剥了壳的荔枝，光滑白皙水嫩好皮肤是要投资的，这款汤羹投入的叫这款汤羹时间',
+			serviceIcon:'/static/healthy-mall/icon_jksc_ddshdz.png',
+			servicename:'深圳美益天美容健康服务站'
+		}
+	
+
+	export default {
+		data() {
+			return {
+				circular: true,
+				info:{
+				},
+				videoList: [{
+						id: "video0",
+						src: "",
+						img: ""
+					},
+					{
+						id: "video1",
+						src: "",
+						img: ""
+					},
+					{
+						id: "video2",
+						src: "",
+						img: ""
+					}
+				],
+				videoDataList: [],
+				articleDetail: {
+					dingNum: 2696,
+					dingStatus: 1,
+					collectNum: 456,
+					collectStatus: 0,
+					commentNum: 996
+				},
+				iconColor:{
+					color: '#FFFFFF',
+					selectedColor: '#03be90',
+					backgroundColor: 'transparent'
+				},
+				inputColor:{
+					showBgColor:'transparent'
+				}
+			}
+		},
+		onLoad(e) {
+			
+		},
+		onReady() {
+			this.getData();
+		},
+		methods: {
+			getData(e) {
+				setTimeout(() => {
+					console.log('timeout');
+					 this.info = Object.assign({},videoData) 
+				}, 200)
+			},
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.page {
+		height: 100%;
+		width: 750rpx;
+		display: flex;
+	}
+
+	.video,
+		{
+		height: auto;
+		display: flex;
+		flex: 1;
+		/* #ifndef APP-PLUS */
+		width: 100%;
+		/* #endif */
+	}
+
+	.video-center {
+		color: #FFFFFF;
+		position: absolute;
+		width: 690rpx;
+		bottom: 110rpx;
+		padding:0 30rpx;
+		font-size: 28rpx;
+		white-space: pre-wrap;
+		text-overflow:ellipsis;
+		overflow:hidden;
+		.video-content{
+			padding: 28rpx 0 16rpx 0;
+			white-space: pre-wrap;
+			text-overflow:ellipsis;
+			overflow:hidden;
+			word-break: break-all;
+			line-height: 1.5;
+		}
+		.avatar {
+			font-size: 32rpx;
+			justify-content: flex-start;
+			.image {
+				width: 75rpx;
+				height: 75rpx;
+				border-radius: 75rpx;
+				margin-right: 20rpx;
+			}
+		}
+
+		.location {
+			justify-content: flex-start;
+			font-size: 22rpx;
+			.image {
+				width: 40rpx;
+				height: 40rpx;
+				border-radius: 40rpx;
+				margin-right: 20rpx;
+			}
+		}
+	}
+	.video-bottom {
+		position: absolute;
+		width: 750rpx;
+		bottom: 0rpx;
+		z-index: 9999;
+	}
+	
+</style>

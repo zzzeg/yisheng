@@ -1,0 +1,48 @@
+<template>
+    <view>
+        <web-view :webview-styles="webviewStyles" :src="url"></web-view>
+    </view>
+</template>
+
+<script>
+    import request from '../../common/request.js'; 
+        export default {
+            data() {
+                return {
+                    webviewStyles: {
+                        progress: {
+                            color: '#FF3333'
+                        }
+                    },
+                    url:'',
+                    type:0,
+                    rid:null
+                }
+            },
+            onLoad(op) {
+                this.type = op.type
+                this.recordType = op.recordType
+                console.log(this.recordType)
+                this.rid = op.recordid
+                var token = uni.getStorageSync('sessionKey');
+                var timestamp = Date.parse(new Date());
+                this.url = request.reporthost + "?timestamp="+ timestamp
+                
+                console.log(this.url)
+                
+            },
+            onShow() {
+                
+            },
+            methods: {
+                
+            },
+            onUnload() {
+                
+            }
+        }
+    
+</script>
+
+<style>
+</style>

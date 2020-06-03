@@ -1,0 +1,626 @@
+<template>
+  <div style="padding-bottom: 60px;">
+    <div class='content2' ref="capture">
+      <div class='base-info' style="padding-bottom: 0;">
+        <div class='customerInfo'>
+          <div class='customer-content text'>
+            <div style="font-size: 14px;line-height: 20px;color: #434E5E;"><img src="/static/img/icon_tbgrxx@3x.png" style="width: 12px;margin-right: 5px;" />{{data.name}}，{{data.gender | sexFil}}，{{data.age}}岁</div>
+            <div class='phone' style="font-size: 14px;line-height: 20px;color: #434E5E;">{{data.phone}}</div>
+          </div>
+        </div>
+        <div style="background: #03BE90;">
+          <div class='evaluation-result' style="margin-top: 0;">
+            <div class='title' style="padding-top: 30px;font-size: 23px;line-height: 34px;text-align: center;font-weight: bold;color: white;height: auto;margin-bottom: 0;">本次舌象</div>
+              <div style="display: flex;padding-bottom: 20px;">
+                <div style="flex: 0 0 150px;margin-top: 22px;">
+                  <div style="color: white;font-size: 14px;padding-left: 16px;">{{formatTimestamp(data.createTime, 'YYYY-MM-DD HH:mm')}}</div>
+                  <div class='tongueImg' id='tongueImage'>
+                    <div :style="{backgroundImage: `url(${tongueImages.front})`}">
+                      <!-- <img :src="tongueImages.front" @click="show(0)"> -->
+                    </div>
+                    <div :style="{backgroundImage: `url(${tongueImages.back})`}">
+                      <!-- <img :src="tongueImages.back" @click="show(1)"> -->
+                    </div>
+                    <!-- <div>
+                      <img :src="tongueImages.body">
+                    </div> -->
+                  </div>
+                </div>
+                <div style="flex: 1;margin-top: 12px;margin-left: 30px;">
+                  <div class='evaluation-result' style="margin-top: 0;" v-if="tongueMark">
+                    <!-- <div class='result-content text'>{{tongueMark | splice}}</div> -->
+                    <div style="font-size: 0;color: white;">
+                      <div style="width: 50%;display: inline-block;font-size: 15px;margin-top: 10px;color: white;"><div style="color: rgba(255, 255, 255, 0.6);font-size: 10px;line-height: 15px;">舌色</div>{{tongueMark.tongueColor || '--'}}</div>
+                      <div style="width: 50%;display: inline-block;font-size: 15px;margin-top: 10px;color: white;"><div style="color: rgba(255, 255, 255, 0.6);font-size: 10px;line-height: 15px;">苔色</div>{{tongueMark.mossColor || '--'}}</div>
+                      <div style="width: 50%;display: inline-block;font-size: 15px;margin-top: 10px;color: white;"><div style="color: rgba(255, 255, 255, 0.6);font-size: 10px;line-height: 15px;">苔质</div>{{tongueMark.mossName || '--'}}</div>
+                      <div style="width: 50%;display: inline-block;font-size: 15px;margin-top: 10px;color: white;"><div style="color: rgba(255, 255, 255, 0.6);font-size: 10px;line-height: 15px;">津液</div>{{tongueMark.bodyfluidName || '--'}}</div>
+                      <div style="width: 50%;display: inline-block;font-size: 15px;margin-top: 10px;color: white;"><div style="color: rgba(255, 255, 255, 0.6);font-size: 10px;line-height: 15px;">舌下脉络</div>{{tongueMark.veinName || '--'}}</div>
+                      <div style="width: 50%;display: inline-block;font-size: 15px;margin-top: 10px;color: white;"><div style="color: rgba(255, 255, 255, 0.6);font-size: 10px;line-height: 15px;">舌形</div>{{tongueMark.ligulate || '--'}}</div>
+                      <div style="width: 50%;display: inline-block;font-size: 15px;margin-top: 10px;color: white;"><div style="color: rgba(255, 255, 255, 0.6);font-size: 10px;line-height: 15px;">点刺</div>{{tongueMark.prickStatus === undefined ? '--' : (tongueMark.prickStatus ? parseStr(tongueMark.prick) : '无')}}</div>
+                      <div style="width: 50%;display: inline-block;font-size: 15px;margin-top: 10px;color: white;"><div style="color: rgba(255, 255, 255, 0.6);font-size: 10px;line-height: 15px;">瘀斑</div>{{tongueMark.ecchymosisStatus === undefined ? '--' : (tongueMark.ecchymosisStatus ? parseStr(tongueMark.ecchymosis) : '无')}}</div>
+                      <div style="width: 50%;display: inline-block;font-size: 15px;margin-top: 10px;color: white;"><div style="color: rgba(255, 255, 255, 0.6);font-size: 10px;line-height: 15px;">瘀点</div>{{tongueMark.petechiaStatus === undefined ? '--' : (tongueMark.petechiaStatus ? parseStr(tongueMark.petechia) : '无')}}</div>
+                      <div style="width: 50%;display: inline-block;font-size: 15px;margin-top: 10px;color: white;"><div style="color: rgba(255, 255, 255, 0.6);font-size: 10px;line-height: 15px;">齿痕</div>{{tongueMark.indentationStatus === undefined ? '--' : (tongueMark.indentationStatus ? '有' : '无')}}</div>
+                      <div style="width: 50%;display: inline-block;font-size: 15px;margin-top: 10px;color: white;"><div style="color: rgba(255, 255, 255, 0.6);font-size: 10px;line-height: 15px;">裂纹</div>{{tongueMark.fissureStatus === undefined ? '--' : (tongueMark.fissureStatus ? parseStr(tongueMark.fissure) : '无')}}</div>
+                      <div style="width: 50%;display: inline-block;font-size: 15px;margin-top: 10px;color: white;"><div style="color: rgba(255, 255, 255, 0.6);font-size: 10px;line-height: 15px;">外观</div>{{tongueMark.laonen || '--'}}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class='evaluation-result'>
+          <div class='title' style="margin-top: 30px;font-size: 23px;font-weight: bold;text-align: center;">体质评估结果</div>
+          <div class='result-content text' style="margin-top: 15px;text-align: center;">根据您的舌像表现及身体表述，评估您为</div>
+          <div style="font-size: 21px;line-height: 23px;color: #03BE90;text-align: center;margin-top: 4px;">{{planData.name || (planData.tongue && planData.tongue.tzpgjg)}}体质</div>
+        </div>
+        <template v-if="planData.tongue && !planData.tongue.constitution">
+          <div class='evaluation-result'>
+            <div class='title'>体质表现</div>
+            <div class='result-content text'>{{planData.tongue.mainPerformance}}</div>
+          </div>
+          <div class='evaluation-result'>
+            <div class='title'>易患疾病</div>
+            <div class='result-content text'>{{planData.tongue.predisposition}}</div>
+          </div>
+        </template>
+        <template v-if="planData.tongue && planData.tongue.constitution">
+          <div class='evaluation-result' style="text-align: center;margin-top: 30px;">
+            <div class='title' :style="{background: `url('/static/img/icon_tzpgjg_zttz@3x.png') no-repeat calc(50% - 50px) center / 18px`, fontWeight: 500}">总体特征</div>
+            <div class='result-content text' style="padding: 0 16px;text-align: left;">{{planData.tongue.constitution.zttz}}</div>
+          </div>
+          <div class='evaluation-result' style="text-align: center;margin-top: 30px;">
+            <div class='title' :style="{background: `url('/static/img/icon_tzpgjg_xttz@3x.png') no-repeat calc(50% - 50px) center / 18px`, fontWeight: 500}">形体特征</div>
+            <div class='result-content text' style="padding: 0 16px;text-align: left;">{{planData.tongue.constitution.xttz}}</div>
+          </div>
+          <div class='evaluation-result' style="text-align: center;margin-top: 30px;">
+            <div class='title' :style="{background: `url('/static/img/icon_tzpgjg_cjbx@3x.png') no-repeat calc(50% - 50px) center / 18px`, fontWeight: 500}">常见表现</div>
+            <div class='result-content text' style="padding: 0 16px;text-align: left;">{{planData.tongue.constitution.cjbx}}</div>
+          </div>
+          <div class='evaluation-result' style="text-align: center;margin-top: 30px;">
+            <div class='title' :style="{background: `url('/static/img/icon_tzpgjg_xltz@3x.png') no-repeat calc(50% - 50px) center / 18px`, fontWeight: 500}">心理特征</div>
+            <div class='result-content text' style="padding: 0 16px;text-align: left;">{{planData.tongue.constitution.xltz}}</div>
+          </div>
+          <div class='evaluation-result' style="text-align: center;margin-top: 30px;">
+            <div class='title' :style="{background: `url('/static/img/icon_tzpgjg_fbqx@3x.png') no-repeat calc(50% - 50px) center / 18px`, fontWeight: 500}">发病倾向</div>
+            <div class='result-content text' style="padding: 0 16px;text-align: left;">{{planData.tongue.constitution.fbqx}}</div>
+          </div>
+          <div class='evaluation-result' style="text-align: center;margin-top: 30px;">
+            <div class='title' :style="{background: `url('/static/img/icon_tzpgjg_synl@3x.png') no-repeat calc(50% - 50px) center / 18px`, fontWeight: 500}">适应能力</div>
+            <div class='result-content text' style="padding: 0 16px;text-align: left;">{{planData.tongue.constitution.synl}}</div>
+          </div>
+          <!-- <div class='evaluation-result'>
+            <div class='title'>中医辨体描述</div>
+            <div class='result-content text'>{{planData.tongue.constitution.zytzms}}</div>
+          </div> -->
+        <!-- <div class='evaluation-result'>
+          <div class='title'>饮食宜忌</div>
+          <div class='result-content text'>{{planData.tongue.constitution.ysyj}}</div>
+        </div>
+        <div class='evaluation-result'>
+          <div class='title'>日常保健</div>
+          <div class='result-content text'>{{planData.tongue.constitution.rcbj}}</div>
+        </div> -->
+        </template>
+      </div>
+      <div class='medical-advice padding' style="background: #EFF1F6;margin: 30px 16px 0;padding: 30px 20px;">
+        <div class='title' style="font-size: 23px;font-weight: bold;">专家建议</div>
+        <div class='evaluation-result' style="margin-top: 20px;" v-if="planData.tongue && planData.tongue.tlfx">
+          <div class='title' style="text-align: left;font-size: 16px;font-weight: 500;"><img src="/static/img/icon_zjjy_tlfx@3x.png" style="width: 23px;vertical-align: middle;margin-right: 5px;" />调理方向</div>
+          <div class='result-content text' style="margin-top: 10px;text-align: left;color: #434E5E;font-size: 14px;line-height: 23px;">{{planData.tongue.tlfx}}</div>
+        </div>
+        <template v-if="planData.tongue && planData.tongue.constitution">
+          <div class='evaluation-result' style="margin-top: 20px;">
+            <div class='title' style="text-align: left;font-size: 16px;font-weight: 500;"><img src="/static/img/icon_zjjy_ysyj@3x.png" style="width: 23px;vertical-align: middle;margin-right: 5px;" />饮食宜忌</div>
+            <div class='result-content text' style="margin-top: 10px;text-align: left;color: #434E5E;font-size: 14px;line-height: 23px;">{{planData.tongue.constitution.ysyj}}</div>
+          </div>
+          <div class='evaluation-result' style="margin-top: 20px;">
+            <div class='title' style="text-align: left;font-size: 16px;font-weight: 500;"><img src="/static/img/icon_zjjy_rcbj@3x.png" style="width: 23px;vertical-align: middle;margin-right: 5px;" />日常保健</div>
+            <div class='result-content text' style="margin-top: 10px;text-align: left;color: #434E5E;font-size: 14px;line-height: 23px;">{{planData.tongue.constitution.rcbj}}</div>
+          </div>
+        </template>
+        <!-- <template v-if="tongueImages.zljyList && tongueImages.zljyList[1] && tongueImages.zljyList[1].value">
+          <div v-for="(item, index) in tongueImages.zljyList" :key="index">
+            <div class="title" style="font-size: 14px;margin-top: 30px;"><img :src="item.icon" style="width: 70px;vertical-align: bottom;margin-right: 8px;">{{item.key}}</div>
+            <div class='tongue-content text' style="margin-top: 20px;">
+              {{item.value}}
+            </div>
+          </div>
+        </template> -->
+      </div>
+      <div class='medical-advice padding' style="background: #EFF1F6;margin: 0 16px;padding: 0 20px 30px;">
+        <div class='title' style="font-size: 23px;font-weight: bold;">专家解读记录</div>
+        <div class="list" v-if="list.length !== 0">
+          <div class="item" v-for="item in list" :key="item.id">
+            <div class="doctor-record">
+              <div class="doctor-info">
+                <div class="doctor-avatar" :style="{backgroundImage: `url(${parse(item.expert.pics, []) && parse(item.expert.pics, [])[0] && parse(item.expert.pics, [])[0].url})`}"></div>{{item.expert.name}}<span>{{item.expert.rank}} | {{item.expert.title}}</span>
+              </div>
+              <div class="record-desc">{{item.analysis}}</div>
+              <div class="record-time">
+                {{formatTimestamp(item.endTime, 'YYYY-MM-DD HH:mm')}}
+                <div class="evaluate-result" v-if="item.score !== null">
+                  <div class="star" v-for="i in item.score" :key="i"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="list" v-else>
+          <div class="item">
+            <div class="item-text">暂无</div>
+          </div>
+        </div>
+      </div>
+      <div class='plan padding' style="margin: 0 16px 0;border: 1px dashed #868E9D;text-align: center;">
+        <div v-if='planData.plan&&planData.plan.length > 0'>
+          <div class='title' style="font-size: 23px;line-height: 34px;font-weight: 500;margin-top: 30px;">适用调理配方</div>
+          <div class='plan-recipe text'>
+            <div class='recipe-list' v-for='(item, index) in planData.plan' :key='index' style="padding: 0 20px 20px;">
+              <div class='recipe-name' style="margin-top: 20px;font-size: 16px;font-weight: 500;">[{{item.name}}]</div>
+              <div class='recipe-plan-list' style="margin-top: 10px;color: #434E5E;font-size: 14px;line-height: 23px;">
+                <span v-for='(t, i) in filter(item.dieticianComponents)' :key='i' style="color: #434E5E;font-size: 14px;line-height: 23px;">{{t.name}}{{filter(item.dieticianComponents).length !== (i + 1) ? ',' : ''}}</span>
+                等数十种食材（见现场配置）
+              </div>
+            </div>
+            <div class='plan-content' style="border-top: 1px dashed #868E9D;padding: 0 20px 20px;">
+              <div class='plan-content-name' style="margin-top: 20px;font-size: 16px;font-weight: 500;">服用方法</div>
+              <div class='plan-content-text' style="margin-top: 10px;color: #434E5E;font-size: 14px;line-height: 23px;">{{planData.plan[0].instructions}}</div>
+            </div>
+            <div class='plan-content' style="border-top: 1px dashed #868E9D;padding: 0 20px 20px;">
+              <div class='plan-content-name' style="margin-top: 20px;font-size: 16px;font-weight: 500;">热量</div>
+              <div class='plan-content-text' style="margin-top: 10px;color: #434E5E;font-size: 14px;line-height: 23px;">{{planData.caloriesAM ? `（早）一平勺卡路里为${planData.caloriesAM}kcal` : `（早）一平勺`}}；{{planData.caloriesPM ? `（晚）一平勺卡路里为${planData.caloriesPM}kcal` : `（晚）一平勺`}}</div>
+            </div>
+            <!-- <div class='plan-content'>
+              <div class='plan-content-name'>[配方价格]</div>
+              <div class='plan-content-text'>230元</div>
+            </div> -->
+            <template v-if="planData.products && planData.products[0]">
+              <div class='plan-content' v-if="planData.products[0].name" style="border-top: 1px dashed #868E9D;padding: 0 20px 20px;">
+                <div class='plan-content-name' style="margin-top: 20px;font-size: 16px;font-weight: 500;">推荐搭配产品</div>
+                <div class='plan-content-text' style="margin-top: 10px;color: #434E5E;font-size: 14px;line-height: 23px;">{{planData.products[0].name}}</div>
+              </div>
+              <div class='plan-content' v-if="planData.products[0].reason" style="border-top: 1px dashed #868E9D;padding: 0 20px 20px;">
+                <div class='plan-content-name' style="margin-top: 20px;font-size: 16px;font-weight: 500;">推荐理由</div>
+                <div class='plan-content-text' style="margin-top: 10px;color: #434E5E;font-size: 14px;line-height: 23px;">{{planData.products[0].reason}}</div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+      <div v-if="!planData.plan || planData.plan.length == 0" style="text-align: left;color: #03BE90;font-size: 16px;line-height: 23px;margin-top: 20px;padding: 0 16px;">我们的专家团队正在为您配置调理食方，10～15min左右即可查看～</div>
+      <div v-transfer-dom>
+        <previewer :list="imgList" ref="previewer" :options="options"></previewer>
+      </div>
+      <div v-transfer-dom>
+        <popup v-model="show">
+          <div class="evaluate-popup">
+            <div class="evaluate-title"></div>
+            <div class="result">“{{evaluateList[curEvaluate]}}”</div>
+            <div class="star-list">
+              <div class="star" v-for="item in 5" :key="item" @click="curEvaluate = item" :style="{ backgroundImage: item <= curEvaluate ? `url('/static/img/img_star_pj64@3x.png')` : `url('/static/img/img_star_hui@3x.png')`}"></div>
+            </div>
+            <div class="popup-btn" @click="submit">提交</div>
+          </div>
+        </popup>
+      </div>
+    </div>
+</template>
+
+<script>
+import { dateFormat, Previewer, TransferDom } from 'vux'
+export default {
+  data () {
+    return {
+      formatTimestamp: dateFormat,
+      loadCount: 0,
+      test: '',
+      options: {},
+      show: false,
+      evaluateList: {
+        1: '很不满意',
+        2: '不太满意',
+        3: '还行',
+        4: '比较满意',
+        5: '非常满意'
+      },
+      curEvaluate: 5,
+      list: [],
+      scoreId: ''
+    }
+  },
+  props: {
+    planData: {},
+    data: {},
+    tongueImages: {},
+    tongueMark: {}
+  },
+  created () {
+    this.imgList = [
+      {
+        msrc: this.tongueImages.front,
+        src: this.tongueImages.front
+      },
+      {
+        msrc: this.tongueImages.back,
+        src: this.tongueImages.back
+      }
+    ]
+    this.getScore()
+  },
+  methods: {
+    showPopup (id) {
+      this.scoreId = id
+      this.show = true
+    },
+    submit () {
+      this.$fetch.advisoryRecordUpdateScore({
+        id: this.scoreId,
+        score: this.curEvaluate
+      }).then(r => {
+        if (r.data.status === 'OK') {
+          this.getScore()
+          this.show = false
+        }
+      })
+    },
+    getScore () {
+      this.$fetch.advisoryRecordFindByInstanceId({
+        instanceId: this.$route.query.id
+      }).then(r => {
+        if (r.data.status === 'OK') {
+          this.list = r.data.data
+        }
+      })
+    },
+    // show (index) {
+    //   this.$refs.previewer.show(index)
+    // },
+    parseStr (str) {
+      let arr = JSON.parse(str)
+      if (arr.length === 0) {
+        return '有'
+      } else {
+        return arr.join()
+      }
+    },
+    parse (str, init) {
+      let ret = init
+      try {
+        ret = JSON.parse(str)
+      } catch (e) {}
+      return ret
+    },
+    filter (arr) {
+      let end = 0
+      if (arr.length > 8) {
+        end = 8
+      } else if (arr.length === 1) {
+        return arr.slice()
+      } else {
+        end = arr.length - 1
+      }
+      return arr.slice(0, end)
+    }
+  },
+  filters: {
+    sexFil (val) {
+      var sex = {UNKNOWN: '未知', MAN: '男', LADY: '女', null: '未知'}
+      return sex[val]
+    },
+    splice (obj) {
+      let ret = ''
+      if (!obj) return ret
+      if (obj.tongueColor) {
+        ret += `（舌色）${obj.tongueColor || '--'}，`
+      }
+      if (obj.mossColor) {
+        ret += `（苔色）${obj.mossColor || '--'}，`
+      }
+      if (obj.mossName) {
+        ret += `（苔质）${obj.mossName || '--'}，`
+      }
+      if (obj.bodyfluidName) {
+        ret += `（津液）${obj.bodyfluidName || '--'}，`
+      }
+      if (obj.veinName) {
+        ret += `（舌下脉络）${obj.veinName || '--'}，`
+      }
+      if (obj.ligulate) {
+        ret += `（舌形）${obj.ligulate || '--'}，`
+      }
+      if (obj.prickStatus) {
+        ret += `（点刺）有，`
+      } else {
+        ret += `（点刺）无，`
+      }
+      if (obj.ecchymosisStatus) {
+        ret += `（瘀斑）有，`
+      } else {
+        ret += `（瘀斑）无，`
+      }
+      if (obj.petechiaStatus) {
+        ret += `（瘀点）有，`
+      } else {
+        ret += `（瘀点）无，`
+      }
+      if (obj.indentationStatus) {
+        ret += `（齿痕）有，`
+      } else {
+        ret += `（齿痕）无，`
+      }
+      if (obj.fissureStatus) {
+        ret += `（裂纹）有，`
+      } else {
+        ret += `（裂纹）无，`
+      }
+      if (obj.laonen) {
+        ret += `（外观）${obj.laonen || '--'}，`
+      }
+      ret = ret.replace(/，$/, '')
+      return ret
+    }
+  },
+  components: {
+    Previewer
+  },
+  directives: {
+    TransferDom
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.customerInfo{
+  background: #EFF1F6;
+  padding: 15px;
+}
+.content2 {
+  text-align: left;
+  background: white;
+  .padding {
+    padding: 20px 30px 0;
+  }
+  .title {
+    height:24px;
+    font-size:16px;
+    font-weight:500;
+    color:#2A3441;
+    line-height:24px;
+    margin-bottom: 10px;
+  }
+  .text {
+    font-size:14px;
+    color: #434E5E;
+  }
+  >div + div {
+    // border-top: 10px solid #EFF1F6;
+  }
+  .base-info {
+    padding-bottom: 20px;
+    .customer-content >div {
+      display: inline-block;
+      height:21px;
+      &.phone {
+        margin-left: 30px;
+        // padding-right: 30px;
+        // background: url('/static/image/img_mwzh.png') no-repeat right / 26px;
+      }
+    }
+    .evaluation-result, .evaluation-time {
+      margin-top: 30px;
+    }
+  }
+  // .tongueImg-info {
+  //   padding-bottom: 20px;
+    .tongueImg {
+      font-size: 0;
+      text-align: center;
+      div {
+        display: inline-block;
+        margin-top: 10px;
+        height: 0;
+        padding-top: 104px;
+        width: 104px;
+        background: no-repeat center bottom / 150% auto;
+        position: relative;
+        overflow: hidden;
+      }
+    }
+    .tongue-exterior {
+      margin-top: 24px;
+    }
+  // }
+  .medical-advice {
+    padding-bottom: 20px;
+    p {
+      line-height: 23px;
+    }
+  }
+  .plan {
+    padding-bottom: 77px;
+    .recipe-list {
+      display: flex;
+      border-bottom: 1px solid #EAEDF4;
+      +.recipe-list {
+        padding-top: 20px;
+      }
+      .recipe-name {
+        margin-right: 20px;
+      }
+      .recipe-plan-list span {
+        display: inline-block;
+        margin-bottom: 20px;
+      }
+    }
+    .plan-content {
+      display: flex;
+      margin-top: 20px;
+      .plan-content-name {
+        flex: 0 0 78px;
+      }
+      .plan-content-text {
+        line-height: 23px;
+      }
+    }
+    .plan-btn {
+      width: 150px;
+      height: 40px;
+      line-height: 40px;
+      text-align: center;
+      color: #FFF;
+      background: linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+      border-radius: 23px;
+      margin-top: 30px;
+    }
+  }
+}
+.list{
+  margin-top: 7px;
+  .item{
+    position: relative;
+    .doctor-record{
+      padding: 15px 0 20px;
+      .doctor-info{
+        position: relative;
+        color: #2A3441;
+        font-size: 16px;
+        line-height: 24px;
+        .doctor-avatar{
+          height: 24px;
+          width: 24px;
+          background: no-repeat center / cover;
+          display: inline-block;
+          border-radius: 50%;
+          vertical-align: middle;
+          margin-right: 6px;
+        }
+        span{
+          color: #A2A9BA;
+          font-size: 13px;
+          line-height: 19px;
+          margin-left: 10px;
+        }
+      }
+      .record-desc{
+        color: #434E5E;
+        font-size: 14px;
+        line-height: 20px;
+        margin-top: 8px;
+      }
+      .record-time{
+        color: #A2A9BA;
+        font-size: 13px;
+        line-height: 19px;
+        margin-top: 10px;
+        .evaluate-result{
+          float: right;
+          font-size: 0;
+          .star{
+            width: 16px;
+            height: 15px;
+            background: url('/static/img/img_star_pj@3x.png') no-repeat center / cover;
+            display: inline-block;
+            +.star{
+              margin-left: 2px;
+            }
+          }
+        }
+        .evaluate-btn{
+          float: right;
+          color: #03BE90;
+          font-size: 13px;
+          line-height: 23px;
+          border: 1px solid #03BE90;
+          border-radius: 12px;
+          padding: 0 10px;
+        }
+      }
+    }
+    .item-title{
+      padding: 0 35px;
+      color: #179F7D;
+      font-size: 15px;
+      line-height: 21px;
+    }
+    +.item{
+      &::before{
+        content: '';
+        height: 1px;
+        position: absolute;
+        top: 0;
+        left: 35px;
+        right: 35px;
+        border-top: 1px dashed #868E9D;
+      }
+      .item-title{
+        padding-top: 21px;
+      }
+    }
+  }
+}
+.item-text{
+  color: #434E5E;
+  font-size: 14px;
+  line-height: 23px;
+  padding: 11px 35px 25px;
+}
+</style>
+<style lang="scss">
+.evaluate-popup{
+  border-radius: 15px 15px 0 0;
+  background: white;
+  padding: 44px 60px 40px;
+  .evaluate-title{
+    height: 1px;
+    background: #C6CAD4;
+    margin: 0 7px;
+    position: relative;
+    &::before{
+      content: '提交评价';
+      position: absolute;
+      padding: 0 15px;
+      color: #16202E;
+      font-weight: bold;
+      font-size: 19px;
+      line-height: 28px;
+      left: 50%;
+      margin-top: -14px;
+      margin-left: -53px;
+      background: white;
+    }
+  }
+  .result{
+    color: #16202E;
+    font-size: 21px;
+    line-height: 31px;
+    margin-top: 34px;
+    text-align: center;
+    font-weight: bold;
+  }
+  .star-list{
+    text-align: center;
+    font-size: 0;
+    margin-top: 20px;
+    .star{
+      display: inline-block;
+      width: 31px;
+      height: 29px;
+      background: no-repeat center / cover;
+      +.star{
+        margin-left: 5px;
+      }
+    }
+  }
+  .popup-btn{
+    margin-top: 33px;
+    line-height: 45px;
+    height: 45px;
+    text-align: center;
+    color: white;
+    background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+    box-shadow:0px 2px 7px 0px rgba(3,190,144,0.3);
+    border-radius:23px;
+  }
+}
+</style>

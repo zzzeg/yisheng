@@ -1,0 +1,757 @@
+<template>
+  <div class="content">
+    <div class="scroll-content" v-if="skinReport" >
+      <div class="time">
+        <div class="icon"></div>
+        {{skinReport.createTime}}
+      </div>
+      <div class="total-score">
+        {{skinReport.score}}分
+        <div class="picture-btn" @click="showFace">查看原图</div>
+      </div>
+      <div class="total-score-title">皮肤健康指数</div>
+      <div class="chart-container">
+        <!-- <canvas id="container"></canvas> -->
+         <canvas canvas-id="canvasRadar" id="canvasRadar" class="charts"></canvas>
+      </div>
+      <div class="result">
+        <div class="result-item" v-for="(item, index) in skinReport.other" :key="index">
+          <div class="result-text">{{item.value}}</div>
+          <div class="result-title">{{item.name}}</div>
+        </div>
+      </div>
+      <div class="exigency-container" v-if="skinReport.urgent">
+        <div class="exigency-title">急需解决</div>
+        <div class="list">
+          <div class="item" :class="expand ? 'expand' : ''">
+            <div class="summary" @click="clickExpand">
+              <div class="summary-title">{{skinReport.urgent.name}}</div>
+              <div class="summary-score" v-if="skinReport.urgent.score || skinReport.urgent.score === 0">{{skinReport.urgent.score}}<span>分</span></div>
+              <div class="summary-level" :style="{color: colors[skinReport.urgent.level] ? 'white' : '#446F67',background: colors[skinReport.urgent.level] ? colors[skinReport.urgent.level] : '#E3F1EF'}">{{skinReport.urgent.level}}</div>
+              <div class="summary-icon"></div>
+            </div>
+            <div class="expand-container" v-if="expand">
+              <div class="chart" v-if="skinReport && skinReport.urgent && skinReport.urgent.data && skinReport.urgent.data.length > 0">
+                <div class="chart-title">
+                  <div class="chart-title-item" v-for="(item, index) in skinReport.urgent.data" :key="index">{{item.name}}</div>
+                </div>
+                <div class="chart-content">
+                  <div class="chart-grid">
+                    <div class="chart-grid-item" v-for="(item, index) in skinReport.urgent.data" :key="index">
+                      <div class="chart-bar" :style="{width: getWidth(item)}"></div>
+                    </div>
+                  </div>
+                  <div class="chart-label-list">
+                    <div class="chart-label-item">轻度</div>
+                    <div class="chart-label-item">中度</div>
+                    <div class="chart-label-item">重度</div>
+                  </div>
+                </div>
+              </div>
+              <div class="desc">{{skinReport.urgent.tips}}</div>
+
+              <div class="products" v-if="products.length > 0">
+                <div class="products-title">推荐产品</div>
+          
+                <div class="product" v-for="(product, index) in products" :key="index" @click="clickProductDetail(item)">
+                  <div class="product-icon" :style="{backgroundImage: 'url('+product.icon+')'}"></div>
+                  <div class="product-introduce">
+                    <div class="product-name">{{product.name}}</div>
+                    <div class="product-desc">{{product.description}}</div>
+                    <div class="product-price">￥{{product.price}}</div>
+                    <div class="product-btn" @click.stop="clickProductSelect">点击购买</div>
+                    <!-- $router.push({path: `/productSelect?instanceId=${$route.query.id}&productUrl=productDetail2&type=${skinReport.urgent.type}&productId=${product.id}`}) -->
+                  </div>
+                </div>
+              </div>
+              <view v-if="orders.length > 0">
+                  <div class="order" v-for="(order, index) in orders" :key="index" @click="orderDetail">
+                      <!-- $router.push({path: `/order/orderDetail?id=${order.id}`}) -->
+                    <div class="order-title">共{{order.item.reduce((total, currentValue) => total + currentValue.num, 0)}}件商品<span>￥{{order.actualPrice}}</span></div>
+                    <div class="order-no">{{order.orderNum}}</div>
+                    <div class="order-payWay">{{order.payType === 'WECHAT' ? '微信支付' : '现金支付'}}</div>
+                    <div class="order-time">{{dateFormat(order.payTime, 'YYYY-MM-DD HH:mm')}}</div>
+                  </div>
+              </view>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="list-block">
+        <div class="block-title">单项分析</div>
+        <div class="list">
+          <view class="item" v-for="(item, index) in skinReport.item" :key="index" @click="clickItem(index)">
+            <div class="item-name">{{item.name}}</div>
+            <div class="item-icon" :style="{backgroundImage: `url(${types[item.type]})`}"></div>
+            <div class="item-level" :style="{color: colors[item.level] ? 'white' : '#446F67',background: colors[item.level] ? colors[item.level] : '#E3F1EF'}">{{item.level}}</div>
+          </view>
+        </div>
+      </div>
+    </div>
+    <div v-transfer-dom>
+      <!-- <previewer :list="imgList" ref="previewer" :options="{}"></previewer> -->
+    </div>
+    <transition>
+      <router-view></router-view>
+    </transition>
+  </div>
+</template>
+<script>
+
+import api from '../../common/api.js';
+import util from '../../common/util.js'
+import uCharts from '@/components/u-charts/u-charts.js'
+var _self;
+var canvaRadar=null;
+export default {
+  
+  data () {
+    return {
+      chartData: [],
+      imgList: [],
+      expand: false,
+      colors: {
+        '重度': '#D35671',
+        '中度': '#E8AC60',
+        '轻度': '#46B39F'
+      },
+      types: {
+        'spot': '../../static/image/img_pfjcbg_bd@2x.png',
+        'pore': '../../static/image/img_pfjcbg_mk@2x.png',
+        'pockmark': '../../static/image/img_pfjcbg_dd@2x.png',
+        'wrinkle': '../../static/image/img_pfjcbg_zw@2x.png',
+        'acne': '../../static/image/img_pfjcbg_cc@2x.png',
+        'dark_circle': '../../static/image/img_pfjcbg_hyq@2x.png',
+        'chloasma': '../../static/image/img_pfjcbg_zsb@2x.png',
+        'roughness': '../../static/image/img_pfjcbg_ccd@2x.png',
+        'texture': '../../static/image/img_pfjcbg_wl@2x.png',
+        'blackhead': '../../static/image/img_pfjcbg_ht@2x.png',
+        'moisture': '../../static/image/img_pfjcbg_sf@2x.png',
+        'sensitive': '../../static/image/img_pfjcbg_mgd@2x.png',
+        'skin_type': '../../static/image/img_pfjcbg_fz@2x.png'
+      },
+      products: [],
+      orders: [],
+      skinReport:{urgent:{data:null}},
+      
+      faceId:null,
+      faceUrl:null,
+      
+      cWidth:'',
+      cHeight:'',
+      pixelRatio:1,
+    }
+  },
+  onLoad (options) {
+        uni.setNavigationBarTitle({
+            title:'皮肤检测分析报告'
+        })
+        console.log(options.sid)
+        _self = this
+        this.cWidth=uni.upx2px(750);
+        this.cHeight=uni.upx2px(500);
+        
+        this.faceId = options.sid
+        var data = {
+            id:this.faceId
+        }
+        api.findFaceById({
+            data:data
+        }).then(res => {
+            console.log(res)
+            if(res.status == 'OK'){
+                this.skinReport = res.data
+                this.skinReport.createTime = util.formatTimestamp(this.skinReport.createTime, 'yyyy-MM-dd hh:mm')
+                
+                let Radar={categories:[],series:[]};
+                Radar.categories = ["棕色斑", "斑点", "水分", "痘痘", "纹理", "毛孔", "皱纹", "黑头", "黑眼圈"]
+                var seriesData = []
+                this.skinReport.top.forEach(item => {
+                    seriesData.push(item.score)
+                })
+                Radar.series = [{name: '皮肤健康指数',data: seriesData}]
+                _self.showRadar("canvasRadar",Radar);
+            }
+        })
+      
+  
+  },
+  mounted () {
+  },
+  methods: {
+    clickProductDetail:function(item){
+        if(item.productType == 'SHIFANG'){
+            uni.navigateTo({
+                url:"../health-product-detail/health-product-detail?id="+item.code+'&productType='+item.productType
+            })
+        }else{
+            uni.navigateTo({
+                url:"../health-product-detail/health-product-detail?id="+item.productId+'&productType='+item.productType
+            })
+        }
+    },
+    clickProductSelect:function(){
+        uni.removeStorageSync('community_cartList');
+        
+        var cartList = []
+        this.products.forEach(item => {
+            var name = item.productType === 'SHIFANG' ? item.cfName : item.name
+        	var obj = {
+                id:item.id,
+                image:item.pic,
+                attr_val:item.efficacy,
+                title:name,
+                price:item.price,
+                number:item.num
+            }
+            
+            cartList.push(obj)
+        })
+        uni.setStorageSync('community_cartList',cartList)
+        uni.navigateTo({
+        	url:'../cart/cart?type=community'
+        })
+    },
+    showRadar(canvasId,chartData){
+        canvaRadar=new uCharts({
+    		$this:_self,
+    		canvasId: canvasId,
+    		type: 'radar',
+    		fontSize:11,
+    		legend:{show:true},
+    		background:'#FFFFFF',
+    		pixelRatio:_self.pixelRatio,
+    		animation: true,
+    		dataLabel: true,
+    		categories: chartData.categories,
+    		series: chartData.series,
+    		width: _self.cWidth*_self.pixelRatio,
+    		height: _self.cHeight*_self.pixelRatio,
+    		extra: {
+    			radar: {
+    				max: 100,//雷达数值的最大值
+                    gridColor:'#91BDB5',
+                    opacity:0.5,
+                    labelColor:'#148973'
+    			}
+    		}
+    	});
+    },				
+    showFace () {
+        if(!this.faceUrl){
+            uni.downloadFile({
+                url: this.skinReport.faceImage , //仅为示例，并非真实的资源
+                success: (fileres) => {
+                    if (fileres.statusCode === 200) {
+                        this.faceUrl = fileres.tempFilePath
+                        var	urls = [fileres.tempFilePath];
+                        uni.previewImage({
+                        	urls,
+                        })
+                    }
+                }
+            });
+        }else{
+			var	urls = [this.faceUrl];
+			uni.previewImage({
+				urls,
+			})
+		}
+    },
+    clickExpand:function(){
+        this.expand = !this.expand
+    },
+    clickItem:function(index){
+        console.log(this.skinReport.item[index].type)
+        
+        uni.navigateTo({
+            url:"skinDetail/skinDetail?id="+this.faceId + "&skinType="+this.skinReport.item[index].type + '&title=' + this.skinReport.item[index].name
+        })
+        // $router.push({path: `/home/skinPos/skinDetail?id=${$route.query.id}&skinType=${item.type}`})
+    },
+    getWidth (item) {
+      let base = ''
+      switch (item.level) {
+        case '轻度':
+          base = 0
+          break
+        case '中度':
+          base = 33.33
+          break
+        case '重度':
+          base = 66.66
+          break
+      }
+      let value = (100 - (item.value || 0))
+      if (item.name === '痤疮数量' || item.name === '毛孔数量' || item.name === '黑头数量') {
+        if (item.value === '0') {
+          value = 0
+        } else {
+          value = 50
+        }
+      }
+      let score = base + (value / 100 * 33.33)
+      return `${score}%`
+    },
+    parse (str, initValue) {
+      let ret = initValue
+      try {
+        ret = JSON.parse(str)
+      } catch (e) {}
+      return ret
+    }
+  },
+  computed: {
+    // ...mapState([
+    //   'skinReport'
+    // ])
+  },
+  watch: {
+    skinReport () {
+      if (this.skinReport.urgent) {
+        api.faceFindPuductByIdAndType({data:{
+          id: this.faceId,
+          type: this.skinReport.urgent.type
+        }}).then(r => {
+            console.log(r.data)
+          if (r.status === 'OK' && r.data) {
+              
+            r.data.forEach(item => {
+                if(item.icon && JSON.parse(item.icon).length > 0){
+                    item.icon = JSON.parse(item.icon)[0].url
+                }
+               
+                item.price = (item.price/100).toFixed(2)
+                
+              if (item.orderId) {
+                api.constitutionOrderFindById({
+                  id: item.orderId
+                }).then(r => {
+                  if (r.status === 'OK') {
+                    if (r.data) {
+                        this.orders.push(r.data)
+                        this.orders.forEach(item => {
+                            item.actualPrice = (item.actualPrice / 100).toFixed(2)
+                        })
+                    }
+                  }
+                })
+              } else {
+                this.products.push(item)
+              }
+            })
+            
+          }
+        })
+      }
+
+
+      
+    }
+  },
+  destroyed () {
+    this.UPDATE_SKIN(null)
+    
+    
+  },
+  components: {
+    // Previewer
+  }
+}
+</script>
+<style lang="scss" scoped>
+$green: #0E5745;
+$white: #FFF;
+.content{
+  height: 100%;
+  overflow: hidden;
+  position: absolute;
+  width: 100%;
+  display: flex;
+  left: 0;
+  top: 0;
+  background: white;
+  flex-direction: column;
+  .scroll-content{
+    // @include scrollPage;
+    overflow:auto;
+    height: 100%;
+    bottom: 0;
+    background: white;
+    .time{
+      text-align: center;
+      line-height: 14px;
+      font-size: 10px;
+      color: #868E9D;
+      margin-top: 5px;
+      .icon{
+        height: 9px;
+        width: 9px;
+        display: inline-block;
+        margin-right: 3px;
+      }
+    }
+    .total-score{
+      margin-top: 20px;
+      color: #148973;
+      font-size: 23px;
+      line-height: 32px;
+      position: relative;
+      text-align: center;
+      .picture-btn{
+        position: absolute;
+        width: 172upx;
+        height: 54upx;
+        border: 1px solid #03BE90;
+        border-radius: 12px;
+        padding-left: 28px;
+        color: #03BE90;
+        font-size: 12px;
+        line-height: 24px;
+        top: 4px;
+        text-align: left;
+        right: 15px;
+        background: url(../../static/image/icon_pfjcbg_ckyt@2x.png) no-repeat 10px center / 14px 14px;
+      }
+    }
+    .total-score-title{
+      margin: 4px;
+      color: #2A3441;
+      font-size: 16px;
+      line-height: 22px;
+      text-align: center;
+    }
+    .chart-container{
+      width: 100%;
+      padding-top: 80%;
+      position: relative;
+      canvas{
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+      }
+    }
+    .result{
+      background:rgba(255,255,255,1);
+      box-shadow:0px 5px 15px 0px rgba(134,142,157,0.5);
+      border-radius:15px;
+      display: flex;
+      height: 85px;
+      margin: 0 15px;
+      .result-item{
+        flex: 1;
+        font-size: 16px;
+        line-height: 22px;
+        text-align: center;
+        position: relative;
+        +.result-item::before{
+          content: '';
+          height: 30px;
+          width: 1px;
+          position: absolute;
+          top: 28px;
+          left: 0;
+          background: #91BDB5;
+        }
+        .result-text{
+          margin-top: 17px;
+          color: #148973;
+        }
+        .result-title{
+          margin-top: 4px;
+          color: #434E5E;
+        }
+      }
+    }
+    .exigency-container{
+      margin: 40px 15px;
+      .exigency-title{
+        color: #16202E;
+        font-size: 19px;
+        line-height: 26px;
+        font-weight: bold;
+        padding-left: 24px;
+        background: url(../../static/image/img_pfjcbg_jxjj@2x.png) no-repeat 0 center / 24px 24px;
+      }
+      .list{
+        .item{
+          margin-top: 10px;
+          &.expand{
+            .summary{
+              border: none;
+              .summary-icon{
+                background-image: url(../../static/image/icon_xxzk@2x.png);
+              }
+            }
+          }
+          .summary{
+            display: flex;
+            align-items: center;
+            height: 50px;
+            line-height: 50px;
+            color: #434E5E;
+            border-bottom: 2px solid #148973;
+            .summary-title{
+              flex: 1;
+              font-size: 16px;
+            }
+            .summary-score{
+              flex: 0 0 auto;
+              font-size: 21px;
+              font-weight: bold;
+              span{
+                font-size: 14px;
+              }
+            }
+            .summary-level{
+              flex: 0 0 auto;
+              width: 36px;
+              height: 14px;
+              background: #D35671;
+              text-align: center;
+              border-radius: 7px;
+              color: white;
+              font-size: 10px;
+              line-height: 14px;
+              margin: 0 8px 0 4px;
+            }
+            .summary-icon{
+              flex: 0 0 16px;
+              height: 16px;
+              background: url(../../static/image/icon_xxzk@2x.png) no-repeat center / 100%;
+            }
+          }
+          .expand-container{
+            background: #F6F7FA;
+            border-radius: 15px;
+            padding: 30px 15px 20px;
+            .chart{
+              display: flex;
+              .chart-title{
+                flex: 0 0 63px;
+                padding-right: 10px;
+                text-align: right;
+                .chart-title-item{
+                  height: 30px;
+                  line-height: 30px;
+                  color: #434E5E;
+                  font-size: 14px;
+                  white-space: nowrap;
+                }
+              }
+              .chart-content{
+                flex: 1;
+                .chart-grid{
+                  position: relative;
+                  border-left: 1px dashed #91BDB5;
+                  border-right: 1px dashed #91BDB5;
+                  border-bottom: 1px solid #91BDB5;
+                  &::before{
+                    content: '';
+                    width: 1px;
+                    height: 100%;
+                    border-left: 1px dashed #91BDB5;
+                    position: absolute;
+                    left: 33.33%;
+                    top: 0;
+                  }
+                  &::after{
+                    content: '';
+                    width: 1px;
+                    height: 100%;
+                    border-left: 1px dashed #91BDB5;
+                    position: absolute;
+                    left: 66.66%;
+                    top: 0;
+                  }
+                  .chart-grid-item{
+                    height: 30upx;
+                    padding: 10px 0;
+                    position: relative;
+                    .chart-bar{
+                      height: 100%;
+                      background: #03BE90;
+                      border-radius: 0 8px 8px 0;
+                    }
+                  }
+                }
+                .chart-label-list{
+                  display: flex;
+                  margin-top: 3px;
+                  .chart-label-item{
+                    flex: 1;
+                    text-align: center;
+                    color: #A2A9BA;
+                    font-size: 14px;
+                    line-height: 20px;
+                  }
+                }
+              }
+            }
+            .desc{
+              margin-top: 20px;
+              color: #434E5E;
+              font-size: 14px;
+              line-height: 22px;
+            }
+            .products{
+              margin-top: 22px;
+              .products-title{
+                font-size: 16px;
+                line-height: 22px;
+                color: #16202E;
+                font-weight: bold;
+              }
+              .product{
+                margin-top: 15px;
+                display: flex;
+                +.product{
+                  margin-top: 10px;
+                }
+                .product-icon{
+                  flex: 0 0 90px;
+                  height: 90px;
+                  border-radius: 6px;
+                  background: no-repeat center / cover;
+                }
+                .product-introduce{
+                  flex: 1;
+                  padding-left: 10px;
+                  position: relative;
+                  .product-name{
+                    color: #434E5E;
+                    font-size: 14px;
+                    line-height: 20px;
+                    height: 40px;
+                    // @include ellipsis(2)
+                  }
+                  .product-desc{
+                    color: #148973;
+                    font-size: 12px;
+                    line-height: 17px;
+                    margin-top: 2px;
+                    // @include ellipsis(1);
+                  }
+                  .product-price{
+                    color: #16202E;
+                    font-size: 18px;
+                    line-height: 25px;
+                    margin-top: 6px;
+                    padding-right: 70px;
+                    font-weight: bold;
+                    // @include ellipsis(1)
+                  }
+                  .product-btn{
+                    background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+                    box-shadow:0px 3px 15px 0px rgba(3,190,144,0.3);
+                    border-radius:12px;
+                    font-size: 12px;
+                    height: 24px;
+                    line-height: 24px;
+                    width: 68px;
+                    text-align: center;
+                    color: white;
+                    position: absolute;
+                    right: 0;
+                    bottom: 0;
+                  }
+                }
+              }
+            }
+            .order{
+              padding: 0;
+              margin: 15px 0;
+              padding: 15px 22px;
+              background: white;
+              border-radius: 5px;
+              .order-title{
+                color: #2A3441;
+                font-size: 15px;
+                line-height: 23px;
+                span{
+                  float: right;
+                }
+              }
+              .order-no{
+                padding-left: 28px;
+                margin-top: 10px;
+                background: url('../../static/image/icon_dd_bh@2x.png') no-repeat 0 center / 18px 18px;
+                color: #434E5E;
+                font-size: 13px;
+                line-height: 19px;
+              }
+              .order-payWay{
+                padding-left: 28px;
+                margin-top: 10px;
+                background: url('../../static/image/icon_dd_zffs@2x.png') no-repeat 0 center / 18px 18px;
+                color: #434E5E;
+                font-size: 13px;
+                line-height: 19px;
+              }
+              .order-time{
+                padding-left: 28px;
+                margin-top: 10px;
+                background: url('../../static/image/icon_dd_sj@2x.png') no-repeat 0 center / 18px 18px;
+                color: #434E5E;
+                font-size: 13px;
+                line-height: 19px;
+              }
+            }
+          }
+        }
+      }
+    }
+    .list-block{
+      margin: 0 15px 40px;
+      .block-title{
+        color: #16202E;
+        font-size: 19px;
+        line-height: 26px;
+        font-weight: bold;
+        padding-left: 24px;
+        background: url('../../static/image/img_pfjcbg_dxfx@2x.png') no-repeat 0 center / 24px 24px;
+      }
+      .list{
+        position: relative;
+        margin-top: -5px;
+        padding: 0 14px;
+        line-height: 0;
+        font-size: 0;
+        .item{
+          margin-top: 30px;
+          display: inline-block;
+          width: 33.33%;
+          text-align: center;
+          .item-name{
+            color: #434E5E;
+            font-size: 14px;
+            line-height: 20px;
+          }
+          .item-icon{
+            width: 40px;
+            height: 45px;
+            margin: 4px auto 2px;
+            background: no-repeat center 0 / 100% auto;
+          }
+          .item-level{
+            display: inline-block;
+            padding: 0 8px;
+            height: 14px;
+            background: #D35671;
+            border-radius: 7px;
+            font-size: 10px;
+            line-height: 14px;
+            text-align: center;
+            color: white;
+            margin: 0 auto;
+            white-space: nowrap;
+          }
+        }
+      }
+    }
+  }
+}
+
+</style>

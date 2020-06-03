@@ -1,0 +1,117 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/index/index",
+			"style": {
+                "navigationBarTitleText": "",
+                "navigationBarBackgroundColor": "#FFFFFF",
+                "backgroundColor": "#FFFFFF"
+				
+				
+			}
+		},{
+			"path": "pages/index/login",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle":"custom",
+				"app-plus":{
+                    "titleView":false
+                }
+			}
+		},
+        {
+            "path": "pages/index/aldiscriminate/index",
+            "style": {
+                "navigationBarBackgroundColor": "#FFFFFF",
+                "navigationStyle":"custom"
+                
+            }
+        },{
+            "path":"pages/index/aldiscriminate/basicInfo",
+            "style": {
+                "navigationBarTitleText": "基本信息",
+                "navigationBarBackgroundColor": "#148973",
+                "backgroundColor": "#148973",
+                "navigationBarTextStyle": "#ffffff"
+            }
+        },{
+            "path":"pages/index/aldiscriminate/healthInfo",
+            "style": {
+                // "navigationBarTitleText": "健康信息",
+                "navigationBarBackgroundColor": "#148973",
+                // "backgroundColor": "#148973",
+                // "navigationBarTextStyle": "#ffffff",
+                "navigationStyle":"custom"
+            }
+        },{
+            "path":"pages/index/aldiscriminate/faceCamera",
+            "style": {
+                // "navigationBarTitleText": "健康信息",
+                // "navigationBarBackgroundColor": "#148973",
+                // "backgroundColor": "#148973",
+                // "navigationBarTextStyle": "#ffffff",
+                "navigationStyle":"custom"
+            }
+        },{
+            "path":"pages/index/aldiscriminate/faceRecognize",
+            "style": {
+                "navigationStyle":"custom"
+            }
+        },{
+            "path":"pages/index/aldiscriminate/tongueFront",
+            "style": {
+                "navigationStyle":"custom"
+            }
+        },{
+            "path":"pages/index/aldiscriminate/tongueContrary",
+            "style": {
+                "navigationStyle":"custom"
+            }
+        },{
+            "path":"pages/index/aldiscriminate/recognizeFailure",
+            "style": {
+                "navigationBarTitleText": "面相舌象",
+                "navigationBarBackgroundColor": "#FFFFFF",
+                "backgroundColor": "#F7F7F8"
+            }
+        },{
+            "path":"pages/index/alskin/welcome",
+            "style": {
+                "navigationBarBackgroundColor": "#FFFFFF",
+                "navigationStyle":"custom"
+                
+            }
+        },{
+            "path":"pages/index/alskin/faceCamera",
+            "style": {
+                "navigationBarBackgroundColor": "#FFFFFF",
+                "navigationStyle":"custom"
+                
+            }
+        },{
+            "path":"pages/index/alskin/faceRecognize",
+            "style": {
+                "navigationBarBackgroundColor": "#FFFFFF",
+                "navigationStyle":"custom"
+                
+            }
+        },{
+            "path":"pages/index/aldiscriminate/questionnaireResult",
+            "style": {
+                "navigationBarTitleText": "肺腑辨证",
+                "navigationBarBackgroundColor": "#008A67",
+                "backgroundColor": "#008A67",
+                "navigationBarTextStyle": "#ffffff"
+                
+            }
+        }
+        
+        
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	}
+}

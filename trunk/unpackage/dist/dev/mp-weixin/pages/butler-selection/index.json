@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "管家推荐",
+  "usingComponents": {
+    "uni-search-bar": "/components/uni-search-bar/uni-search-bar",
+    "uni-load-more": "/components/uni-load-more/uni-load-more"
+  }
+}

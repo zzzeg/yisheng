@@ -1,0 +1,537 @@
+<template>
+	<view>
+		<!-- 地址 -->
+		<navigator url="/pages/mine-address-detail/mine-address-detail" class="address-section">
+			<view class="order-content">
+				<image src="/static/healthy-mall/icon_jksc_ddshdz.png" mode="aspectFit"></image>
+				<view class="cen">
+					<template v-if="addressData.name">
+						<view class="top">
+							<text class="name">{{addressData.name}}</text>
+							<text class="mobile">{{addressData.mobile}}</text>
+						</view>
+						<text class="address">{{addressData.regions}} {{addressData.detailAddress}}</text>
+					</template>
+					<template v-else>
+						<view class="top">
+							<text class="name">请填写收货地址</text>
+						</view>
+					</template>
+				</view>
+				<uni-icons type="arrowright" color="#c6cad4"></uni-icons>
+			</view>
+		</navigator>
+
+		<view class="goods-section">
+			<!-- 商品列表 -->
+			<block v-for="(item, index) in buylist" :key="item.id">
+				<view class="cart-item">
+					<view class="image-wrapper">
+						<image :src="item.image" :class="[item.loaded]" mode="aspectFill" lazy-load @load="onImageLoad('buylist', index)"
+						 @error="onImageError('buylist', index)"></image>
+					</view>
+					<view class="item-right">
+						<text class="clamp title">{{item.title}}</text>
+						<text class="attr">{{item.attr_val}}</text>
+						<view class="u-f item-right-bottom">
+							<text class="price">¥{{item.price|toFixed}}</text>
+							<text class="price">x{{item.number}}</text>
+						</view>
+					</view>
+				</view>
+			</block>
+		</view>
+		<!-- 金额明细 -->
+		<view class="yt-list">
+			<view class="yt-list-cell b-b">
+				<text class="cell-tit clamp">共 <text class="base">{{totalNum}}</text> 件商品 总价：</text>
+				<text class="cell-tip base">￥{{goodsPrice|toFixed}}</text>
+				<text class="cell-tip smalltip">（含配送费￥{{fee}}）</text>
+			</view>
+		</view>
+
+		<!-- 底部 -->
+		<view class="footer">
+			<text class="submit" @click="submit">提交订单</text>
+		</view>
+
+	</view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				type:'',//健康商城 community  自营  customer
+				buylist: [],
+				payType: 1, //1微信 2支付宝
+				totalNum:0,
+				total:0,
+				goodsPrice:0,
+				fee:0,
+				// addressStatus:false,//是否有默认地址
+				addressData: {
+					name: '',
+					mobile: '',
+					regions: '',
+					detailAddress: ''
+				},
+			}
+		},
+		computed: {
+			communityId() {
+				return this.$store.getters.communityId 
+			}
+		},
+		onLoad(options) {
+			//健康商城 community  自营  customer
+			this.type =options.type
+			//运费
+			this.fee = Number(options.fee)
+			//商品数据
+			uni.getStorage({
+				key: 'buylist',
+				success: (res) => {
+					this.buylist = res.data;
+					this.goodsPrice = 0;
+					let list = this.buylist;
+					//合计 计算总价
+					list.forEach(item => {
+						console.log(item);
+						this.goodsPrice += item.price * item.number;
+						this.totalNum += item.number;
+					})
+					this.goodsPrice+= this.fee
+					// this.goodsPrice = this.goodsPrice - this.deduction + this.freight;
+				}
+			});
+			uni.getStorage({
+				key: 'deliAddress',
+				success: (e) => {
+					this.addressData = e.data;
+					// uni.removeStorage({
+					// 	key: 'deliAddress'
+					// })
+				}
+			})
+		},
+		onShow() {
+			let pages = getCurrentPages();
+			let currPage = pages[pages.length-1];
+			if(currPage.data.addressData.name==undefined || currPage.data.selectedAddress==''){
+				
+			}else{
+				this.addressData = currPage.data.addressData
+			}
+			console.log(this.addressData);
+		},
+		methods: {
+			//显示优惠券面板
+			numberChange(data) {
+				this.number = data.number;
+			},
+			changePayType(type) {
+				this.payType = type;
+			},
+			//监听image加载完成
+			onImageLoad(key, index) {
+				this.$set(this[key][index], 'loaded', 'loaded');
+			},
+			//监听image加载失败
+			onImageError(key, index) {
+				this[key][index].image = '/static/healthy-mall/errorImage.jpg';
+			},
+			submit() {
+				// console.log(this.addressData);
+				let addressData = this.addressData
+				console.log(addressData.name,addressData.name=='');
+				if(addressData.name==''){
+					uni.showToast({
+						title: '地址有误',
+						icon:'none'
+					});
+					return
+				}
+				switch (this.type){
+					case 'community':
+						let items = []
+						this.buylist.map(item=>{
+							items.push({
+								num: item.number,
+								productId: item.id,
+								type: 'COMMUNITY_PRODUCT'
+							})
+						})
+						this.$api.constitutionOrderAddOrder({
+							name:addressData.name,
+							communityId:this.communityId,
+							address:addressData.regions+addressData.detailAddress,
+							contcatPhone:addressData.mobile,
+							items:items,
+						}).then(res=>{
+							console.log(res);
+						}).catch(err=>{
+							console.log(err);
+						})
+						break;
+					case 'customer':
+						this.$api.constitutionOrderAddOrder({
+							name:addressData.name,
+							address:addressData.regions+addressData.detailAddress,
+							contcatPhone:addressData.mobile,
+							items:[],
+						}).then(res=>{
+							console.log(res);
+						}).catch(err=>{
+							console.log(err);
+						})
+						break;
+				}
+				
+				// {
+				//   "address": "string",
+				//   "contcatPhone": "string",
+				//   "items": [
+				//     {
+				//       "num": 0,
+				//       "productId": "string",
+				//       "type": "DIET_PLAN"
+				//     }
+				//   ],
+				//   "name": "string"
+				// }
+				
+			},
+			stopPrevent() {}
+		},
+		filters: {
+			toFixed: function(value) {
+				return value.toFixed(2);
+			}
+		}
+	}
+</script>
+
+<style lang="scss">
+	$font-color-dark:#fefefe;
+
+	.address-section {
+		position: relative;
+
+		.order-content {
+			background: #fff;
+			display: flex;
+			align-items: center;
+			margin: 30rpx 0;
+			padding: 30rpx 22rpx;
+			image{
+				width: 84rpx;
+				height: 84rpx;
+			}
+		}
+
+		// .icon-shouhuodizhi {
+		// 	flex-shrink: 0;
+		// 	display: flex;
+		// 	align-items: center;
+		// 	justify-content: center;
+		// 	width: 90rpx;
+		// 	color: #888;
+		// 	font-size: 44rpx;
+		// }
+
+		.cen {
+			margin-left: 20rpx;
+			display: flex;
+			flex-direction: column;
+			flex: 1;
+			font-size: 28rpx;
+		}
+
+		.name {
+			font-size: 32rpx;
+			margin-right: 24rpx;
+			color: #16202E;
+		}
+
+		.mobile {
+			color: #A2A9BA;
+			font-size: 28rpx;
+		}
+
+		.address {
+			margin-top: 16rpx;
+			margin-right: 20rpx;
+			color: #434E5E;
+		}
+
+		.a-bg {
+			position: absolute;
+			left: 0;
+			bottom: 0;
+			display: block;
+			width: 100%;
+			height: 5rpx;
+		}
+	}
+
+	.goods-section {
+		margin-top: 16rpx;
+		background: #fff;
+		padding-bottom: 1px;
+		.cart-item {
+			display: flex;
+			align-items: center;
+			position: relative;
+			margin: 0 30rpx;
+			padding:30rpx 0;
+			border-bottom: 1px solid #EFF1F6;
+			background-color: #FFFFFF;
+			overflow: hidden;
+
+			.image-wrapper {
+				margin-left: 30rpx;
+				width: 156rpx;
+				height: 156rpx;
+				flex-shrink: 0;
+				position: relative;
+
+				image {
+					border-radius: 8upx;
+					width: 100%;
+					height: 100%;
+					transition: .6s;
+					opacity: 0;
+
+					&.loaded {
+						opacity: 1;
+					}
+				}
+			}
+
+			.item-right {
+				display: flex;
+				flex-direction: column;
+				flex: 1;
+				overflow: hidden;
+				position: relative;
+				padding-left: 30rpx;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				.title {
+					font-size: 30rpx;
+					color: #2A3441;
+					height: 40rpx;
+					line-height: 40rpx;
+					text-overflow: ellipsis;
+					overflow: hidden;
+					white-space: nowrap;
+				}
+
+				.price {
+					font-size: 30rpx;
+					color: #16202E;
+					line-height: 40rpx;
+				}
+
+				.attr {
+					font-size: 26rpx;
+					color: #A2A9BA;
+					height: 50rpx;
+					line-height: 50rpx;
+				}
+
+				.price {
+					height: 50rpx;
+					line-height: 50rpx;
+				}
+
+				.item-right-bottom {
+					justify-content: space-between;
+					align-items: center;
+				}
+			}
+
+			.del-btn {
+				padding: 4rpx 10rpx;
+				font-size: 34rpx;
+				height: 50rpx;
+				color: #4cd964;
+			}
+		}
+	}
+
+	.yt-list {
+		background: #fff;
+	}
+	.yt-list-cell {
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+		padding: 10rpx 30rpx 10rpx 40rpx;
+		line-height: 70rpx;
+		position: relative;
+
+		&.cell-hover {
+			background: #fafafa;
+		}
+
+		&.b-b:after {
+			left: 30rpx;
+		}
+
+		.cell-icon {
+			height: 32rpx;
+			width: 32rpx;
+			font-size: 22rpx;
+			color: #fff;
+			text-align: center;
+			line-height: 32rpx;
+			background: #f85e52;
+			border-radius: 4rpx;
+			margin-right: 12rpx;
+
+			&.hb {
+				background: #ffaa0e;
+			}
+
+			&.lpk {
+				background: #3ab54a;
+			}
+
+		}
+
+		.cell-more {
+			align-self: center;
+			font-size: 24rpx;
+			color: #4cd964;
+			margin-left: 8rpx;
+			margin-right: -10rpx;
+		}
+
+		.cell-tit {
+			font-size: 26rpx;
+			color: #2A3441;
+			margin-right: 10rpx;
+			.base {
+				color: #03BE90;
+			}
+		}
+
+		.cell-tip {
+			font-size: 28rpx;
+			color: #2A3441;
+			&.base {
+				color: #03BE90;
+			}
+
+			&.smalltip {
+				color:#A2A9BA;
+				font-size: 20rpx;
+			}
+
+			&.red {
+				color: #4cd964;
+			}
+		}
+
+		&.desc-cell {
+			.cell-tit {
+				max-width: 90rpx;
+			}
+		}
+
+		.desc {
+			flex: 1;
+			font-size: 24rpx;
+			color: #fefefe;
+		}
+	}
+
+	/* 支付列表 */
+	.pay-list {
+		padding-left: 40rpx;
+		margin-top: 16rpx;
+		background: #fff;
+
+		.pay-item {
+			display: flex;
+			align-items: center;
+			padding-right: 20rpx;
+			line-height: 1;
+			height: 110rpx;
+			position: relative;
+		}
+
+		.icon-weixinzhifu {
+			width: 80rpx;
+			font-size: 40rpx;
+			color: #6BCC03;
+		}
+
+		.icon-alipay {
+			width: 80rpx;
+			font-size: 40rpx;
+			color: #06B4FD;
+		}
+
+		.icon-xuanzhong2 {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 60rpx;
+			height: 60rpx;
+			font-size: 40rpx;
+			color: #4cd964;
+		}
+
+		.tit {
+			font-size: 32rpx;
+			color:#fefefe;
+			flex: 1;
+		}
+	}
+
+	.footer {
+		position: fixed;
+		left: 0;
+		bottom: 0;
+		z-index: 995;
+		display: flex;
+		align-items: center;
+		width: 100%;
+		height: 90rpx;
+		justify-content: space-between;
+		font-size: 30rpx;
+		background-color: #fff;
+		z-index: 998;
+		color: #4cd964;
+		box-shadow: 0 -1px 5px rgba(0, 0, 0, .1);
+
+		.price-content {
+			padding-left: 30rpx;
+		}
+
+		.price-tip {
+			color: #4cd964;
+			margin-left: 8rpx;
+		}
+
+		.price {
+			font-size: 36rpx;
+			color:#4cd964;
+		}
+
+		.submit {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 280rpx;
+			height: 100%;
+			color: #fff;
+			font-size: 32rpx;
+			flex: 1;
+			background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+		}
+	}
+</style>

@@ -1,0 +1,777 @@
+<template>
+	<view class="content">
+        <view v-if="state == 1" style="display: flex;flex-direction: column; align-items: center;">
+            <image class="logo" src="../../static/image/logo_mw.png" mode=""> 
+            <image class="sydl" src="../../static/image/img_sy_dl.png" mode=""></image>
+            <view style="font-size:33upx; color: #2A3441;">
+                您还未登录，请先登录
+            </view>
+            <button hover-class="button-hover" class="login-btn" open-type="getUserInfo" @getuserinfo="getUserList">登录</button>
+        </view>
+        <view v-if="state == 3" class="">
+            <view class="topBox">
+                <view class="wode">
+                    我的明我 <image src="" mode=""></image>
+                </view>
+                <view class="topTitle">
+                    {{!community.province ? '' : community.province}} | {{!community.city ? '' : community.city}}
+                </view>
+                <view class="topTitle">
+                    用户数：{{!community.joinCount ? '' : community.joinCount}}<text style="font-size: 34upx;">切换服务站 ></text>
+                </view>
+                <view class="topTitle">
+                    评价：
+                    <view class="">
+                        <image v-if="community" v-for="(star,index) in community.score" :key="index" src="../../static/image/img_star_14yellow.png" mode="">
+                        <image v-if="community" v-for="(star,index) in (5 - community.score)" :key="index" src="../../static/image/img_star_14gray.png" mode="">
+                    </view>
+                    <view class="joinBtn"> <image v-if="!community.mark" src="../../static/image/home_yishoucang.png" mode=""></image> {{community.mark ? '已收藏' : '收藏'}}</view>
+                    <view class="joinBtn"><image v-if="!community.join" src="../../static/image/home_yishoujiaru.png" mode=""></image> {{community.join ? '已加入' : '加入'}}</view>
+                </view>
+            </view>
+            <view class="communityBox">
+                <image :src="community.icon" mode=""></image>
+                <view class="" style="color: #16202E;font-weight: 500; font-size: 36upx;">
+                    {{!community.companyName ? '' : community.companyName}}
+                </view>
+                <view class="">
+                    服务站类型：<text style="color: #01AC82;">{{!community.tags ? '' : community.tags}}</text>
+                </view>
+                <!-- <view class="" style="margin-top: 20upx;">
+                    生发乌发 / 纤体 / 排毒养颜/<br>
+                    面部护理/皮肤护理
+                </view> -->
+                <view class="">
+                    站主：{{!community.contactName ? '' : community.contactName}}
+                </view>
+            </view>
+            <view class="btnBox">
+                <view class="fwqbtn">服务区</view>
+                <view class="jkscbtn"><image src="../../static/image/jiankangshangcheng.png" mode=""></image>健康商城</view>
+            </view>
+            <view class="titleBox">
+                <view class="left"></view>
+                <image src="../../static/image/home_guanjia.png" mode=""></image>
+                <view class="title">
+                    <text style="color: #03BE90; font-size: 29upx;">健康管家服务区</text>
+                    <text style="color: #BBC5D7; font-size: 19upx">Health Butler Service Area</text>
+                </view>
+            </view>
+            <view class="doctorBox">
+                <image :src="community.mangerAvatar" mode=""></image>
+                <view >
+                    <view style="color: #16202E;">{{!community.mangerName ? '' : community.mangerName}}</view>
+                    <view class="">
+                        健康职业证：健康管理师资格证   健康营养师…   <br>
+                        管家活跃榜第100+名
+                    </view>
+                </view>
+            </view>
+            <view class="btnBox">
+                <view class="gkfxbtn">官家分享</view>
+                <view class="gkfxbtn">官家咨询</view>
+            </view>
+            <view class="btnBox" style="margin-bottom: 80upx;">
+                <view class="shareContent" >
+                    <image class="cover" src="" mode=""></image>
+                    <view class="" style="margin:10upx 28upx;font-size:28upx;">
+                        美容护肤日记分享，爱美小姐姐值得借鉴
+                    </view>
+                    <view class="authorBox" >
+                        <image class="authorHeader" src="" mode=""></image>
+                        <text style="margin-left: 10upx; flex: 1;">蓝色经理</text>
+                        <image src="../../static/image/home_yanjing.png" mode=""></image>
+                        <text>3.5 万</text>
+                    </view>
+                </view>
+                <view class="shareBtnBox">
+                    <view class="shareBtn">
+                        <image style="width: 48upx; height: 48upx;margin-bottom: 22upx;" src="../../static/image/home_zhibo.png" mode=""></image>
+                        <view class="">
+                            明我直播
+                        </view>
+                    </view>
+                    <view class="shareBtn">
+                        <image style="width: 52upx; height: 54upx;margin-bottom: 22upx;" src="../../static/image/home_mingyishuo.png" mode=""></image>
+                        <view class="">
+                            明医说
+                        </view>
+                    </view>
+                    <view v-if="community.market" class="shareBtn" style="height: 292upx;">
+                        <image style="width: 56upx; height: 60upx;margin-bottom: 22upx;" src="../../static/image/home_shangcheng.png" mode=""></image>
+                        <view class="">
+                            管家自营商店
+                        </view>
+                    </view>
+                </view>
+            </view>
+            <view class="titleBox">
+                <view class="left"></view>
+                <image style="width: 48upx; height: 58upx;" src="../../static/image/home_yisheng_icon.png" mode=""></image>
+                <view class="title">
+                    <text style="color: #03BE90; font-size: 29upx;">驻站医生服务区</text>
+                    <text style="color: #BBC5D7; font-size: 19upx">Station Doctor Service Area</text>
+                </view>
+            </view>
+            <image style="width: 598upx; height: 352upx; margin-left: 77upx;" src="../../static/image/home_yisheng.png" mode=""></image>
+            <view class="doctorBox">
+                <image :src="community.expert.pics" mode=""></image>
+                <view >
+                    <view style="color: #16202E; display: flex; flex-direction: row; margin-bottom: 10upx;">
+                        <view class="" style="line-height: 62upx;font-size: 35upx;">
+                            {{!community.expert.name ? '' : community.expert.name}}
+                        </view>
+                        <view class="jkscbtn" style="width: 150upx;font-size: 25upx;">
+                            医生简介
+                        </view>
+                    </view>
+                    <view class="" style="font-size: 29upx;">
+                        {{!community.expert.tagPName ? '' : community.expert.tagPName}}
+                    </view>
+                </view>
+            </view>
+            <view class="btnBox">
+                <view class="gkfxbtn">图文问诊</view>
+                <view class="gkfxbtn">视频问诊</view>
+                <view class="jkscbtn" style="margin: 0upx;">查看报告</view>
+            </view>
+            <view style="padding: 33upx; font-size:33upx;">
+                <view class="">
+                    擅长
+                </view>
+                <view class="" style="font-size:29upx; color: #868E9D;margin-top: 20upx;">
+                    {{!community.expert.speciality ? '': community.expert.speciality}}
+                </view>
+            </view>
+            <view class="titleBox">
+                <view class="left"></view>
+                <image style="width: 48upx; height: 58upx;" src="../../static/image/home_zhineng.png" mode=""></image>
+                <view class="title">
+                    <text style="color: #03BE90; font-size: 29upx;">智能服务区</text>
+                    <text style="color: #BBC5D7; font-size: 19upx">Intelligence Service Area</text>
+                </view>
+            </view>
+            <view class="doctorBox" style="margin:0upx">
+                <image class="al_pifu" src="../../static/image/home_alpifu.png" mode=""></image>
+                <view class="">
+                    <view class="" style="font-size: 35upx;color: #16202E;">
+                        AI检测皮肤
+                    </view>
+                    <view class="" style="font-size: 27upx;margin: 20upx 0upx;">
+                        健康管理师，主任医师 | 执业医师
+                    </view>
+                    <view style="color: #16202E; display: flex; flex-direction: row; margin-bottom: 10upx;">
+                        <view class="gkfxbtn" style="margin-right: 0upx;" @click="clickAL(0)" >AI测肤</view>
+                        <view class="jkscbtn" style="width: 200upx;font-size: 25upx;">
+                            查看报告
+                        </view>
+                    </view>
+                    
+                </view>
+            </view>
+            <view class="alal" style="margin:0upx">
+                <view class="alBox">
+                    <view class="">
+                        体质智能辨识
+                    </view>
+                    <image src="../../static/image/home_shexiang.png" mode=""></image>
+                    <view class="gkfxbtn albtn" @click="clickAL(1)" >体质辩识</view>
+                    <view class="jkscbtn albtn" style=" margin-top: 24upx;">
+                        查看报告
+                    </view>
+                </view>
+                <view class="alBox">
+                    <view class="">
+                        肺腑智能辨证
+                    </view>
+                    <image src="../../static/image/home_feifu.png" mode=""></image>
+                    <view class="gkfxbtn albtn" @click="clickAL(2)" >肺腑问诊</view>
+                    <view class="jkscbtn albtn" style=" margin-top: 24upx;">
+                        查看报告
+                    </view>
+                </view>
+                <view class="alBox">
+                    <view class="">
+                        智能全科医生
+                    </view>
+                    <image src="../../static/image/home_alyisheng.png" mode=""></image>
+                    <view class="gkfxbtn albtn" @click="clickAL(3)" >智能问诊</view>
+                    <view class="jkscbtn albtn" style=" margin-top: 24upx;">
+                        查看报告
+                    </view>
+                </view>
+            </view>
+            <view class="evaluationBox">
+                <view class="">
+                    服务站评价
+                </view>
+                <view class="evaluationStar">
+                    <image v-for="(star,index) in starNum" :key="index" @click="clickStar(index,true)" src="../../static/image/img_star_28yellow.png" mode="">
+                    <image v-for="(star,index) in (5-starNum)" :key="index" @click="clickStar(index,false)" src="../../static/image/img_star_28gray.png" mode="">
+                </view>
+                <view class="">
+                    您的好评是对我们服务最大的支持！
+                </view>
+                <view class="gkfxbtn " @click="clickAppraise" style="width: 270upx;margin-top: 40upx;">提交</view>
+            </view>
+        </view>
+		
+    </view>
+</template>
+
+<script>
+    import api from '../../common/api.js';
+    
+	export default {
+		data() {
+			return {
+				state:0,     //0未知      1、未授权           2、未绑定       3、已登录
+                community:null,
+                starNum:0
+			}
+		},
+    
+		onLoad() {
+            var _self = this
+            
+            uni.setNavigationBarColor({
+                frontColor: '#ffffff',
+                backgroundColor: '#F6F9FF',
+               
+            })
+            
+            uni.checkSession({
+                success() {
+                    // session_key 未过期，并且在本生命周期一直有效
+                    console.log("未过期");
+                    _self.wxlogin()
+                        
+                },
+                fail() {
+                    console.log("过期");
+                    _self.wxlogin()
+                }
+            })
+		},
+		methods: {
+            clickAppraise:function(){
+                
+                if(this.starNum == 0){
+                    uni.showToast({
+                        title: "请先选择评分",
+                        icon: 'none',
+                        duration: 2000
+                    })
+                    return
+                }
+                var data = {
+                    "communityId": this.community.id,
+                    "score": this.starNum
+                }
+                
+                api.addCommunityAppraise({
+                    data:data
+                }).then(res=>{
+                    console.log(res)
+                    
+                })
+            },
+            clickStar:function(index,tag){
+                console.log(index)
+                console.log(tag)
+                console.log(this.starNum)
+                if(tag){
+                    if(this.starNum && index == 0){
+                        this.starNum = 0
+                    }else{
+                        this.starNum = index + 1
+                    }
+                    
+                }else{
+                    this.starNum = this.starNum + index + 1
+                }
+                console.log(this.starNum)
+            },
+            wxlogin:function(){
+                var _self = this
+                uni.login({
+                    provider: 'weixin',
+                    success: function(loginRes) {
+                        console.log(loginRes)
+                        const obj = {
+                            code: loginRes.code
+                        }
+                        api.getUnionid({
+                            data: obj
+                        }).then(res => {
+                            console.log(res)
+                            console.log('sk:' + res.data.session_key)
+                            uni.setStorageSync('sk', res.data.session_key);
+                            uni.setStorageSync('openid', res.data.openid);
+                            uni.setStorageSync('unionid', res.data.unionid);
+                            _self.checkAuth()
+                        })
+                    }
+                });
+            },
+            checkAuth: function() {
+                var _self = this
+                uni.getUserInfo({
+                    success(res) { //已经授权请求是否绑定信息
+                        
+                        _self.getAccount(res)
+                    },
+                    fail(res) { //没有授权直接跳转登录
+                        console.log("没有授权")
+                        _self.state = 1
+                    }
+                })
+            },
+            getAccount: function(res) {
+                const sessionKey = uni.getStorageSync('sk');
+                // console.log("res.iv:")
+                // console.log(res.iv)
+                const data = {
+                    encryptedData: res.encryptedData,
+                    iv: res.iv,
+                    sessionKey: sessionKey
+                }
+                var _self = this
+                api.getAccountInfo({
+                    data: data
+                }).then(accountRes => {
+                    console.log("accountRes:")
+                    console.log(accountRes)
+                    if (!accountRes.data.bnUserInfo) {
+                        uni.removeStorageSync('sk');
+                        return;
+                    }
+                    
+                    if(accountRes.data.wxUserInfo && accountRes.data.wxUserInfo.unionid ){
+                             
+                        uni.setStorageSync('unionid', accountRes.data.wxUserInfo.unionid);
+                        
+                    }
+                    if(accountRes.data.bnUserInfo && accountRes.data.bnUserInfo.sessionId ){
+                        const sessionId = accountRes.data.bnUserInfo.sessionId
+                        uni.setStorageSync('sessionId', sessionId)
+                    }
+                    
+                    // uni.setStorageSync('sessionId', 'b477011c669c4770812174d335c8226a')
+                    // try{
+                    if (accountRes.data.bnUserInfo.phone == "" || accountRes.data.bnUserInfo.phone == null) { //未绑定
+                        this.state = 2
+                        uni.navigateTo({
+                            url:'login'
+                        })
+                    }else{
+                        // uni.setStorageSync('userinfo', accountRes.data.bnUserInfo);
+                        this.findUser(accountRes.data.bnUserInfo.id)
+                    }
+                })
+            },        
+            getUserList: function(res) {
+                console.log(res)
+                 if (this.login) {
+                     return
+                 }
+                if (res.detail.errMsg == "getUserInfo:ok") {
+                    //授权
+                    if (res.iv) {
+                        this.getAccount(res)
+                    } else {
+                        this.getAccount(res.target)
+                    }
+                
+                } else {
+                    //拒绝授权
+                    uni.showModal({
+                        title: '提示',
+                        content: '允许授权后放可使用',
+                        success: function(res) {
+                            if (res.confirm) {
+                                uni.openSetting({
+                                    success(openRes) {
+                                        console.log(res.authSetting)
+                                    }
+                                });
+                            } else if (res.cancel) {
+                
+                            }
+                        }
+                    });
+                
+                }
+            },
+            findUser:function(id){
+                const userObj = {
+                    userId: id,
+                }
+                api.findUserById({
+                    data:userObj
+                }).then(userRes => {
+                    console.log(userRes)
+                    if(userRes.status == 'OK'){
+                        if( userRes.data && userRes.data.followCommunityId && userRes.data.followCommunityId.length > 3 ){
+                            this.findCommunity(userRes.data.followCommunityId)
+                        }else{      //跳转加入服务站
+                            
+                        }
+                    }
+                })
+            },
+            findCommunity:function(id){
+                const data = {
+                    id:id
+                }
+                api.findCommunityById({
+                    data:data
+                }).then(res => {
+                    console.log(res)
+                    if(res.status == 'OK'){
+                        this.community = res.data
+                        this.community.icon = JSON.parse(this.community.icon)[0].url
+                        this.community.mangerAvatar = JSON.parse(this.community.mangerAvatar)[0].url
+                        if(this.community.expert.pics && JSON.parse(this.community.expert.pics).length > 0){
+                            this.community.expert.pics = JSON.parse(this.community.expert.pics)[0].url
+                        }
+                        
+                        uni.setNavigationBarColor({
+                            frontColor: '#ffffff',
+                            backgroundColor: '#008A67',
+                           
+                        })
+                        this.state = 3
+                    }
+                })
+            },
+            clickAL:function(tag){
+                if(tag == 0){
+                    uni.navigateTo({
+                        url:'alskin/welcome?communityId='+this.community.id
+                    })
+                }else if(tag == 1){
+                    uni.navigateTo({
+                        url:'aldiscriminate/index'
+                    })
+                }else if(tag == 2){
+                    uni.navigateTo({
+                        url:'aldiscriminate/basicInfo?type=2'
+                    })
+                }
+                
+            }
+		}
+	}
+</script>
+
+<style>
+    page{
+        background: #F6F9FF;
+    }
+	.content {
+		display: flex;
+		flex-direction: column;
+		/* align-items: center; */
+		/* justify-content: center; */
+	}
+    .logo{
+        margin-top: 250upx;
+        width: 220upx;
+        height: 56upx;
+    }
+    .sydl{
+        margin-top: 30upx;
+        width: 500upx;
+        height: 500upx;
+    }
+    .login-btn {
+        margin-left: 125upx;
+        margin-right: 125upx;
+        margin-top: 83upx;
+        height: 104upx;
+        line-height: 104upx;
+        border-radius: 52upx;
+        width: calc(100% - 250upx);
+        color: #FFFFFF;
+        font-size: 31upx;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+        box-shadow:0px 6upx 31upx 0px rgba(3,190,144,0.3);
+    }
+    .evaluationBox{
+        display: flex;
+        flex-direction: column;
+        align-items: center; 
+        justify-content: center;
+        margin:110upx 33upx;
+        width:683upx;
+        height:410upx;
+        background:rgba(255,255,255,1);
+        box-shadow:0px 6upx 31upx 0px rgba(65,68,73,0.2),0px 10px 208px 42px rgba(65,68,73,0);
+        border-radius:42upx;
+        color: #414449;
+    }
+    .evaluationStar{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        /* margin: 10upx 0upx; */
+        width: 65%;
+    }
+    .evaluationStar image{
+        width: 92upx;
+        height: 92upx;
+    }
+    .alBox{
+        width: 33.33%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size:29upx;
+        color:rgba(22,32,46,1);
+    }
+    .alal{
+        display: flex;
+        flex-direction: row;
+    }
+    .authorBox{
+        
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin:25upx 28upx;
+        font-size:25upx;
+        color: #868E9D;
+    }
+    
+    .shareContent{
+        flex: 1; 
+        background: #FFFFFF;
+        height: 667upx;
+        border-radius:17upx;
+    }
+    .shareContent .cover{
+        width: 100%;
+        height:0;
+        padding-bottom:100%;
+    }
+    .shareBtnBox{
+        margin-left: 46upx;
+        width: 200upx;
+        height: 667upx;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .shareBtn{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: #868E9D;
+        font-size:29upx;
+        width: 100%;
+        height: 146upx;
+        background:rgba(255,255,255,1);
+        box-shadow:0px 6upx 31upx 0px rgba(65,68,73,0.2);
+        border-radius:17upx;
+    }
+    .gkfxbtn{
+        width:197upx;
+        height:67upx;
+        background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+        box-shadow:0px 6upx 31upx 0px rgba(3,190,144,0.3);
+        border-radius:33upx;
+        line-height: 67upx;
+        text-align: center;
+        color: #FFFFFF;
+        margin-right: 46upx;
+    }
+    .doctorBox{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin:0upx 33upx 33upx 33upx;
+        font-size:23upx;
+        font-weight:400;
+        color: #868E9D;
+    }
+    .doctorBox image{
+        width: 133upx;
+        height: 133upx;
+        background: #F8F8F8;
+        border-radius: 50%;
+        margin-right: 20upx;
+    }
+    .titleBox{
+        margin:30upx 33upx;
+        width:438upx;
+        height:108upx;
+        background:rgba(255,255,255,1);
+        box-shadow:0px 0px 15upx 0px rgba(198,198,198,0.5);
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+    .titleBox image{
+        width: 64upx;
+        height: 46upx;
+        margin-left: 20upx;
+    }
+    .titleBox .title{
+        display: flex;
+        flex-direction: column;
+        margin-left: 10upx;
+    }
+    .titleBox .left{
+        width:15upx;
+        height:100%;
+        background:linear-gradient(360deg,rgba(140,227,154,1) 0%,rgba(14,193,149,1) 100%);
+        box-shadow:0px 0px 15px 0px rgba(198,198,198,0.5);
+    }
+    .btnBox{
+        display: flex;
+        align-items: flex-start;
+        margin: 23upx 33upx;
+        width: calc(100% - 66upx);
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+    .fwqbtn{
+        width:188upx;
+        height:75upx;
+        background:rgba(3,190,144,1);
+        box-shadow:0px 0px 17upx 6upx rgba(0,0,0,0.07);
+        border-radius:15upx;
+        line-height: 75upx;
+        text-align: center;
+        color: #FFFFFF;
+    }
+    .jkscbtn{
+        width: 222upx;
+        margin-left: 30upx;
+        height: 62upx;
+        background: #FFFFFF;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        box-shadow:0px 0px 17upx 6upx rgba(0,0,0,0.07);
+        border-radius:38upx;
+        color: #03BE90;
+        font-size:30upx;
+    }
+    .jkscbtn image{
+        width: 29upx;
+        height: 35upx;
+        margin-right: 8upx;
+    }
+    .topBox{
+        width: 100%;
+        height:563upx;
+        padding-top: 24upx ;
+        background: #008A67;
+        color: #FFFFFF;
+        font-size:30upx;
+    }
+    .topTitle{
+        margin:0upx 64upx 20upx 64upx;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .topTitle image{
+        width: 28upx;
+        height: 26upx;
+        background: transparent;
+        margin-top: 4upx;
+        margin-left: 8upx;
+    }
+    .joinBtn{
+        width: 122upx;
+        height: 64upx;
+        text-align: right;
+        line-height: 64upx;
+        border-radius:30upx;
+        opacity:0.5;
+        background: #2F2F2F;
+        position: relative;
+        padding-right: 28upx;
+    }
+    .communityBox{
+        background: url(../../static/image/communitybg.png) no-repeat;
+        background-size:100% 100%;
+        margin-top: -300upx;
+        margin-left: 64upx;
+        width: calc(100% - 128upx);
+        height: 400upx;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size:23upx;
+        font-weight:400;
+        color: #868E9D;
+        text-align: center;
+    }
+    .communityBox image{
+        width: 104upx;
+        height: 104upx;
+        background: #F8F8F8;
+        margin-top: 20upx;
+        margin-bottom: 14upx;
+        border-radius: 10upx;
+    }
+    .authorBox image{
+       width: 98upx;
+       height: 64upx;
+       margin-top: 10upx;
+    }
+    .authorBox .authorHeader{
+        width: 52upx;
+        height: 52upx;
+        background: #F8F8F8;
+        border-radius: 50%;
+        margin-top: 0upx;
+    }
+    .doctorBox .al_pifu{
+        width: 280upx; 
+        height: 280upx;
+        border-radius: 0;
+        background: transparent;
+    }
+    .alBox image{
+        width: 100%;
+        height: 250upx;
+    
+    }
+    .albtn{
+        width: 177upx;
+        height: 58upx;
+        font-size: 25upx;
+        margin: 0upx;
+    }
+    .joinBtn image{
+        width: 150upx;
+        height: 64upx;
+        position: absolute;
+        left: 0;
+        top: 0;
+        margin-top: 0rpx;
+        margin-left: 0rpx;
+    }
+    .wode{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+        margin: 0upx 63upx;
+    }
+    .wode image{
+        width: 42upx;
+        height: 42upx;
+    }
+</style>

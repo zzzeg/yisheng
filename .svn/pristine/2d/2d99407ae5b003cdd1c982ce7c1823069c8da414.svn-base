@@ -1,0 +1,358 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationBarBackgroundColor": "#FFFFFF",
+				"backgroundColor": "#FFFFFF"
+
+
+			}
+		}, {
+			"path": "pages/index/login",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom",
+				"app-plus": {
+					"titleView": false
+				}
+			}
+		},
+		{
+			"path": "pages/index/aldiscriminate/index",
+			"style": {
+				"navigationBarBackgroundColor": "#FFFFFF",
+				"navigationStyle": "custom"
+
+			}
+		}, {
+			"path": "pages/index/aldiscriminate/basicInfo",
+			"style": {
+				"navigationBarTitleText": "基本信息",
+				"navigationBarBackgroundColor": "#148973",
+				"backgroundColor": "#148973",
+				"navigationBarTextStyle": "#ffffff"
+			}
+		}, {
+			"path": "pages/index/aldiscriminate/healthInfo",
+			"style": {
+				// "navigationBarTitleText": "健康信息",
+				"navigationBarBackgroundColor": "#148973",
+				// "backgroundColor": "#148973",
+				// "navigationBarTextStyle": "#ffffff",
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "pages/index/aldiscriminate/faceCamera",
+			"style": {
+				// "navigationBarTitleText": "健康信息",
+				// "navigationBarBackgroundColor": "#148973",
+				// "backgroundColor": "#148973",
+				// "navigationBarTextStyle": "#ffffff",
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "pages/index/aldiscriminate/faceRecognize",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "pages/index/aldiscriminate/tongueFront",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "pages/index/aldiscriminate/tongueContrary",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "pages/index/aldiscriminate/recognizeFailure",
+			"style": {
+				"navigationBarTitleText": "面相舌象",
+				"navigationBarBackgroundColor": "#FFFFFF",
+				"backgroundColor": "#F7F7F8"
+			}
+		}, {
+			"path": "pages/index/alskin/welcome",
+			"style": {
+				"navigationBarBackgroundColor": "#FFFFFF",
+				"navigationStyle": "custom"
+
+			}
+		}, {
+			"path": "pages/index/alskin/faceCamera",
+			"style": {
+				"navigationBarBackgroundColor": "#FFFFFF",
+				"navigationStyle": "custom"
+
+			}
+		}, {
+			"path": "pages/index/alskin/faceRecognize",
+			"style": {
+				"navigationBarBackgroundColor": "#FFFFFF",
+				"navigationStyle": "custom"
+
+			}
+		}, {
+			"path": "pages/index/aldiscriminate/questionnaireResult",
+			"style": {
+				"navigationBarTitleText": "肺腑辨证",
+				"navigationBarBackgroundColor": "#008A67",
+				"backgroundColor": "#008A67",
+				"navigationBarTextStyle": "#ffffff"
+
+			}
+		}, {
+			"path": "pages/index/connectVideoInterrogation",
+			"style": {
+				"navigationBarTitleText": "视频问诊",
+				"navigationBarBackgroundColor": "#FFFFFF",
+				"backgroundColor": "#F7F7F8"
+
+			}
+		}, {
+			"path": "pages/index/doctorInfo",
+			"style": {
+				"navigationBarTitleText": "医生简介",
+				"navigationBarBackgroundColor": "#FFFFFF",
+				"backgroundColor": "#F7F7F8"
+
+			}
+		}, {
+			"path": "pages/index/videoInterrogation",
+			"style": {
+				"navigationBarBackgroundColor": "#FFFFFF",
+				"navigationStyle": "custom"
+
+			}
+		}, {
+			"path": "pages/index/skinPos",
+			"style": {
+				"navigationBarTitleText": "皮肤检测报告",
+				"navigationBarBackgroundColor": "#FFFFFF",
+				"backgroundColor": "#F7F7F8"
+			}
+		}, {
+			"path": "pages/index/skinDetail/skinDetail",
+			"style": {
+				"navigationBarBackgroundColor": "#FFFFFF",
+				"backgroundColor": "#F7F7F8"
+			}
+		}, {
+			"path": "pages/index/auth",
+			"style": {
+				"navigationBarBackgroundColor": "#FFFFFF",
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "pages/index/doctorReport",
+			"style": {
+				"navigationBarTitleText": "健康调理报告",
+				"navigationBarBackgroundColor": "#FFFFFF",
+				"backgroundColor": "#F7F7F8"
+			}
+		}, {
+			"path": "pages/index/physicalReport",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationBarBackgroundColor": "#FFFFFF",
+				"backgroundColor": "#F7F7F8"
+			}
+		}, {
+			"path": "pages/index/mwwebview",
+			"style": {
+				"navigationBarTitleText": "智能全科医生",
+				"navigationBarBackgroundColor": "#FFFFFF",
+				"backgroundColor": "#F7F7F8"
+			}
+		}, {
+			"path": "pages/index/physicalReport2",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationBarBackgroundColor": "#FFFFFF",
+				"backgroundColor": "#F7F7F8"
+			}
+		}, {
+			"path": "pages/index/chatRoom",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationBarBackgroundColor": "#FFFFFF",
+				"backgroundColor": "#F7F7F8"
+			}
+		},
+		{
+			"path": "pages/health-mall-community/health-mall-community",
+			"style": {
+				"navigationBarTitleText": "健康商城"
+			}
+		}, 
+		{
+			"path": "pages/health-mall-community/health-mall-community2",
+			"style": {
+				"navigationBarTitleText": "健康商城",
+                "enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/health-search-page/health-search-page",
+			"style": {
+				"navigationBarTitleText": "搜索",
+                "enablePullDownRefresh": true
+			}
+		}, 
+		{
+			"path": "pages/health-mall-customer/health-mall-customer",
+			"style": {
+				"navigationBarTitleText": "管家自营"
+			}
+		}, 
+		{
+			"path": "pages/cart/cart",
+			"style": {
+				"navigationBarTitleText": "购物车"
+			}
+		}, {
+			"path": "pages/pay/confirm/confirm",
+			"style": {
+				"navigationBarTitleText": "订单"
+			}
+		}, {
+			"path": "pages/mine-address-detail/mine-address-detail",
+			"style": {
+				"navigationBarTitleText": "收货地址"
+			}
+		}, {
+			"path": "pages/housekeeper-sharing/housekeeper-sharing",
+			"style": {
+				"navigationBarTitleText": "管家分享",
+                "enablePullDownRefresh": true
+			}
+		}, {
+			"path": "pages/housekeeper-sharing-img/housekeeper-sharing-img",
+			"style": {
+				"navigationBarTitleText": "管家分享"
+			}
+		}, {
+			"path": "pages/housekeeper-sharing-video/housekeeper-sharing-video",
+			"style": {
+				"navigationBarTitleText": "管家分享"
+			}
+		}, {
+			"path": "pages/order-detail/order-detail",
+			"style": {
+                 "navigationBarTitleText": "订单详情"
+            }
+		}, {
+			"path": "pages/health-product-detail/health-product-detail",
+			"style": {}
+		}, {
+			"path": "pages/service-record/service-record",
+			"style": {
+                "navigationBarTitleText": "服务记录",
+                "enablePullDownRefresh": true
+            }
+		}, {
+			"path": "pages/serverStation/main",
+			"style": {
+				"navigationBarTitleText": "服务站",
+				"navigationBarBackgroundColor": "#fff",
+				"backgroundColor": "#008A67",
+                "enablePullDownRefresh": true
+			}
+		}, {
+			"path": "pages/serverStation/stationList",
+			"style": {
+				"navigationBarTitleText": "已加入服务站",
+				"navigationBarBackgroundColor": "#fff",
+				"backgroundColor": "#008A67",
+                "enablePullDownRefresh": true
+			}
+		}, {
+			"path": "pages/liveborad/famousDoctor",
+			"style": {
+				"navigationBarTitleText": "明医说",
+				"navigationBarBackgroundColor": "#fff",
+				"backgroundColor": "#008A67",
+                "enablePullDownRefresh": true
+			}
+		}, {
+			"path": "pages/liveborad/liveList",
+			"style": {
+				"navigationBarTitleText": "明我直播",
+				"navigationBarBackgroundColor": "#fff",
+				"backgroundColor": "#008A67",
+                "enablePullDownRefresh": true
+			}
+		}, {
+			"path": "pages/liveborad/noticeInfo",
+			"style": {
+				"navigationBarTitleText": "直播预告",
+				"navigationBarBackgroundColor": "#fff",
+				"backgroundColor": "#008A67"
+			}
+		}, {
+			"path": "pages/mine/index",
+			"style": {
+				"navigationBarTitleText": "我的明我",
+				"navigationBarBackgroundColor": "#fff",
+				"backgroundColor": "#008A67"
+			}
+		}, {
+			"path": "pages/mine/reportList",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationBarBackgroundColor": "#fff",
+				"backgroundColor": "#008A67",
+                "enablePullDownRefresh": true
+			}
+		},{
+			"path": "pages/liveborad/liveInfo",
+			"style": {
+                "navigationBarTitleText": "视频",
+                "navigationBarBackgroundColor": "#fff",
+                "backgroundColor": "#008A67"
+			}
+		},{
+			"path": "pages/mine/collectList",
+			"style": {
+                "navigationBarTitleText": "收藏",
+                "navigationBarBackgroundColor": "#fff",
+                "backgroundColor": "#008A67",
+                "enablePullDownRefresh": true
+			}
+		}, {
+			"path": "pages/liveborad/share",
+			"style": {
+				"navigationBarTitleText": "明医说",
+				"navigationBarBackgroundColor": "#fff",
+				"backgroundColor": "#008A67"
+			}
+		}
+
+		// ,{
+		// 	"path": "pages/index/shipin",
+		// 	"style": {
+		//         "navigationBarTitleText": "医生报告",
+		//         "navigationBarBackgroundColor": "#fff",
+		//         "backgroundColor": "#008A67"
+		// 	}
+		// }
+        
+
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "",
+		"navigationBarBackgroundColor": "#FFFFFF",
+		"backgroundColor": "#F8F8F8"
+	},
+	"easycom": {
+		"autoscan": true,
+		"custom": {
+			"uni-(.*)": "@/components/uni-$1/uni-$1.vue", // 匹配components目录内的vue文件
+			"h-(.*)": "@/components/common/h-$1.vue" // 匹配common目录内的vue文件
+		}
+	}
+}

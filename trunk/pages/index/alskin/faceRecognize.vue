@@ -1,0 +1,285 @@
+<template>
+    <view class="sssssss" @touchmove.stop.prevent="moveHandle" :style="{ height: screenHeight }">
+        <view class="navigation" :style="{ height: statusBarHeight }">
+            <image @click="clickBack" class="backBtn" src="../../../static/image/icon_left.png" mode=""></image>
+            
+        </view>
+        <view class="fenxizhong">
+            {{slogan}}
+        </view>
+        <image class="quanquan" src="../../../static/image/img_fxzwqqq.png" mode=""></image>
+        <image class="qqqqq" src="../../../static/image/img_zdqqqq.png" mode=""></image>
+        <image class="facePic" :src="url" mode="widthFix"></image>
+        <view class="hole"></view>
+        <view v-if="recognizeState != 0" @click="clickBtn" class="login-btn">{{btnTitle}}</view>
+    </view>
+</template>
+
+<script>
+    import api from '../../../common/api.js';
+    
+    var statusBarHeight = uni.getSystemInfoSync().statusBarHeight + 44 + 'px'
+    var screenHeight = uni.getSystemInfoSync().screenHeight + 'px'
+    export default {
+        
+    	data() {
+    		return {
+    			statusBarHeight: statusBarHeight,
+                screenHeight:screenHeight,
+                url:'',
+                recognizeState:0,
+                uploadParams:null,
+                slogan:'分析中...',
+                btnTitle:'查看报告',
+                communityId:'',
+                faceRecord:null
+    		}
+    	},
+    	onLoad(options) {
+            this.url = options.url
+            this.communityId = options.communityId
+            const data = {
+            	purpose: 'useravatar'
+            }
+            api.getUploadParams({
+            	data: data
+            }).then(res => {
+            	console.log('getUploadParams')
+            	console.log(res)
+            	this.uploadParams = res.data
+                this.next()
+            })
+            
+    	},
+    	methods: {
+            clickBtn:function(){
+                if(this.recognizeState == 1){        //跳转报告
+                    uni.navigateTo({       
+                        url:'../skinPos?sid='+this.faceRecord.id
+                    })
+                }
+                if(this.recognizeState == 2){
+                    uni.navigateBack({
+                        delta:2
+                    })
+                }
+            },
+            clickBack:function(){
+                uni.navigateBack({
+                    delta:2
+                })
+            },
+            next:function(){
+                if (this.uploadParams) {
+                  
+                	uni.showLoading({
+                		title: '图片上传中'
+                	})
+                    var _self = this
+                	uni.uploadFile({
+                		url: this.uploadParams.url,
+                		filePath: this.url,
+                		name: 'userAvatar',
+                		formData: {
+                			policy: this.uploadParams.policy,
+                			Signature: this.uploadParams.Signature
+                		},
+                        success(result) {
+                			if (result.data) {
+                                console.log(result.data);
+                				let r = JSON.parse(result.data)
+                				if (r.status === 'OK') {
+                                    var pic = r.data.location + r.data.filepath
+                                    _self.recognize(pic)
+                                    
+                        		} else {
+                                    uni.showToast({
+                                        title: r.message,
+                                        icon: "none",
+                                        duration: 2000
+                                    })
+                                }
+                            }
+                        },fail() {
+                        		                
+                        },complete(res) {
+                        	uni.hideLoading()
+                        	if (res.statusCode !== 200) {
+                        		uni.showToast({
+                        			title: res.errMsg,
+                        			icon: "none",
+                        			duration: 2000
+                        		})
+                        	}
+                        }
+                    })
+              
+                }else{
+                    uni.showToast({
+                        title: 'getUploadParams failed!',
+                        icon: "none",
+                        duration: 2000
+                    })
+                }
+            },
+            recognize:function(url){
+                
+                const data = {
+                	path: url,
+                    communityId:this.communityId
+                }
+                api.faceAnalysis({
+                    data:data
+                }).then(res=>{
+                    if(res.status == 'OK'){
+                        this.faceRecord = res.data
+                        this.recognizeState = 1
+                        this.slogan = '分析完成！'
+                        this.btnTitle = '查看报告'
+                    }else{
+                        this.recognizeState = 2
+                        this.slogan = '图片拍摄不符合要求，请按照示例拍摄！'
+                        this.btnTitle = '重新拍摄'
+                    }
+                })
+                
+            },
+            moveHandle:function(){
+                
+            }
+        },
+    }
+</script>
+
+<style>
+    page{
+        background: #333;
+    }
+    
+    
+    .hole {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      z-index: 80;
+      /*overflow: hidden;*/
+    }
+    .hole:after {
+      position: absolute;
+      height: 520upx;
+      width: 520upx;
+    /*  left: -48%;
+      top: -17%; */
+      left: -736upx;
+      top: -509upx;
+
+      content: '';
+      border-radius: 50%;
+      border: 850upx solid #008A67;
+    }
+    .qqqqq{
+        left: 108upx;
+        height: 536upx;
+        width: 536upx;
+        top: 332upx;
+        position: absolute;
+        z-index: 100;
+    }
+    .fenxizhong{
+        top: 200upx;
+        width: 100%;
+        text-align: center;
+        position: absolute;
+        z-index: 100;
+        color: #FFFFFF;
+    }
+    .quanquan{
+        left: 77upx;
+        width: 596upx;
+        height: 596upx;
+        top: 300upx;
+        position: absolute;
+        z-index: 100;
+    }
+    .login-btn {
+        position: absolute;
+        z-index: 100;
+        left: 63upx;
+        right: 63upx;
+        top: 1000upx;
+        height: 104upx;
+        line-height: 104upx;
+        border-radius: 52upx;
+        color: #FFFFFF;
+        font-size: 31upx;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+        box-shadow:0px 6upx 31upx 0px rgba(3,190,144,0.3);
+    }
+    .sssssss{
+        display: flex;
+        align-items: center;
+    }
+    .navigation{
+        position: absolute;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        top: 0upx;
+        z-index: 90;
+    }
+    .backBtn{
+        position: absolute;
+        width: 50upx;
+        height: 50upx;
+        bottom: 21upx;
+        left: 12upx;
+    }
+    .facePic{
+        /* position: absolute; */
+        width: 100%;
+        
+    }
+    .previousBtn{
+        position: absolute;
+        left: 0upx;
+        bottom: 0upx;
+        width: 120upx;
+        height: 120upx;
+        border-radius: 0upx 105upx 0upx 0upx ;
+        background: #FFFFFF;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 110;
+    }
+    .previousBtn image{
+        margin-top: 20upx;
+        margin-right: 20upx;
+        width: 34upx;
+        height: 34upx;
+        z-index: 111;
+    }
+    .nextBtn{
+        position: absolute;
+        right: 0upx;
+        bottom: 0upx;
+        width: 120upx;
+        height: 120upx;
+        border-radius: 105upx 0upx 0upx 0upx;
+        background: #148973;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 110;
+    }
+    .nextBtn image{
+        margin-top: 20upx;
+        margin-left: 20upx;
+        width: 34upx;
+        height: 34upx;
+        z-index: 111;
+    }
+</style>

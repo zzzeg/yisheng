@@ -1,0 +1,516 @@
+<template>
+  <div class="content">
+    <div class="scroll-content" v-if="data">
+      <view v-if="data.filename">
+        <div class="cirle">
+          <div class="cirle-top">
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"  width="170px" height="170px"  viewBox="0 0 170 170"
+              xml:space="preserve">
+              <linearGradient id="top" gradientUnits="userSpaceOnUse" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop  offset="0" style="stop-color:#73CFCF"/>
+              <stop  offset="1" style="stop-color:#ffffff"/>
+              </linearGradient>
+              <circle
+                class="top"
+                :r="80"
+                :cx="85"
+                :cy="85"
+                :stroke-width="10"
+                fill="none"/>
+            </svg>
+          </div>
+          <div class="cirle-bottom">
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"  width="170px" height="170px"  viewBox="0 0 170 170"
+              xml:space="preserve">
+              <linearGradient id="bottom" gradientUnits="userSpaceOnUse" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop  offset="0" style="stop-color:#73CFCF"/>
+              <stop  offset="1" style="stop-color:#03BE90"/>
+              </linearGradient>
+              <circle
+                class="bottom"
+                :r="80"
+                :cx="85"
+                :cy="0"
+                :stroke-width="10"
+                fill="none"/>
+            </svg>
+          </div>
+          <div class="avatar" :style="{backgroundImage: `url(${data.filename})`}"></div>
+          <div class="score" v-if="data.score">{{data.score}}</div>
+        </div>
+        <!-- <div class="tip">结果比 <span>22%</span> 的人好</div> -->
+      </view>
+      <view v-else>
+      <div class="score2" v-if="data.score">{{data.score}}分</div>
+      <!-- <div class="tip2">结果比 <span>9%</span> 的人好</div> -->
+      </view>
+      <div class="result">
+        <div class="result-item" v-for="(item, index) in data.item" :key="index">
+          <div class="result-text">{{item.value}}</div>
+          <div class="result-title">{{item.name}}</div>
+        </div>
+      </div>
+      <div class="chart" v-if="data && data.data && data.data.length > 0">
+        <div class="chart-title">
+          <div class="chart-title-item" v-for="(item, index) in data.data" :key="index">{{item.name}}</div>
+        </div>
+        <div class="chart-content">
+          <div class="chart-grid">
+            <div class="chart-grid-item" v-for="(item, index) in data.data" :key="index">
+              <div class="chart-bar" :style="{width: getWidth(item)}"></div>
+            </div>
+          </div>
+          <div class="chart-label-list">
+            <div class="chart-label-item">轻度</div>
+            <div class="chart-label-item">中度</div>
+            <div class="chart-label-item">重度</div>
+          </div>
+        </div>
+      </div>
+      <div class="result-desc" v-if="data.tips">{{data.tips}}</div>
+      <div class="desc">
+        <div class="desc-title">{{data.name}}</div>
+        <div class="desc-text">{{data.introduction}}</div>
+      </div>
+      <div class="products" v-if="products.length > 0">
+        <div class="products-title">推荐产品</div>
+        <div class="product" v-for="(product, index) in products" :key="index" @click="clickProductDetail(product.id)">
+          <div class="product-icon" :style="{backgroundImage: 'url('+product.icon+')'}"></div>
+          <div class="product-introduce">
+            <div class="product-name">{{product.name}}</div>
+            <div class="product-desc">{{product.description}}</div>
+            <div class="product-price">￥{{product.price}}</div>
+            <div class="product-btn" @click.stop="clickProductSelect">点击购买</div>
+          </div>
+        </div>
+      </div>
+      <view v-if="orders.length > 0">
+      <div class="order" v-for="(order, index) in orders" :key="index" @click="orderDetail">
+        <div class="order-title">共{{order.item.reduce((total, currentValue) => total + currentValue.num, 0)}}件商品<span>￥{{order.actualPrice }}</span></div>
+        <div class="order-no">{{order.orderNum}}</div>
+        <div class="order-payWay">{{order.payType === 'WECHAT' ? '微信支付' : '现金支付'}}</div>
+        <div class="order-time">{{formatTimestamp(order.payTime, 'YYYY-MM-DD HH:mm')}}</div>
+      </div>
+      </view>
+    </div>
+    <transition>
+      <router-view></router-view>
+    </transition>
+  </div>
+</template>
+<script>
+    
+import api from '../../../common/api.js';
+import util from '../../../common/util.js'
+
+export default {
+  data () {
+    return {
+      data: null,
+      products: [],
+      orders: [],
+      faceId:null,
+      skinType:null
+    }
+  },
+  onLoad (options) {
+      this.faceId = options.id
+      this.skinType = options.skinType
+      console.log(this.faceId)
+      console.log(this.skinType)
+    api.faceFindPuductByIdAndType({data:{
+      id: this.faceId,
+      type: this.skinType
+    }}).then(r => {
+      if (r.status === 'OK' && r.data) {
+        r.data.forEach(item => {
+            if(item.icon && JSON.parse(item.icon).length > 0){
+                item.icon = JSON.parse(item.icon)[0].url
+            }
+            console.log(item.icon)
+            item.price = (item.price/100).toFixed(2)
+          if (item.orderId) {
+            api.constitutionOrderFindById({
+              id: item.orderId
+            }).then(r => {
+              if (r.status === 'OK') {
+                if (r.data){
+                    this.orders.push(r.data)
+                    this.orders.forEach(item => {
+                        item.actualPrice = (item.actualPrice / 100).toFixed(2)
+                    })
+                } 
+              }
+            })
+          } else {
+            this.products.push(item)
+          }
+        })
+      }
+    })
+    api.faceFindDetailByIdAndType({data:{
+      id: this.faceId,
+      type: this.skinType
+    }}).then(r => {
+      if (r.status === 'OK') {
+        this.data = r.data
+        console.log(this.data)
+      }
+    })
+  },
+  mounted () {
+  },
+  methods: {
+    getWidth (item) {
+      let base = ''
+      switch (item.level) {
+        case '轻度':
+          base = 0
+          break
+        case '中度':
+          base = 33.33
+          break
+        case '重度':
+          base = 66.66
+          break
+      }
+      let value = (100 - (item.value || 0))
+      if (item.name === '痤疮数量' || item.name === '毛孔数量' || item.name === '黑头数量') {
+        if (item.value === '0') {
+          value = 0
+        } else {
+          value = 50
+        }
+      }
+      let score = base + (value / 100 * 33.33)
+      return `${score}%`
+    },
+    parse (str, initValue) {
+      let ret = initValue
+      try {
+        ret = JSON.parse(str)
+      } catch (e) {}
+      return ret
+    }
+  },
+  computed: {
+  },
+  watch: {
+  }
+}
+</script>
+<style lang="scss" scoped>
+$green: #0E5745;
+$white: #FFF;
+.content{
+  height: 100%;
+  overflow: hidden;
+  position: absolute;
+  width: 100%;
+  display: flex;
+  background: white;
+  left: 0;
+  top: 0;
+  flex-direction: column;
+  .scroll-content{
+    // @include scrollPage;
+    overflow:auto;
+    height: 100%;
+    bottom: 0;
+    background: white;
+    .top{stroke:url(#top);}
+    .bottom{stroke:url(#bottom);}
+    .cirle{
+      height: 170px;
+      width: 170px;
+      position: relative;
+      margin: 20px auto 0;
+      .cirle-top{
+        width: 170px;
+        position: absolute;
+        height: 85px;
+        left: 0;
+        top: 0;
+        overflow: hidden;
+      }
+      .cirle-bottom{
+        width: 170px;
+        position: absolute;
+        height: 85px;
+        left: 0;
+        bottom: 0;
+      }
+      .avatar{
+        height: 150px;
+        width: 150px;
+        left: 10px;
+        top: 10px;
+        border-radius: 50%;
+        left: 10px;
+        top: 10px;
+        background: no-repeat center / cover;
+        position: absolute;
+      }
+      .score{
+        height: 36px;
+        width: 36px;
+        line-height: 36px;
+        right: -13px;
+        top: 67px;
+        border-radius: 50%;
+        color: white;
+        text-align: center;
+        background: #03BE90;
+        position: absolute;
+      }
+    }
+    .tip{
+      color: #868E9D;
+      font-size: 14px;
+      line-height: 20px;
+      text-align: center;
+      margin: 6px auto 0;
+      span{
+        color: #148973;
+      }
+    }
+    .score2{
+      padding: 20px 15px 0;
+      color: #03BE90;
+      font-size: 28px;
+      line-height: 40px;
+    }
+    .tip2{
+      color: #868E9D;
+      font-size: 14px;
+      line-height: 20px;
+      margin: 4px 15px 0;
+      span{
+        color: #148973;
+      }
+    }
+    .result{
+      display: flex;
+      margin: 30px 40px;
+      .result-item{
+        flex: 1;
+        font-size: 16px;
+        line-height: 22px;
+        text-align: center;
+        position: relative;
+        +.result-item::before{
+          content: '';
+          width: 1px;
+          position: absolute;
+          top: 3px;
+          left: 0;
+          bottom: 3px;
+          background: #91BDB5;
+        }
+        .result-text{
+          color: #148973;
+        }
+        .result-title{
+          margin-top: 4px;
+          font-size: 14px;
+          color: #434E5E;
+        }
+      }
+    }
+    .chart{
+      display: flex;
+      margin: 0 40px 0 30px;
+      .chart-title{
+        flex: 0 0 63px;
+        padding-right: 10px;
+        text-align: right;
+        .chart-title-item{
+          height: 30upx;
+          line-height: 30px;
+          color: #434E5E;
+          font-size: 14px;
+          white-space: nowrap;
+        }
+      }
+      .chart-content{
+        flex: 1;
+        .chart-grid{
+          position: relative;
+          border-left: 1px dashed #91BDB5;
+          border-right: 1px dashed #91BDB5;
+          border-bottom: 1px solid #91BDB5;
+          &::before{
+            content: '';
+            width: 1px;
+            height: 100%;
+            border-left: 1px dashed #91BDB5;
+            position: absolute;
+            left: 33.33%;
+            top: 0;
+          }
+          &::after{
+            content: '';
+            width: 1px;
+            height: 100%;
+            border-left: 1px dashed #91BDB5;
+            position: absolute;
+            left: 66.66%;
+            top: 0;
+          }
+          .chart-grid-item{
+            height: 30px;
+            padding: 10px 0;
+            position: relative;
+            .chart-bar{
+              height: 100%;
+              background: #03BE90;
+              border-radius: 0 8px 8px 0;
+            }
+          }
+        }
+        .chart-label-list{
+          display: flex;
+          margin-top: 3px;
+          .chart-label-item{
+            flex: 1;
+            text-align: center;
+            color: #A2A9BA;
+            font-size: 14px;
+            line-height: 20px;
+          }
+        }
+      }
+    }
+    .result-desc{
+      color: #434E5E;
+      font-size: 16px;
+      line-height: 26px;
+      padding: 15px;
+      margin: 30px 15px;
+      background: #EEFAF8;
+      border-radius: 15px;
+    }
+    .desc{
+      margin: 30px 15px;
+      .desc-title{
+        color: #148973;
+        font-size: 19px;
+        line-height: 26px;
+        font-weight: bold;
+      }
+      .desc-text{
+        margin-top: 10px;
+        color: #434E5E;
+        font-size: 16px;
+        line-height: 26px;
+      }
+    }
+    .products{
+      margin: 30px 15px;
+      padding: 15px 15px 20px;
+      background: #F6F7FA;
+      border-radius: 15px;
+      .products-title{
+        font-size: 16px;
+        line-height: 22px;
+        color: #16202E;
+        font-weight: bold;
+      }
+      .product{
+        margin-top: 15px;
+        display: flex;
+        +.product{
+          margin-top: 10px;
+        }
+        .product-icon{
+          flex: 0 0 90px;
+          height: 90px;
+          border-radius: 6px;
+          background: no-repeat center / cover;
+        }
+        .product-introduce{
+          padding-left: 10px;
+          flex: 1;
+          position: relative;
+          .product-name{
+            color: #434E5E;
+            font-size: 14px;
+            line-height: 20px;
+            height: 40px;
+            // @include ellipsis(2)
+          }
+          .product-desc{
+            color: #148973;
+            font-size: 12px;
+            line-height: 17px;
+            margin-top: 2px;
+            // @include ellipsis(1);
+          }
+          .product-price{
+            color: #16202E;
+            font-size: 18px;
+            line-height: 25px;
+            margin-top: 6px;
+            padding-right: 70px;
+            font-weight: bold;
+            // @include ellipsis(1)
+          }
+          .product-btn{
+            background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+            box-shadow:0px 3px 15px 0px rgba(3,190,144,0.3);
+            border-radius:12px;
+            font-size: 12px;
+            height: 24px;
+            line-height: 24px;
+            width: 68px;
+            text-align: center;
+            color: white;
+            position: absolute;
+            right: 0;
+            bottom: 0;
+          }
+        }
+      }
+    }
+    .order{
+      padding: 15px 22px;
+      margin: 30px 15px;
+      background: #F6FAF9;
+      border-radius: 5px;
+      .order-title{
+        color: #2A3441;
+        font-size: 15px;
+        line-height: 23px;
+        span{
+          float: right;
+        }
+      }
+      .order-no{
+        padding-left: 28px;
+        margin-top: 10px;
+        background: url('../../../static/image/icon_dd_bh@2x.png') no-repeat 0 center / 18px 18px;
+        color: #434E5E;
+        font-size: 13px;
+        line-height: 19px;
+      }
+      .order-payWay{
+        padding-left: 28px;
+        margin-top: 10px;
+        background: url('../../../static/image/icon_dd_zffs@2x.png') no-repeat 0 center / 18px 18px;
+        color: #434E5E;
+        font-size: 13px;
+        line-height: 19px;
+      }
+      .order-time{
+        padding-left: 28px;
+        margin-top: 10px;
+        background: url('../../../static/image/icon_dd_sj@2x.png') no-repeat 0 center / 18px 18px;
+        color: #434E5E;
+        font-size: 13px;
+        line-height: 19px;
+      }
+    }
+  }
+}
+
+</style>

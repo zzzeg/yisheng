@@ -1,0 +1,295 @@
+<template>
+    <view class="content" :style="{ height: screenHeight }">
+        <live-player 
+            v-if="!isFull" class="manpin"
+             :id="streamId"
+             :src="playerUrl" 
+             mode="RTC" 
+             object-fit="contain"
+             autoplay 
+         ></live-player>
+        <live-pusher v-if="isFull" class="manpin" id='livePusher' ref="livePusher"  :url="pusUrl"
+                mode="SD" :muted="true" :enable-camera="true" :auto-focus="true" :beauty="1" whiteness="2"
+                aspect="9:16" @statechange="statechange" @netstatus="netstatus" @error = "error"
+                ></live-pusher>
+        <movable-area>
+        	<movable-view :x="x" :y="y" direction="all" @change="onChange" @click="clickMovableView" >
+                <live-pusher class="xiaopin" v-if="!isFull" id='livePusher' ref="livePusher" :url="pusUrl"
+                        mode="SD" :muted="true" :enable-camera="true" :auto-focus="true" :beauty="1" whiteness="2"
+                        aspect="9:16" @statechange="statechange" @netstatus="netstatus" @error = "error"
+                        ></live-pusher>
+                <live-player
+                    v-if="isFull" 
+                    class="xiaopin" 
+                     :id="streamId"
+                     :src="playerUrl" 
+                     mode="RTC" 
+                     object-fit="contain"
+                     autoplay 
+                 ></live-player>
+            </movable-view>
+        </movable-area>
+        <view class="navigation" :style="{ height: statusBarHeight }">
+            <image @click="clickBack" class="backBtn" src="../../static/image/icon_left.png" mode=""></image>
+            <view class="titleNav">
+                视频问诊
+            </view>
+        </view>
+        <view class="controlContent">
+            <view class="emediaContrContent">
+        		<view class="controlItem" @click="toggleCamera" :style="{'color':devicePositionColor}">
+        			<image
+        				class="icon-record"
+        				:src='devicePositionIcon' style="width:22px; height: 24px"/>
+        			切换摄像头
+        		</view>
+        		<view class="controlItem" @click="toggleMuted" :style="{'color':micphoneColor}">
+        			<image
+        				class="icon-record"
+        				:src='micphoneIcon' style="width:22px; height: 24px"/>
+        			麦克风</view>
+        		<view class="controlItem" @click="togglePlay" :style="{'color':videoColor}">
+        			<image
+        				class="icon-record"
+        				:src='videoIcon' style="width:22px; height: 24px"/>
+        			视频</view>
+        	
+        	</view>
+                
+        	<view class="hangup" bindtap="hangup">
+        		<image
+        			class="icon-record"
+        			src='../../static/image/hangup@2x.png'/>
+        	</view>
+        </view>
+    </view>
+</template>
+
+<script>
+    var statusBarHeight = uni.getSystemInfoSync().statusBarHeight + 44 + 'px'
+    var screenHeight = uni.getSystemInfoSync().screenHeight + 'px'
+    export default {
+        
+    	data() {
+    		return {
+                LivePusherContext:null,
+                
+    			statusBarHeight: statusBarHeight,
+                screenHeight:screenHeight,
+                communityId:'',
+                
+                isFull:false,
+                x: 0,
+                y: 0,
+                scale: 2,
+                old: {
+                	x: 0,
+                	y: 0,
+                	scale: 2
+                },
+                
+                videoColor:'',
+                devicePositionColor:'#fff',
+                micphoneColor:'',
+                devicePositionIcon:'../../static/image/switchCamera_white@2x.png',
+                videoIcon:'../../static/image/video_white@2x.png',
+                micphoneIcon:'../../static/image/micphone_white@2x.png',
+                
+                enableCamera: true,
+                playerUrl: '',
+                pusUrl: "",
+    		}
+    	},
+    	onLoad(options) {
+            this.communityId = options.communityId
+            
+            
+            this.LivePusherContext = wx.createLivePusherContext()
+            var _self = this
+            
+            wx.emedia.mgr.onMemberJoined = function(mem){
+            	console.log("++++++++++ member", mem)
+                var jid = wx.WebIM.conn.context.jid
+            	let identityName = jid.appKey + '_' + jid.name+ '@' + jid.domain
+            	// let identityName = wx.WebIM.conn.context.jid.split("/")[0]
+            	// 如果是自己进入会议了，开始发布流
+            	if(mem.name == identityName){
+            		let rtcId = wx.emedia.util.getRtcId()
+            		wx.emedia.mgr.pubStream(rtcId).then(function(res){
+                        _self.pusUrl = res.data.rtmp
+            			
+            		})
+                        
+            		var enableCamera = me.data.enableCamera;
+            	    console.warn("begin enable camera", me.data.enableCamera);
+                        
+            	    //默认enableCamera为false  关闭摄像头时声音不会有延迟，否则有延迟
+            	    //所以最好别用autopush
+            		_self.setData({
+            			enableCamera: false,
+            			pusUrl: _self.url + 'record_type=audio' || 'https://domain/push_stream',
+            		}, () => {
+            			
+                        setTimeout(() => {
+                        	_self.LivePusherContext.start({
+                        		success: function () {
+                            		// console.log('关闭摄像头推流', enableCamera)
+                            		enableCamera && _self.setData({enableCamera: enableCamera})
+                            	}
+                        	})
+                        }, 1500)
+            	      
+            	    })
+            	}
+            }
+            
+            wx.emedia.mgr.onStreamAdded = function(stream){
+                console.log('%c onAddStream', 'color: green', stream)
+            	let streamId = stream.id
+            	// setTimeout(() => {
+            		// if(playerUrl.length > 8){
+            		// 	return
+            		// }
+            		wx.emedia.mgr.subStream(streamId).then(function(data){
+            			console.log('%c 订阅流成功', 'color:green', data)
+            			// let playContext = wx.createLivePlayerContext(streamId, me)
+            			// let subUrl = {
+            			// 	streamId: streamId,
+            			// 	subUrl: data.data.rtmp,
+            			// 	memName: stream.memName.split("_")[1].split("@")[0],
+            			// 	// playContext: playContext
+            			// }
+                        
+            			// subUrls.push(subUrl)
+            			// console.log('%c subUrls 11 ....', "background:yellow")
+            			// console.log(subUrls)
+                        
+            			
+                        _self.playerUrl = data.data.rtmp
+                        _self.streamId = streamId
+            				// showInvite: false
+            			
+            		})
+            	// }, 2000)
+                        
+            }
+    	},
+    	methods: {
+            clickBack:function(){
+                uni.navigateBack({
+                    delta:1
+                })
+            },
+            onChange: function(e) {
+            	this.old.x = e.detail.x
+            	this.old.y = e.detail.y
+            },
+            toggleCamera:function(){
+                this.LivePusherContext.switchCamera({
+                    success: function(){
+                        this.devicePositionIcon = this.devicePositionIcon =='switchCamera_white'?'switchCamera_gray': 'switchCamera_white'
+                		this.devicePositionColor = this.devicePositionColor == '#fff'? '#aaa':'#fff'
+                	}
+                })
+            },
+            clickMovableView:function(){
+                this.isFull = !this.isFull
+            }
+        }
+    }
+</script>
+
+<style>
+    .xiaopin{
+        width: 100%;
+        height: 100%;
+        border: 2upx #F1F1F1 solid;
+    }
+    .manpin{
+        width: 100%;
+        height: 100%;
+    }
+    
+    movable-area {
+    	height: 100%;
+    	width: 100%;
+    	/* background-color: #D8D8D8; */
+    	overflow: hidden;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+    movable-view {
+    	display: flex;
+    	align-items: center;
+    	justify-content: center;
+    	height: 266upx;
+    	width: 150upx;
+    	background-color: #007AFF;
+    	color: #fff;
+    }
+    .navigation{
+        position: absolute;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        top: 0;
+    }
+    .titleNav{
+        width:152upx;
+        height:56upx;
+        font-size:38upx;
+        font-weight:300;
+        color:rgba(255,255,255,1);
+        line-height:56upx;
+        position: absolute;
+        bottom: 21upx;
+        left: calc(50% - 76upx);
+    }
+    .backBtn{
+        position: absolute;
+        width: 50upx;
+        height: 50upx;
+        bottom: 21upx;
+        left: 21upx;
+    }
+    .controlContent {
+    	display: flex;
+    	flex-direction: column;
+    	height: 340rpx;
+    	width: 100%;
+    	align-items: center;
+    	padding-top: 20rpx;
+        position: absolute;
+        bottom: 0;
+    }
+    
+    .emediaContrContent {
+    	display: flex;
+    	width: 100%;
+    }
+    .controlItem {
+    	flex: 1;
+    	height: 100rpx;
+    	text-align: center;
+    	color: #fff;
+    	display: flex;
+    	flex-direction: column;
+    	align-items: center;
+    	font-size: 12px;
+    }
+    .icon-record {
+    	width: 100rpx;
+    	height: 100rpx;
+    }
+    .hangup {
+    	width: 100rpx;
+    	height: 100rpx;
+    	border-radius: 50rpx;
+    	background: red;
+    	margin-top: 60rpx;
+    	display: flex;
+    	align-items: center;
+    	justify-content: center;
+    }
+</style>

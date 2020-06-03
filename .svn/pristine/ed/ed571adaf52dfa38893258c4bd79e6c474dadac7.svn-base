@@ -1,0 +1,352 @@
+<template>
+	<scroll-view :scroll-y="scroll">
+		<view class="cont">
+		<view class="title">
+			健康服务站
+		</view>
+		<view class="intrduce">
+			明我是分享模式的智慧健康服务基础平台，平台核心基础为全球丰富的健康产品、不同专业方向的健康医生与健康AI医生；健康相关的企业/机构或个人都可以借助明我平台建立自己的云上健康服务站，为其用户提供智慧健康服务。
+		</view>
+		<view style="margin: 0 0 40rpx 0">
+			<view style="margin:15px 0 10px 0; font-weight: 400; color:#16202E;">选择服务站</view>
+			<view class="searchBar">
+				<input placeholder="请输入服务站名称或关键字" @confirm="clikSearch()" class="searchInput" confirm-type="search" type="text" v-model="searchVal" />
+				<view class="searchIco" @tap="clikSearch()">
+					<image class="sico" src="../../static/image/icon_md_sousuo.png" mode=""></image>
+				</view>
+			</view>
+		</view>
+		
+		<view class="searchItemsList">
+			<view class="labels">服务站类型：</view>
+			<view :class="{'items': addrList, 'all': moreOpen}">
+				<view :class="{'defaults': item, 'active': slistCheck.indexOf(item) != -1 }" v-for="(item, index) in slist" :key="index"  @tap="checkItem('slistCheck', item)">{{ item }}</view>
+			</view>
+			<view class="more" @tap="toggle('moreOpen')">
+				<view v-if="!moreOpen">更多<image class="disinline" src="../../static/image/icon_md_xzcs@2x.png" style="width:24rpx; height:24rpx; vertical-align: middle;"></image></view>
+				<view v-else>收起<image class="disinline" src="../../static/image/icon_md_xzcs@2x.png" style="width:24rpx; height:24rpx; vertical-align: middle;transform: rotate(180deg);"></image></view>
+			</view>
+		</view>
+		
+		<view class="searchItemsList">
+			<view class="labels">星级评价：</view>
+			<view class="items" style="width: calc(100% - 6em);">
+				<view :class="{'defaults': item, 'active': star == item.num }" v-for="(item, index) in starts" :key="index" style="margin-right:12rpx;" @tap="checkstart(item.num)">{{ item.label }}</view>
+			</view>
+		</view>
+		
+		<view class="searchItemsList">
+			<view class="labels">所在地区：</view>
+			<view :class="{'items': addrList, 'all': allOpen}">
+				<view :class="{'defaults': item, 'active': addrCheck.indexOf(item) != -1 }" v-for="(item, index) in addrList" :key="index" @tap="checkItem('addrCheck', item)">{{ item }}</view>
+			</view>
+			<view class="more" @tap="showall(true)">
+				<view>
+					<text class="textoverflow">{{ addrCheck[0].length > 0 ? addrCheck[0] : '全部' }}</text>
+					<image class="disinline" src="../../static/image/icon_md_xzcs@2x.png" style="width:24rpx; height:24rpx; vertical-align: middle;"></image>
+				</view>
+				<!-- <view v-else>收起<image class="disinline" src="../../static/image/icon_md_xzcs@2x.png" style="width:24rpx; height:24rpx; vertical-align: middle;transform: rotate(180deg);"></image></view> -->
+			</view>
+		</view>
+		
+		<view v-if="serverList && serverList.length > 0" style="padding: 40rpx 0 0 0;">
+			<view class="serverlists" v-for="(item, index) in serverList" :key="index" @click="clickServer(index)">
+				<view class="disinline" style="margin:10rpx 20rpx 0 0;">
+					<image src="../../static/image/fwz_img.jpg" style="width:160rpx; height:160rpx; border-radius: 20rpx;"></image>
+				</view>
+				<view class="disinline" style="width:calc(100% - 180rpx); font-size:20rpx; line-height:28rpx;color:#A2A9BA;">
+					<view class="title">{{ item.name }}</view>
+					<view>服务站类型：<text class="color_gre">{{ item.tagPName ? item.tagPName :'' }}</text></view>
+					<view class="disinline" style="width:calc(100% - 9em); margin-right:20rpx">健康管家：{{item.mangerName?item.mangerName:''}}</view>
+					<view class="disinline">{{item.addr ? item.addr : ''}}</view>
+					<view class="disinline" style="width:calc(100% - 9em); margin-right:20rpx">
+						评价：
+						<image class="disinline" style="width:20rpx; height:20rpx; vertical-align: middle;" :src="item.score && $util.round(item.score) > xi?'../../static/image/img_star_14yellow.png':'../../static/image/img_star_14gray.png'" v-for="xi in 5" :key="xi"></image>
+					</view>
+					<view class="disinline">用户数：{{ item.joinCount }}</view>
+					<view class="color_gre"><view class="xiegang color_gre" v-for="(xx, x) in item.tags" :key="x">{{ xx }}</view></view>
+				</view>
+				<view class="disinline" style="font-size:25rpx; color:#A2A9BA; line-height: 2;">
+					站主：{{item.contactName?item.contactName:''}}
+				</view>
+			</view>
+		</view>
+		
+		<view style="margin:80rpx 0 0 0; font-size:30rpx; color:#A2A9BA; font-weight: 400; text-align: center;" v-else>
+			未搜索到相关服务站
+		</view>
+		
+		
+		<view class="dialog" v-if="showdialog">
+			<view class="close" @tap="showall(false)"><image src="../../static/image/icon_md_gb@2x.png" class="disinline" style="width:48rpx; height:48rpx;"></image></view>
+			<view class="searchCityBar">
+				<image src="../../static/image/icon_md_sousuo@2x.png" class="disinline" style="width:40rpx; height:40rpx; vertical-align: middle;"></image>
+				<input placeholder="请输入城市名称" class="searchInput" type="text" @input="goSearchList(searchVal1)" v-model="searchVal1" />
+			</view>
+			<view v-if="cityList.length > 0">
+				<view style="margin-top:40rpx;">
+					<view :class="{'defaultsBig': addrCheck, 'active': !addrCheck[0]}" @tap="checkItem('addrCheck')">全部城市</view>
+				</view>
+				<view class="provinces" v-for="(items, index) in cityList" :key="index">
+					<view class="province">
+						<image src="../../static/image/icon_md_dwh@2x.png" class="disinline" style="width:32rpx; height:32rpx; margin:0 6rpx 4rpx 0; vertical-align: middle;"></image>
+						{{ items.name }}
+					</view>
+					<view :class="{'defaultsBig': addrCheck, 'active': addrCheck[0] == item.name }" v-for="(item, ind) in items.children" :key="ind" style="margin-right:12rpx;" @tap="checkItem('addrCheck', item.name.substring(0, item.name.length - 1))">{{ item.name }}</view>
+				</view>
+			</view>
+			<view v-else style="text-align: center; margin:80rpx 0; font-size:30rpx;">
+				{{ '该城市还没有健康服务站~' }}
+			</view>
+		</view>
+		<view v-if="ismore">
+			<uni-load-more :status="status"  :content-text="contentText" color="#007aff"  />
+		</view>
+		</view>
+	</scroll-view>
+</template>
+
+<script>
+	import api from '../../common/api.js';
+	import uniLoadMore from "../../components/uni-load-more/uni-load-more.vue"
+	export default{
+	    components: {uniLoadMore},
+		data() {
+			return {
+                ismore:false,
+                contentText: {
+                    contentdown: '查看更多',
+                    contentrefresh: '加载中',
+                    contentnomore: '没有更多',
+                },
+                page:1,
+                size:10,
+				showdialog: false,
+				searchVal: '',
+				searchVal1: '',
+				slistCheck: [],
+				slist: [],
+				star: 5,
+				starts: [{num: '',label: '全部'},
+                        {num: 5,label: '五星'},
+                        {num: 4,label: '四星'},
+                        {num: 3,label: '三星'}],
+				addrCheck: [],
+				addrList: ['深圳', '北京', '广州', '上海'],
+				allOpen: false,
+				moreOpen: false,
+				serverList: [],
+				cityList: [], // 城市列表
+				cacheDataList: [] // 城市列表备份
+			}
+		},
+        onLoad() {
+        	this.getareasList() // 获取地区列表
+        	this.getconmutype() // 获取服务站类型
+        	this.getserverList() // 查询服务站
+        },
+        onPullDownRefresh() {
+            console.log('onPullDownRefresh')
+            this.page = 1
+            this.getserverList()
+            
+        },
+        onReachBottom() {
+            console.log('onReachBottom')
+            this.status = 'loading'
+            uni.showNavigationBarLoading()
+            
+            this.page++
+            this.getserverList()
+        },
+		computed: {
+			scroll () {
+				return !this.showdialog
+			}
+		},
+		methods: {
+            clikSearch:function(){
+                this.page = 1
+                this.getserverList()
+            },
+            clickServer:function(index){
+                
+                console.log(this.serverList[index])
+                uni.reLaunch({
+                    url:'../index/index?communityid='+this.serverList[index].id
+                })
+                
+            },
+			goSearchList(value) {
+				// 模糊遍历城市列表
+				let cacheList = []
+				var reg = new RegExp(value,"g");
+				this.cacheDataList.map(q=>{
+					let z = {
+						name: '',
+						children: []
+					}
+					q.children.map(i=> {
+						if(reg.test(i.name)) {
+							z.name = q.name
+							z.children.push(i)
+						}
+					})
+					if (z.children.length > 0) {
+						cacheList.push(z)
+					}
+				})
+				this.cityList = cacheList
+			},
+			showall(value) {
+				// 触发弹窗搜索城市对应的服务站
+				this.showdialog = value
+				if(value) {
+					// 可选功能：关闭城市搜索框的时候，初始化查询的值
+					// this.searchVal1 = ''
+					// this.goSearchList(this.searchVal1)
+					this.page = 1
+					// 查询城市对应的服务站
+					this.getserverList()
+				}
+			},
+			getareasList() {
+				// 查询城市列表
+				api.getareasList().then(res=>{
+					this.cityList = res.data
+					this.cacheDataList = res.data
+				})
+			},
+			getconmutype() {
+				api.getcommunityType({
+					page: 1,
+					size: 999
+				}).then(res=>{
+					let n = []
+					res.list.map(item=>{
+						n.push(item.name)
+					})
+					this.slist = n
+				})
+			},
+			checkstart(num) {
+				this.star = this.star == num ? '' : num
+                this.page = 1
+				this.getserverList()
+			},
+			toggle(item) {
+				this[item] = !this[item]
+				console.log('item is xxx', this[item])
+			},
+			checkItem(pitem, item) {
+				if(!item) {
+					this[pitem] = []
+				} else{
+					if(this[pitem] == item) {
+						this[pitem] = []
+					} else {
+						this[pitem] = []
+						this[pitem].push(item)
+					}
+				}
+				console.log(this.addrCheck.length)
+                this.page = 1
+				this.getserverList()
+				this.showdialog = false
+			},
+			getserverList() {
+				console.log('触发了搜索')
+				// 获取服务站列表
+				api.getcommuty({
+					page: this.page,
+					size:this.size,
+					provinceName: '',
+					cityName: this.addrCheck[0] ? this.addrCheck[0] : '',
+					sort:'',
+					keywords: this.searchVal, // 关键词
+					tagName: this.slistCheck[0] ? this.slistCheck[0] : '', //服务站类型
+					level: this.star  // 五四三二一星级
+				}).then(res=>{
+                    if(res.status == 'OK'){
+                        if(this.page == 1){
+                            this.serverList = []
+                            if(res.list.length>=this.size){
+                                this.ismore = true
+                            }
+                        }
+                        res.list.map(item=>{
+                        	var update = false;
+                        	if(item.province){
+                        	    item.addr = item.province.substring(0, item.province.length - 1) 
+                        		update = true
+                        	}
+                        	if(item.city){
+                        	    item.addr = item.addr  + ' | ' + item.city.substring(0,item.city.length - 1)
+                        		update = true
+                        	}
+                        	if(!update){
+                        		item.addr = ''
+                        	}
+                            if(item.score){
+                                item.score = Math.round(item.score)
+                            }
+                            this.serverList.push(item);
+                        })
+                    }
+					uni.stopPullDownRefresh();
+					uni.hideNavigationBarLoading()
+				})
+			}
+		}
+	}
+</script>
+
+<style scoped lang="scss">
+	.disinline{ display:inline-block; vertical-align: top; }
+	.color_gre{ color:#03BE90 }
+	.cont{ padding:32rpx; background:linear-gradient(180deg,rgba(255,255,255,1) 0%,rgba(239,241,246,1) 100%); box-sizing: border-box; }
+	.title{
+		color:#03BE90; font-size:29rpx; line-height: 2; font-weight: 500;
+	}
+	.intrduce{ font-size:25rpx; color:#868E9D; line-height:2; }
+	.sp16{ font-size:32rpx; }
+	.searchInput{ height:80rpx;background:rgba(241,242,247,1); border-radius:50rpx; display:inline-block; width:calc(100% - 100rpx); vertical-align: middle;box-sizing: border-box;padding: 0 40rpx; font-size:28rpx; }
+	.searchIco{ display:inline-block; vertical-align: middle; width:80rpx;height:80rpx;
+		background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+		box-shadow:0px 3px 15px 0px rgba(3,190,144,0.3);
+		border-radius:25px; text-align:center; margin-left:20rpx;
+		.sico{ width:40rpx; height:40rpx; margin-top:20rpx; }
+	}
+	.searchItemsList {
+		.labels{ display: inline-block; vertical-align: top; line-height: 2; font-size:28rpx; color:#16202E; font-weight: 400; width:6em;}
+		.items{ 
+			display: inline-block; vertical-align: top; line-height: 1.7; width: calc(100% - 10em);
+			height:2.5em; overflow: hidden;
+			.defaults{ font-size:24rpx; color:#434E5E; display:inline-block; padding:12rpx 20rpx; border-radius:20rpx; background:rgba(241,242,247,1); margin:0px 16rpx 16rpx 0rpx; 
+				&.active{ background: #03BE90; color:#fff; }
+				&:last-child { margin-right:0!important; }
+			}
+		}
+		.items.all{ height:auto; }
+		.more {display: inline-block; vertical-align: top; color:#03BE90; font-size:24rpx; line-height:2.9; width:5em; text-align:right;margin-top:10rpx;
+			.textoverflow{ display:inline-block; max-width: 4em;overflow: hidden;text-overflow:ellipsis;white-space: nowrap; vertical-align: top;}
+		}
+	}
+	.serverlists{ padding:30rpx 0rpx 30rpx 26rpx;background:rgba(255,255,255,1);box-shadow:0px 2px 10px 0px rgba(85,112,105,0.1);border-radius:10px; margin: 0 0 40rpx 0; 
+		.title{ font-size:28rpx; font-weight: 500; }
+	}
+	.dialog{ position:fixed; overflow: auto; top:0; left:0; right:0; bottom:0; background:#fff; box-sizing: border-box; padding:32rpx;  z-index:9999;
+		.close{ text-align:right;}
+		.searchCityBar{ height:80rpx;background:rgba(241,242,247,1); border-radius:50rpx;box-sizing: border-box;padding: 0 40rpx; font-size:28rpx; }	
+		.province{ font-size:30rpx; color:#A2A9BA; margin:40rpx 0 20rpx 0;}
+		.defaultsBig{ font-size:28rpx; line-height:34rpx; padding:16rpx 20rpx; border-radius:20rpx; color:#434E5E; display:inline-block; vertical-align: middle; background:#F1F2F7; margin:0 28rpx 0 0;
+			&.active{ background:#03BE90; color:#fff; }
+		 }
+	}
+	.xiegang{
+		display:inline-block;vertical-align: middle;
+		&:after{ content: '/'; display:inline-block; }
+		&:last-child:after{ content: '';}
+	}
+	
+</style>

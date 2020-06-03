@@ -1,0 +1,180 @@
+<template>
+    <view class="content">
+        <image class="logo" src="https://coffer.bainuo.cn/mdt-pub/img_zzys_yisheng_bg.png"></image>
+        <view class="login-box">
+            <view class="boxxxx"></view>
+            <view class="headerBox">
+                <image src="" mode=""></image>
+            </view>
+            <view style="color: #2A3441;font-size: 38upx;">
+                陈伟华
+            </view>
+            <view style="color: #A2A9BA;">
+                健康管理师，主任医师 | 执业医师
+            </view>
+            <view class="btnBox">
+                <view class="gkfxbtn">图文问诊</view>
+                <view class="gkfxbtn">视频问诊</view>
+            </view>
+        </view>    
+        <view class="boxTop" >
+            <view class="titleBox">
+                擅长
+            </view>
+            <view style="margin: 44upx 32upx 6upx 32upx;">
+                1.运用辨体-辨病-辨证相结合诊治疑难杂病：失眠、偏头痛、抑郁、高血压、心律失常、脂肪肝、肥胖、消瘦、糖尿病、高脂血、痛风、中风、肾功能不全、便秘、口腔溃疡、结肠炎、咳嗽、痤疮、湿疹、异位性皮炎、紫癜、月经不调、痛经等。<br>
+                2.男科病如性功能障碍、男性不育、前列腺炎、前列腺增生症等。
+            </view>
+            <view style="height: 50upx;width: 100%;"></view>
+        </view>
+        <view class="boxTop" >
+            <view class="titleBox">
+                简介
+            </view>
+            <view style="margin: 44upx 32upx 6upx 32upx;">
+                1.运用辨体-辨病-辨证相结合诊治疑难杂病：失眠、偏头痛、抑郁、高血压、心律失常、脂肪肝、肥胖、消瘦、糖尿病、高脂血、痛风、中风、肾功能不全、便秘、口腔溃疡、结肠炎、咳嗽、痤疮、湿疹、异位性皮炎、紫癜、月经不调、痛经等。<br>
+                
+            </view>
+            <view style="height: 50upx;width: 100%;"></view>
+        </view>
+        <view class="boxTop" >
+            <view class="titleBox">
+                资质
+            </view>
+            <view style="margin: 44upx 32upx 6upx 32upx;">
+                <uni-swiper-dot :info="info" :current="current" :mode="mode" :dots-styles="dotsStyles" field="content">
+                	<swiper class="swiper-box" @change="change">
+                		<swiper-item v-for="(item, index) in info" :key="index">
+                			<view :class="item.colorClass" class="swiper-item">
+                				<image class="image" :src="item.url" mode="aspectFill" />
+                			</view>
+                		</swiper-item>
+                	</swiper>
+                </uni-swiper-dot>
+            </view>
+            <view style="height: 50upx;width: 100%;"></view>
+        </view>
+    </view>
+    
+</template>
+
+<script>
+    import api from '../../common/api.js';
+    
+    export default {
+    	data() {
+    		return {
+                info: [
+                    {url:'https://coffer.bainuo.cn/mdt-pub/img_zzys_yisheng_bg.png'},
+                    {url:'https://coffer.bainuo.cn/mdt-pub/img_zzys_yisheng_bg.png'},
+                    {url:'https://coffer.bainuo.cn/mdt-pub/img_zzys_yisheng_bg.png'}
+                ],
+                current: 0,
+                mode: 'dot',
+                dotsStyles: {
+                    backgroundColor: 'rgba(255, 255, 255, 1)',
+                    selectedBackgroundColor: '#03BE90',
+                    border: '1px rgba(83, 200, 249,0.0) solid',
+                    selectedBorder: '1px rgba(83, 200, 249,0.0) solid'
+                }
+            }
+        },
+        onLoad(options) {
+            
+        },
+        methods:{
+            change(e) {
+            	this.current = e.detail.current
+            }
+        }
+    }
+</script>
+
+<style>
+    page{
+        background: #EFF1F6;
+    }
+    .content{
+        text-align: center;
+        font-size:29upx;
+        color: #434E5E;
+    }
+    .logo {
+    	height: 488upx;
+    	width: 100%;
+        position: absolute;
+        left: 0upx;
+        top: 0upx;
+        z-index: -99;
+    }
+    .boxTop{
+        margin: 30upx 33upx;
+        width:683upx;
+        background:rgba(255,255,255,1);
+        box-shadow:0px 4upx 21upx 0px rgba(85,112,105,0.1);
+        border-radius:21upx;
+        font-size: 30upx;
+        color: #868E9D;
+        text-align: left;
+    }
+    .titleBox{
+        padding-top: 32upx ;
+        margin: 0upx 32upx;
+        height: 78upx;
+        border-bottom: 2upx dashed #C6CAD4;
+        color: #16202E;
+        font-size: 38upx;
+    }
+    .btnBox{
+        display: flex;
+        flex-direction: row;
+        margin: 70upx 123upx 90upx 123upx;
+        justify-content: space-between;
+    }
+    
+    .gkfxbtn{
+        width:197upx;
+        height:67upx;
+        background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+        box-shadow:0px 6upx 31upx 0px rgba(3,190,144,0.3);
+        border-radius:33upx;
+        line-height: 67upx;
+        text-align: center;
+        color: #FFFFFF;
+    }
+    .login-box{
+        width: 683upx;
+        height: 503upx;
+        /* margin-top: -310upx; */
+        position: relative;
+        margin-top: 238upx;
+        margin-left: 33upx;
+    }
+    .boxxxx{
+        position: absolute;
+        z-index: -97;
+        width: 100%;
+        background:#FFFFFF;
+        box-shadow:0upx 42upx 208upx 0upx rgba(22,32,46,0.15);
+        border-radius:31upx;
+        height: 419upx;
+        top: 84upx;
+    }
+    .headerBox{
+        width: 168upx;
+        height: 168upx;
+        margin-top: -84upx;
+        background: #FFFFFF;
+        border-radius: 50%;
+        margin-left: calc(50% - 84upx);
+        
+    }
+    .headerBox image{
+        margin: 8upx;
+        width: 152upx;
+        height: 152upx;
+        border-radius: 50%;
+        background: #F8F8F8;
+    }
+    
+</style>

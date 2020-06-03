@@ -1,0 +1,121 @@
+<template>
+    <view class="content">
+        <view class="boxTop">
+            <view class="titleBox">
+                注意：急重症不适合网上问诊，请立即前往医院就诊
+            </view>
+            <view style="margin: 44upx 32upx 6upx 32upx;">
+                <text style="color: #16202E;">问诊说明：</text><text>问诊时请详细描述你的症状，包括发病诱因，曾经的就诊经历等等，信息越全，越有助于您获得医生的正确诊断与提供有效的解决方案。</text>
+            </view>
+            <view style="margin: 0upx 32upx 102upx 32upx;">
+                <text style="color: #16202E;">重要提醒：</text><text>问诊结束后，十分钟内会给您发送问诊相关报告，请到查看报告里查看。</text>
+            </view>
+        </view>
+        <button @click="clickConnect"  hover-class="button-hover" class="login-btn" >视频连接</button>
+    </view>
+</template>
+
+<script>
+    
+    
+    import api from '../../common/api.js';
+    
+    export default {
+    	data() {
+    		return {
+                communityid:null,
+                confrId:null,
+                to:null
+            }
+        },
+        onLoad(options) {
+            this.recordId = options.recordId
+            this.communityid = options.communityId
+            this.to = options.to
+            
+            // //类型、密码、是否录屏、是否合并录屏
+            // wx.emedia.mgr.createConference(10, '', false, false).then(function(createRes){
+            //     console.log('成功', createRes)
+            //     if(createRes.statusCode == '200'){
+            //         let ticket = createRes.data.ticket
+            //         let ticketJosn = JSON.parse(ticket)
+            //         let confrId = ticketJosn.confrId
+            //         console.log("confrId:"+confrId)
+            //         wx.emedia.mgr.joinConferenceWithTicket(confrId, ticket).then(function(res){
+            //             console.log('加入会议成功', res)
+            //             uni.navigateTo({
+            //                 url:"videoInterrogation"
+            //             })
+            //         })
+                  
+            //         _self.confrId = confrId
+                                
+            //     }
+                
+            // })    				
+        },
+        methods:{
+            clickConnect:function(){
+                var _self = this
+                const userinfo = uni.getStorageSync('userinfo');
+                var data = {
+                    recordId:this.recordId,
+                    to:this.to,
+                    from:userinfo.userId
+                }
+                api.emchatCreateConferences({
+                    data:data
+                }).then(res=>{
+                    console.log(res)
+                    if(res.status == 'OK'){
+                       
+                            uni.navigateTo({
+                                url:"videoInterrogation?confrId="+res.data.id+'&pwd='+res.data.password
+                            })
+                            // uni.navigateTo({
+                            //     url:'shipin'
+                            // })
+                    }
+                })
+            }
+        }
+    }
+</script>
+
+<style>
+    page{
+        background: #EFF1F6;
+    }
+    .boxTop{
+        margin: 80upx 33upx;
+        width:683upx;
+        height:563upx;
+        background:rgba(255,255,255,1);
+        box-shadow:0px 4upx 21upx 0px rgba(85,112,105,0.1);
+        border-radius:21upx;
+        font-size: 30upx;
+        color: #868E9D;
+    }
+    .titleBox{
+        padding-top: 52upx ;
+        margin: 0upx 32upx;
+        height: 112upx;
+        border-bottom: 2upx dashed #C6CAD4;
+        color: #FF5A5A;
+    }
+    .login-btn {
+        margin-left: 240upx;
+        margin-right: 240upx;
+        margin-top: 24upx;
+        height: 68upx;
+        line-height: 68upx;
+        border-radius: 34upx;
+        color: #FFFFFF;
+        font-size: 29upx;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+        box-shadow:0px 6upx 31upx 0px rgba(3,190,144,0.3);
+    }
+</style>

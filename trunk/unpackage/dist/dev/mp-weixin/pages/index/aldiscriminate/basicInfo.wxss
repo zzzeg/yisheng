@@ -1,0 +1,178 @@
+
+page{
+        background: #148973;
+}
+.content{
+        position: relative;
+}
+.topBox{
+        margin-top: 450rpx;
+        height: 40rpx;
+        border-radius: 40rpx 40rpx 0rpx 0rpx;
+        background: #FFFFFF;
+        width: calc(100% - 120rpx);
+        margin-left: 60rpx;
+}
+.box{
+        /* margin: 450upx 60upx 120upx 60upx; */
+        margin-left: 60rpx;
+        background: #FFFFFF;
+        width: calc(100% - 120rpx);
+        height: 100rpx;
+}
+.bottomBox{
+        /* margin-top: 450upx; */
+        height: 40rpx;
+        margin-left: 60rpx;
+        width: calc(100% - 120rpx);
+        background: #FFFFFF;
+        border-radius: 0rpx 0rpx 40rpx 40rpx;
+}
+.contentBox{
+        position: absolute;
+        z-index: 11;
+        top: -380rpx;
+        left: 115rpx;
+        /* margin-top: -550upx;
+        margin-left: 115upx; */
+        width: calc(100% - 230rpx);
+}
+.basicTitle{
+        height:68rpx;
+        font-size:46rpx;
+        font-family:NotoSansCJKsc-Medium,NotoSansCJKsc;
+        font-weight:500;
+        color:rgba(22,32,46,1);
+        line-height:68rpx;
+        opacity: 0;
+}
+.hintBox{
+        margin-top: 40rpx;
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-box-orient: horizontal;
+        -webkit-box-direction: normal;
+        -webkit-flex-direction: row;
+                flex-direction: row;
+        margin-bottom: 30rpx;
+        opacity: 0;
+}
+.hintBox image{
+        width: 58rpx;
+        height: 60rpx;
+}
+.hintText{
+        margin-left: 20rpx;
+        font-size:24rpx;
+        font-family:NotoSansCJKsc-Regular,NotoSansCJKsc;
+        font-weight:400;
+        color:rgba(134,142,157,1);
+        line-height:36rpx;
+        -webkit-box-flex: 1;
+        -webkit-flex: 1;
+                flex: 1;
+}
+.hintText1{
+		padding: 0 70rpx;
+	    height:60px;
+	    font-size:14px;
+	    font-family:PingFangSC-Regular,PingFang SC;
+	    font-weight:400;
+	    color:rgba(255,255,255,1);
+	    line-height:20px;
+}
+.infoBox{
+        opacity: 0;
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-box-orient: horizontal;
+        -webkit-box-direction: normal;
+        -webkit-flex-direction: row;
+                flex-direction: row;
+        margin-bottom: 20rpx;
+}
+.intoTitle{
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-box-align: center;
+        -webkit-align-items: center;
+                align-items: center; /*定义body的元素垂直居中*/
+        font-size:30rpx;
+        font-family:NotoSansCJKsc-Regular,NotoSansCJKsc;
+        font-weight:400;
+        color:rgba(42,52,65,1);
+        line-height:45rpx;
+}
+.infoInput{
+        border-bottom: 2rpx solid #E0E2E6;
+        /* border-radius: 45upx; */
+        height: 90rpx;
+        padding-left: 40rpx;
+        padding-right: 40rpx;
+        margin-left: 25rpx;
+        -webkit-box-flex: 1;
+        -webkit-flex: 1;
+                flex: 1;
+}
+.infoSex{
+        background: #F6F7FA;
+        border-radius:45rpx;
+        height: 90rpx;
+        margin-left: 25rpx;
+        -webkit-box-flex: 1;
+        -webkit-flex: 1;
+                flex: 1;
+        padding-left: 40rpx;
+        line-height:90rpx;
+        color: #434E5E;
+}
+.btnBox{
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-box-orient: horizontal;
+        -webkit-box-direction: normal;
+        -webkit-flex-direction: row;
+                flex-direction: row;
+        opacity: 0;
+        margin-bottom: 30rpx;
+}
+scroll-view ::-webkit-scrollbar {
+        width: 0;
+        height: 0;
+        background-color: transparent;
+}
+.animation{
+        opacity: 1;
+}
+.login-btn {
+        width: calc(50% - 10rpx);
+        margin-top: 60rpx;
+        height: 90rpx;
+        line-height: 90rpx;
+        border-radius: 45rpx;
+        /* opacity: 0.4; */
+        color: #FFFFFF;
+        font-size: 31rpx;
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-box-pack: center;
+        -webkit-justify-content: center;
+                justify-content: center;
+        -webkit-box-align: center;
+        -webkit-align-items: center;
+                align-items: center;
+        background:-webkit-linear-gradient(217deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+        background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+        -webkit-box-shadow:0px 6rpx 31rpx 0px rgba(3,190,144,0.3);
+                box-shadow:0px 6rpx 31rpx 0px rgba(3,190,144,0.3);
+}
+.selectSex{
+        background:rgba(3,190,144,1);
+        color:rgba(255,255,255,1);
+}
+

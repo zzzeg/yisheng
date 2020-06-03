@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "健康商城",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "uni-search-bar": "/components/uni-search-bar/uni-search-bar",
+    "uni-icons": "/components/uni-icons/uni-icons",
+    "h-product-list": "/components/common/h-product-list",
+    "uni-load-more": "/components/uni-load-more/uni-load-more"
+  }
+}

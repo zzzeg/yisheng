@@ -1,0 +1,307 @@
+<script>
+    
+    let disp = require("utils/broadcast");
+    
+    const emedia = wx.emedia = require("./common/emedia/emedia_for_miniProgram") 
+    
+	export default {
+		onLaunch: function() {
+			console.log('App Launch')
+            
+            this.$im.conn.listen({
+            	onOpened: (message)=>{
+            		// this.$im.conn.setPresence();
+            		console.log('登录成功登录成功');
+            		// message.accessToken && uni.setStorageSync("myToken", message.accessToken);
+            		// if (is_reconnect) {
+            		// 	uni.hideToast();
+            		// 	this.$helper.toast('success', '登陆成功', 2000)
+            		// 	is_reconnect = false;
+            		// }
+            		// if(this.getCurrentRoute() == "pages/login/login" || getCurrentRoute() == "pages/login_token/login_token"){
+            		// 	this.onLoginSuccess();
+            		// }
+            		
+            	},
+            	onReconnect: ()=>{
+            		// this.$helper.toast('loading', '重连中...', 2000)
+            	},
+            	onSocketConnected: ()=>{
+            		// this.$helper.toast('success', '登陆成功', 2000)
+            	},
+            	onClosed: ()=>{
+            		// this.$helper.toast('none', '网络已断开', 2000)
+            		uni.redirectTo({
+            			url: "../login/login"
+            		});
+            		this.$conn.closed = true;
+            		this.$im.conn.close();
+            	},
+            	onInviteMessage: (message)=>{
+            		this.$options.globalData.saveGroupInvitedList.push(message);
+            		disp.fire("em.xmpp.invite.joingroup", message);
+            
+            	},
+            	onPresence: (message)=>{
+            		console.log("onPresence", message);
+            		switch(message.type){
+            		case "unsubscribe":
+            			// pages[0].moveFriend(message);
+            			break;
+            		// 好友邀请列表
+            		case "subscribe":
+            			if(message.status === "[resp:true]"){
+            				return;
+            			}
+            			else{
+            				// pages[0].handleFriendMsg(message);
+            				for (let i = 0; i < this.$options.globalData.saveFriendList.length; i ++) {
+            			      	if(this.$options.globalData.saveFriendList[i].from === message.from){
+            			      		this.$options.globalData.saveFriendList[i] = message
+            			      		disp.fire("em.xmpp.subscribe");
+            						return;
+            			 		}
+            			    }
+            				this.$options.globalData.saveFriendList.push(message);
+            				console.log(JSON.stringify(this.$options.globalData.saveFriendList));
+            				disp.fire("em.xmpp.subscribe");
+            			}
+            			break;
+            		case "subscribed":
+            			uni.showToast({
+            				title: "添加成功",
+            				duration: 1000
+            			});
+            			disp.fire("em.xmpp.subscribed");
+            			break;
+            		case "unsubscribed":
+            			uni.showToast({
+            				title: "已拒绝",
+            				duration: 1000
+            			});
+            			break;
+            		case "memberJoinPublicGroupSuccess":
+            			this.$helper.toast('none', '已进群', 1000)
+            			break;
+            
+            		case "unavailable":
+            			disp.fire("em.xmpp.contacts.remove");
+            			disp.fire("em.xmpp.group.leaveGroup", message);
+            			break;
+            
+            		case 'deleteGroupChat':
+            			disp.fire("em.xmpp.invite.deleteGroup", message);
+            			break;
+            
+            		case "leaveGroup": 
+            			disp.fire("em.xmpp.group.leaveGroup", message);
+            			break;
+            
+            		case "removedFromGroup": 
+            			disp.fire("em.xmpp.group.leaveGroup", message);
+            			break;
+            
+            
+            		default:
+            			break;
+            		}
+            	},
+            
+            	onRoster: (message)=>{
+            		// let pages = getCurrentPages();
+            		// if(pages[0]){
+            		// 	pages[0].onShow();
+            		// }
+            	},
+            
+            	onVideoMessage: (message)=>{
+            		console.log("onVideoMessage: ", message);
+            		if(message){
+            			msgStorage.saveReceiveMsg(message, msgType.VIDEO);
+            		}
+            		this.calcUnReadSpot(message);
+            		this.ack(message);
+            	},
+            
+            	onAudioMessage: (message)=>{
+            		console.log("onAudioMessage", message);
+            		if(message){
+            			if(this.onMessageError(message)){
+            				msgStorage.saveReceiveMsg(message, msgType.AUDIO);
+            			}
+            			this.calcUnReadSpot(message);
+            			this.ack(message);
+            		}
+            	},
+            	
+            	onCmdMessage: (message)=>{
+            		console.log("onCmdMessage", message);
+            		if(message){
+            			if(this.onMessageError(message)){
+            				msgStorage.saveReceiveMsg(message, msgType.CMD);
+            			}
+            			this.calcUnReadSpot(message);
+            			this.ack(message);
+            		}
+            	},
+            
+            	onTextMessage: (message)=>{
+            		console.log("onTextMessage", message);
+            		if(message){
+            			if(this.onMessageError(message)){
+            				msgStorage.saveReceiveMsg(message, msgType.TEXT);
+            			}
+            			this.calcUnReadSpot(message);
+            			this.ack(message);
+            		}
+            	},
+            
+            	onEmojiMessage: (message)=>{
+            		console.log("onEmojiMessage", message);
+            		if(message){
+            			if(this.onMessageError(message)){
+            				msgStorage.saveReceiveMsg(message, msgType.EMOJI);
+            			}
+            			this.calcUnReadSpot(message);
+            			this.ack(message);
+            		}
+            	},
+            
+            	onPictureMessage: (message)=>{
+            		console.log("onPictureMessage", message);
+            		if(message){
+            			if(this.onMessageError(message)){
+            				msgStorage.saveReceiveMsg(message, msgType.IMAGE);
+            			}
+            			this.calcUnReadSpot(message);
+            			this.ack(message);
+            		}
+            	},
+            
+            	onFileMessage: (message)=>{
+            		console.log('onFileMessage', message);
+            		if (message) {
+            			if(this.onMessageError(message)){
+            				msgStorage.saveReceiveMsg(message, msgType.FILE);
+            			}
+            			this.calcUnReadSpot(message);
+            			this.ack(message);
+            		}
+            	},
+            
+            	// 各种异常
+            	onError: (error)=>{
+            		console.log(error)
+            		// 16: server-side close the websocket connection
+            		if(error.type == this.$im.statusCode.WEBIM_CONNCTION_DISCONNECTED && !logout){
+            			if(this.$im.conn.autoReconnectNumTotal < this.$im.conn.autoReconnectNumMax){
+            				return;
+            			}
+            			uni.showToast({
+            				title: "server-side close the websocket connection",
+            				duration: 1000
+            			});
+            			uni.redirectTo({
+            				url: "../login/login"
+            			});
+            			logout = true
+            			return;
+            		}
+            		// 8: offline by multi login
+            		if(error.type == this.$im.statusCode.WEBIM_CONNCTION_SERVER_ERROR){
+            			uni.showToast({
+            				title: "offline by multi login",
+            				duration: 1000
+            			});
+            			uni.redirectTo({
+            				url: "../login/login"
+            			});
+            		}
+            		if(error.type ==  this.$im.statusCode.WEBIM_CONNCTION_OPEN_ERROR){
+            			disp.fire("em.xmpp.error.passwordErr");
+            			
+            		}
+            		if (error.type == this.$im.statusCode.WEBIM_CONNCTION_AUTH_ERROR) {
+            			disp.fire("em.xmpp.error.tokenErr");
+            		}
+            		if (error.type == 'socket_error') {///sendMsgError
+            			console.log('socket_errorsocket_error', error)
+            			uni.showToast({
+            				title: "网络已断开",
+            				icon: 'none',
+            				duration: 2000
+            			});
+            			disp.fire("em.xmpp.error.sendMsgErr", error);
+            		}
+            	},
+            });
+            
+		},
+		onShow: function(options) {
+			console.log('App Show')
+            
+            
+            
+		},
+		onHide: function() {
+			console.log('App Hide')
+		},methods: {
+            onLoginSuccess(){
+            	// uni.hideToast();
+                console.log("hideToast")
+            	uni.navigateTo({
+            	    url: "../chat/chat"
+            	})
+            },
+            
+            ack(receiveMsg){
+            	// 处理未读消息回执
+            	var bodyId = receiveMsg.id;         // 需要发送已读回执的消息id
+            	var ackMsg = new this.$im.message("read", this.$im.conn.getUniqueId());
+            	ackMsg.set({
+            		id: bodyId,
+            		to: receiveMsg.from
+            	});
+            	this.$im.conn.send(ackMsg.body);
+            },
+            
+            onMessageError(err){
+            	if(err.type === "error"){
+            		uni.showToast({
+            			title: err.errorText
+            		});
+            		return false;
+            	}
+            	return true;
+            },
+            
+            getCurrentRoute(){
+            	let pages = getCurrentPages();
+            	let currentPage = pages[pages.length - 1];
+            	return currentPage.route;
+            },
+            calcUnReadSpot(message){
+            	let myName = uni.getStorageSync("myUsername");
+            	let members = uni.getStorageSync("member") || []; //好友
+            	var listGroups = uni.getStorageSync('listGroup')|| []; //群组
+            	let allMembers = members.concat(listGroups)
+            	let count = allMembers.reduce(function(result, curMember, idx){
+            		let chatMsgs;
+            		if (curMember.roomId) {
+            			chatMsgs = uni.getStorageSync(curMember.roomId + myName.toLowerCase()) || [];
+            		}else{
+            			chatMsgs = uni.getStorageSync(curMember.name.toLowerCase() + myName.toLowerCase()) || [];
+            		}
+            		return result + chatMsgs.length;
+            	}, 0);
+            	this.$options.globalData.unReadMessageNum = count;
+            	disp.fire("em.xmpp.unreadspot", message);
+            }
+        }
+	}
+</script>
+
+<style>
+	/*每个页面公共css */
+    button::after{ border: none;} 
+</style>

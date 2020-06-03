@@ -1,0 +1,102 @@
+
+.login-btn image{
+    width: 26rpx;
+    height: 26rpx;
+    margin-right: 40rpx;
+}
+.login-btn {
+    margin-left: 163rpx;
+    margin-right: 163rpx;
+    margin-top: 60rpx;
+    height: 90rpx;
+    line-height: 104rpx;
+    border-radius: 52rpx;
+    /* opacity: 0.4; */
+    color: #FFFFFF;
+    font-size: 31rpx;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+            justify-content: center;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+            align-items: center;
+    background:-webkit-linear-gradient(217deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+    background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+    -webkit-box-shadow:0px 6rpx 31rpx 0px rgba(3,190,144,0.3);
+            box-shadow:0px 6rpx 31rpx 0px rgba(3,190,144,0.3);
+}
+.descriptionText{
+    width: 70%;
+    margin-top: 20rpx;
+    margin-left: 15%;
+    font-size:28rpx;
+    font-family:NotoSansCJKsc-Regular,NotoSansCJKsc;
+    font-weight:400;
+    color:rgba(255,255,255,0.7);
+    line-height:41rpx;
+}
+.welcomeText{
+    font-size:36rpx;
+    font-family:NotoSansCJKsc-Regular,NotoSansCJKsc;
+    font-weight:400;
+    color:rgba(255,255,255,1);
+    line-height:54rpx;
+    margin-top: 20rpx;
+    margin-bottom: 13rpx;
+}
+.hello{
+    margin-top: 60rpx;
+    font-size:46rpx;
+    font-family:NotoSansCJKsc-Medium,NotoSansCJKsc;
+    font-weight:500;
+    color:rgba(255,255,255,0.9);
+    line-height:68rpx;
+}
+.content{
+    width: 100%;
+    height: 100%;
+    background: url('https://coffer.bainuo.cn/mdt-pub/img_syt_bg.png') no-repeat ;
+    background-size: 100% ; 
+    text-align: center;
+}
+.navigation{
+    position: relative;
+    width: 100%;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+            flex-direction: column;
+}
+.titleNav{
+    width:152rpx;
+    height:56rpx;
+    font-size:38rpx;
+    font-family:NotoSansCJKsc-Medium,NotoSansCJKsc;
+    font-weight:300;
+    color:rgba(255,255,255,1);
+    line-height:56rpx;
+    position: absolute;
+    bottom: 21rpx;
+    left: calc(50% - 76rpx);
+}
+.backBtn{
+    position: absolute;
+    width: 50rpx;
+    height: 50rpx;
+    bottom: 21rpx;
+    left: 21rpx;
+}
+.logo{
+    padding-top: 60rpx;
+}
+.logo image{
+    width: 456rpx;
+    height: 456rpx;
+}
+

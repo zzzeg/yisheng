@@ -1,0 +1,33 @@
+import request from './request'
+
+function login(obj) {
+    const header = {
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    return request.post({
+        url: '/api/application/login',
+        data: obj.data,
+        header: header
+    },true);
+
+}
+
+function managerMsgPage(obj){
+    const sessionKey = uni.getStorageSync('sessionKey');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    return request.get({
+        url: '/manager/managerPage',
+        data: obj.data,
+        header: header
+    },false)
+}
+
+export default {
+    login,
+  
+    managerMsgPage
+}

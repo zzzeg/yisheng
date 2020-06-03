@@ -1,0 +1,455 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+	/*每个页面公共css */
+button::after{ border: none;}
+.line{
+        width:100%;
+        height:2rpx;
+}
+page{
+		height: 100%;
+		background-color: #EFF1F6;
+		line-height:1.8;
+		font-family:PingFang-SC-Medium,PingFang-SC;
+}
+view{
+		line-height:1.8;
+        font-family:PingFang-SC-Medium,PingFang-SC;
+}
+text{
+        font-family:PingFang-SC-Medium,PingFang-SC;
+}
+.f1{
+	    -webkit-box-flex:1;
+	    -webkit-flex:1;
+	            flex:1
+}
+.u-f{
+	    display: -webkit-box;
+	    display: -webkit-flex;
+	    display: flex;
+	    -webkit-box-orient: horizontal;
+	    -webkit-box-direction: normal;
+	    -webkit-flex-direction: row;
+	            flex-direction: row;
+}
+.u-f-ac{
+	    display: -webkit-box;
+	    display: -webkit-flex;
+	    display: flex;
+	    -webkit-box-orient: horizontal;
+	    -webkit-box-direction: normal;
+	    -webkit-flex-direction: row;
+	            flex-direction: row;
+	    -webkit-box-align:center ;
+	    -webkit-align-items:center ;
+	            align-items:center ;
+}
+.u-f-jsb{
+	    display: -webkit-box;
+	    display: -webkit-flex;
+	    display: flex;
+	    -webkit-box-pack: justify;
+	    -webkit-justify-content: space-between;
+	            justify-content: space-between;
+}
+.u-f-jsa{
+	    display: -webkit-box;
+	    display: -webkit-flex;
+	    display: flex;
+	    -webkit-justify-content: space-around;
+	            justify-content: space-around;
+}
+.u-f-ajc{
+	    display: -webkit-box;
+	    display: -webkit-flex;
+	    display: flex;
+	    -webkit-box-orient: horizontal;
+	    -webkit-box-direction: normal;
+	    -webkit-flex-direction: row;
+	            flex-direction: row;
+	    -webkit-box-align:center;
+	    -webkit-align-items:center;
+	            align-items:center;
+	    -webkit-box-pack: center;
+	    -webkit-justify-content: center;
+	            justify-content: center;
+}
+.u-column{
+	    -webkit-box-orient: vertical;
+	    -webkit-box-direction: normal;
+	    -webkit-flex-direction: column;
+	            flex-direction: column;
+}
+.u-row{
+	    -webkit-box-orient: horizontal;
+	    -webkit-box-direction: normal;
+	    -webkit-flex-direction: row;
+	            flex-direction: row;
+}
+.cpt-mask {
+        position: fixed;  
+        top: 0;  
+        left: 0;  
+        width: 100%; 
+        height: 100%;  
+        background-color: #000000;  
+        opacity: 0.5;
+        z-index: 99;
+}  
+

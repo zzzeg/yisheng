@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "uni-swiper-dot": "/components/uni-swiper-dot/uni-swiper-dot",
+    "uni-goods-nav": "/components/uni-goods-nav/uni-goods-nav"
+  }
+}
