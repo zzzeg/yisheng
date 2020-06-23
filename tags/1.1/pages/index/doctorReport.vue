@@ -1,0 +1,593 @@
+<template>
+    <view class="">
+        <view class="content">
+            <view class="title">
+                健康调理报告
+            </view>
+            <view class="line" style="background: #434E5E;"></view>
+            <view class="basicInfoBox">
+                <view style="width: 33%;margin-top: 25upx;">
+                    名字：{{report.userName}}
+                </view>
+                <view style="width: 33%;margin-top: 25upx;">
+                    性别：{{report.gender == 'LADY' ? '女' : "男"}}
+                </view>
+                <view style="width: 33%;margin-top: 25upx;">
+                    年龄：{{report.age?report.age:''}}
+                </view>
+                <view style="width: 33%;margin-top: 25upx;">
+                    身高：{{report.height ? report.height : ''}}
+                </view>
+                <view style="width: 33%;margin-top: 25upx;">
+                    体重：{{report.weight ? report.weight : ''}}
+                </view>
+            </view>
+            <view class="line" style="background: #434E5E; margin-top: 20upx;"></view>
+            <view class="childTitle">
+                报告结论
+            </view>
+            <view class="line" style="background: #434E5E;"></view>
+            <view class="childContent">
+                <view style="margin-top: 20upx;">
+                    主诉：{{report.problem.symptom}}
+                </view>
+                <view style="margin-top: 20upx;">
+                    结论：{{report.jielun}}
+                </view>
+                <view style="margin-top: 20upx;">
+                    调理原则：{{report.remark}}
+                </view>
+               
+            </view>
+            <view class="childTitle">
+                调理方案
+            </view>
+            <view class="line" style="background: #434E5E; margin-top: 20upx;"></view>
+            <view class="childContent">
+                <view v-if="report && report.plan" class="plan-box" v-for="(item,index) in report.plan" :key="index">
+                    
+                    <view @click="clickProductDetail(item.productId)" class="plan-box-title">
+                 
+                        <image :src="item.icon" mode=""></image>
+                        <view class="plan-box-name">
+                            <view style="margin-top: 10upx;" >{{item.productType === 'SHIFANG' ? item.cfName : item.name}} </view>
+                            <!-- <view class="remarksBox">
+                                {{item.efficacy}}  
+                            </view> -->
+                            <view class="moneyBox" style="margin-top: 10upx;" >
+                                <text>￥{{item.price/100}}</text>
+                                <view class="countBox">
+                                    <text style="margin-left: 20upx; margin-right: 20upx;" >X {{item.num}}</text>
+                                </view>
+                            </view>
+                        </view>
+                    </view>
+                </view>
+                <button v-if="report && report.plan && report.plan.length>0" @click="clickBuy" :class="{'disabledBtn': report.orderId }"  class="login-btn" >{{report.orderId ? '已购买' : '点击购买'}}</button>
+                <view class="childTitle">
+                    问诊记录
+                </view>
+                <view class="line" style="background: #434E5E; margin-top: 20upx;"></view>
+                <view v-if="showRecord" class="">
+                    <scroll-view class="msg-list" style="position: static;" scroll-y="true" :show-scrollbar='0' :scroll-with-animation="scrollAnimation" :scroll-top="scrollTop" :scroll-into-view="scrollToView" @scrolltoupper="loadHistory" upper-threshold="50">
+                    	
+                        <view class="row" v-for="(row,index) in msgList" :key="index" :id="'msg'+row.msg.id">
+                        	<block v-if="row.type=='suggest'" >
+                                <view class="other" >
+                                	<!-- 左-头像 -->
+                                	<view class="left">
+                                		<image :src="row.msg.expertPics"></image>
+                                	</view>
+                                	<!-- 右-用户名称-时间-消息 -->
+                                	<view class="right">
+                                        <view class="text bubble">
+                                        	健康调理报告已发送，请到查看报告里查看
+                                        </view>
+                                    </view>
+                                </view>
+                                <view class="system">
+                                	<!-- 文字消息 -->
+                                	<view style="margin-top: 20upx;" class="text">
+                                		本次问诊已完成
+                                	</view>
+                                
+                                </view>
+                                <button style="color: #03BE90;background: #FFFFFF;border-radius: 20upx;box-shadow:0 0 0 0;" @click="clickWenzhen" class="login-btn" >再次问诊</button>
+                            </block>
+                            <!-- 系统消息 -->
+                        	<block v-if="row.type=='system'" >
+                        		<view class="system">
+                        			<!-- 文字消息 -->
+                        			<view v-if="row.msg.type=='text'" class="text">
+                        				{{row.msg.content.text}}
+                        			</view>
+                        		
+                        		</view>
+                        	</block>
+                        	<!-- 用户消息 -->
+                        	<block v-if="row.type=='user'">
+                        		<!-- 自己发出的消息 -->
+                        		<view class="my" v-if="row.msg.userinfo.uid==myuid">
+                        			<!-- 左-消息 -->
+                        			<view class="left">
+                        				<!-- 文字消息 -->
+                        				<view v-if="row.msg.type=='text'" class="bubble">
+                        					<rich-text :nodes="row.msg.content.text"></rich-text>
+                        				</view>
+                        				<!-- 语言消息 -->
+                        				<view v-if="row.msg.type=='voice'" :style="{'width': row.msg.content.length/60*70+15 +'%' }" class="bubble voice" @tap="playVoice(row.msg)" :class="playMsgid == row.msg.id?'play':''">
+                        					<view class="length">{{row.msg.content.length+'"'}} </view>
+                        					<view class="icon my-voice"></view>
+                        				</view>
+                        				<!-- 图片消息 -->
+                        				<view v-if="row.msg.type=='img'" class="bubble img" @tap="showPic(row.msg)">
+                        					<image :src="row.msg.content.url" :style="{'width': row.msg.content.w+'px','height': row.msg.content.h+'px'}"></image>
+                        				</view>
+                        				
+                        			</view>
+                        			<!-- 右-头像 -->
+                                    
+                        			<view class="right">
+                        				<image :src="row.msg.userinfo.face"></image>
+                        			</view>
+                        		</view>
+                        		<!-- 别人发出的消息 -->
+                        		<view class="other" v-if="row.msg.userinfo.uid!=myuid">
+                        			<!-- 左-头像 -->
+                        			<view class="left">
+                        				<image :src="row.msg.userinfo.face"></image>
+                        			</view>
+                        			<!-- 右-用户名称-时间-消息 -->
+                        			<view class="right">
+                        				<!-- <view class="username">
+                        					<view class="name">{{row.msg.userinfo.username}}</view> <view class="time">{{row.msg.time}}</view>
+                        				</view> -->
+                        				<!-- 文字消息 -->
+                        				<view v-if="row.msg.type=='text'" class="bubble">
+                        					<rich-text :nodes="row.msg.content.text"></rich-text>
+                        				</view>
+                        				<!-- 语音消息 -->
+                        				<view v-if="row.msg.type=='voice'" class="bubble voice" @tap="playVoice(row.msg)" :class="playMsgid == row.msg.id?'play':''">
+                        					<view class="icon other-voice"></view>
+                        					<view class="length">{{row.msg.content.length}}</view>
+                        				</view>
+                        				<!-- 图片消息 -->
+                        				<view v-if="row.msg.type=='img'" class="bubble img" @tap="showPic(row.msg)">
+                        					<image :src="row.msg.content.url" :style="{'width': row.msg.content.w+'px','height': row.msg.content.h+'px'}"></image>
+                        				</view>
+                        				
+                        			</view>
+                        		</view>
+                        	</block>
+                        </view>
+                        
+                    </scroll-view>
+                            
+                </view>
+                
+                <view class="recordBtn" @click="cliskRecord">
+                    <view v-if="!showRecord" class="">查看详细</view> 
+                    <image src="../../static/image/icon_md_xzcs.png" :class="{diandao: showRecord}" mode=""></image>
+                    <view v-if="showRecord" class="">收起</view>
+                </view>
+            </view>
+            <view style="text-align: right; color: #16202E; position: relative;;">
+                <image class="expertSign" :src="report.expertSign" mode="widthFix"></image>
+                <view style="margin-top: 50upx">
+                    医生_____________
+                </view> 
+            </view>
+            <view style="color: #A2A9BA;text-align: right;margin-top: 50upx">
+                报告时间：{{report.reportTime}}
+            </view>
+        </view>
+        
+    </view>
+</template>        
+
+<script>
+    import api from '../../common/api.js';
+    import util from '../../common/util.js'
+    export default {
+      
+        data () {
+            return {
+                showRecord:false,
+                report:null,
+                rid:null,
+                msgList:[],
+                myuid:0,
+                expertPic:null,
+                userinfo:uni.getStorageInfoSync('userinfo'),
+    
+            }
+        },
+        onLoad(options) {
+            this.rid = options.rid
+            
+            
+        },
+        onShow() {
+            this.getReport()
+            this.getExpertMessage()
+        },
+        methods:{
+            clickWenzhen:function(){
+                var data = {
+                    expertId:this.report.expertId,
+                    type:'IMAGE',
+                    communityId:this.report.communityId
+                }
+                
+                api.addAdvisoryRecord({
+                    data:data
+                }).then(res=>{
+                    if(res.status == 'OK'){
+                        uni.navigateTo({
+                            url:"chatRoom?chatType=2&recordId=" + this.rid +"&to=" + this.report.expertId+"&communityId="
+                            + this.report.communityId +"&title=" + this.report.expertName+"&topic=" + this.expertPic
+                        })
+                    }
+                })
+            },
+            clickProductDetail:function(id){
+                console.log(id)
+                uni.navigateTo({
+                    url:"../health-product-detail/health-product-detail?id="+id
+                })
+            },
+            clickBuy:function(){
+                if(this.report.orderId){
+                    return
+                }
+                
+                var cartList = []
+                this.report.plan.forEach(item => {
+                    console.log(item)
+                    var name = item.productType === 'SHIFANG' ? item.cfName : item.name
+                	var obj = {
+                        id:item.productId,
+                        image:item.icon,
+                        // attr_val:item.tagName,
+                        title:name,
+                        price:item.price/100,
+                        number:item.num
+                    }
+                    
+                    cartList.push(obj)
+                })
+                // uni.setStorageSync('community_cartList',cartList)
+                // uni.navigateTo({
+                // 	url:'../cart/cart?type=community&instanceId=' + this.report.id
+                // })
+       
+                
+                uni.setStorage({
+                    key: 'buylist',
+                    data: cartList,
+                    success: () => {
+                        
+                        uni.navigateTo({
+                            url: '../pay/confirm/confirm?type=community&instanceId=' + this.report.id
+                        })
+                    }
+                })
+            },
+            cliskRecord:function(){
+                this.showRecord = !this.showRecord
+                
+            },
+            getExpertMessage:function(){
+                var data = {
+                    size: 999,
+                    page: 1,
+                    recordId:this.rid,
+                    // expertId:this.expertId
+                }
+                let _self = this;
+                var list = []
+                var currentDate = ''
+                api.expertMessage({
+                    data: data
+                }).then(listRes => {
+                
+                    if(listRes.status=='OK' && listRes.list.length>0 ){
+                        
+                        this.formattingMessage(listRes)
+                        
+                    }
+                })
+            },
+            formattingMessage:function(listRes){
+                let _self = this;
+                this.messageList = listRes.list
+                var today = util.formatDate(new Date, 'yyyy-MM-dd')
+                var tempDate
+                var tempHhhh 
+                var tempMmmm = 0
+               
+                listRes.list.forEach((item,index)=>{
+                    
+                    console.log(item.expertId)
+                    var date = util.formatTimestamp(item.time, 'yyyy-MM-dd')
+                                            
+                    var time = util.formatTimestamp(item.time,'hh:mm')
+                    
+                    if(!item.extJson){
+                        var message = {}
+                        message.type = 'user'
+                        message.msg = {}
+                        message.msg.id = item.id
+                        
+                        if(item.type=='txt'){       //文字类型
+                            message.msg.type = "text"
+                        }else if(item.type=='img'){     //图片类型
+                            message.msg.type = "img"
+                        }else if(item.type=='audio'){
+                            message.msg.type = "voice"
+                        }
+                        
+                        message.msg.time = time
+                        message.msg.userinfo = {}
+                        if(item.fromId!=item.expertId){
+                            //自己发的消息
+                            message.msg.userinfo.uid = 0
+                            message.msg.userinfo.username = item.userName
+                            message.msg.userinfo.face = item.userAvatar
+                            
+                        }else{
+                            //对方发的消息
+                            // message.msg.userinfo.uid = item.expertId
+                            // message.msg.userinfo.username = item.expertName
+                            // message.msg.userinfo.face = JSON.parse(item.expertPics)[0].url
+                            var expertPics
+                            if(item.expertPics && JSON.parse(item.expertPics).length){
+                                expertPics = JSON.parse(item.expertPics)[0].url
+                            }
+                            this.expertPic = expertPics
+                            message.msg.userinfo = {
+                                uid:item.expertId,
+                                username:_self.title,
+                                face:JSON.parse(item.expertPics)[0].url
+                            }
+                            
+                        }
+                        message.msg.content = {}
+                        if(item.type=='txt'){       //文字类型
+                            message.msg.content.text = item.content
+                        }else if(item.type=='img'){     //图片类型
+                            message.msg.content.url = item.url
+                        }else if(item.type=='audio'){
+                            message.msg.content.url = item.url
+                            message.msg.content.length = item.content
+                        }
+                        
+                        _self.msgList.unshift(message)
+                    }else{
+                        var message = {}
+                
+                        
+                        var extContent = JSON.parse(item.extJson)
+                        var message = {}
+                        message.type = 'suggest'
+                        message.msg = {}
+                        message.msg.id = item.id
+                        message.msg.time = date + ' ' + time
+                        message.msg.content = {}
+                        message.msg.content.text = extContent.content
+                        message.msg.score = extContent.score
+                        if(item.expertPics && JSON.parse(item.expertPics).length){
+                            message.msg.expertPics = JSON.parse(item.expertPics)[0].url
+                        }
+                        _self.msgList.unshift(message)
+                    }
+                    
+                    if(today!=date ){     //日期不一样加时间消息
+                        if( tempDate != date){
+                            var message = {}
+                            message = {type:"system",msg:{id:0,type:"text",content:{text:date+' '+time}}}
+                            _self.msgList.unshift(message)
+                            tempDate = date
+                        }
+                        
+                    }else{          //今天
+                        var message = {}
+                        var hhhhh = util.formatTimestamp(item.time,'hh')
+                        var mmmm = util.formatTimestamp(item.time,'mm')
+                        if(tempHhhh!=hhhhh){        //不同小时
+                            message = {type:"system",msg:{id:0,type:"text",content:{text:hhhhh+':'+mmmm}}}
+                            _self.msgList.unshift(message)
+                            tempHhhh = hhhhh
+                        }else{      //同一个小时
+                            
+                            if(mmmm - tempMmmm <-2 ){
+                                message = {type:"system",msg:{id:0,type:"text",content:{text:hhhhh+':'+mmmm}}}
+                                _self.msgList.unshift(message)
+                            }
+                            tempMmmm = mmmm
+                        }
+                        
+                    }
+                    
+                })
+                for(let i=0;i<_self.msgList.length;i++){
+                	if(_self.msgList[i].type=='user'&&_self.msgList[i].msg.type=="img"){
+                		// _self.msgList[i].msg.content = _self.setPicSize(_self.msgList[i].msg.content);
+                		// _self.msgImgList.push(_self.msgList[i].msg.content.url);
+                	}
+                }
+            },
+            getReport:function(){
+                api.findAdvisoryReport({
+                    data:{
+                        advisoryId:this.rid
+                    }
+                }).then(res=>{
+                    console.log(res)
+                    if(res.status =='OK' ){
+                        this.report = res.data
+                        this.report.problem = JSON.parse(this.report.problem)
+                        this.report.problem.conclusion.forEach((item,index) => {
+                            if(index == 0){
+                                this.report.jielun = item.name
+                            }else{
+                                this.report.jielun = this.report.jielun + ',' + item.name
+                            }
+                            
+                        })
+                        this.report.plan = JSON.parse(this.report.plan)
+                        if(this.report.expertSign && JSON.parse(this.report.expertSign).length>0){
+                            this.report.expertSign = JSON.parse(this.report.expertSign)[0].url
+                        }
+                     
+                        this.report.plan.forEach(item => {
+                            if(item.icon && JSON.parse(item.icon).length>0){
+                                item.icon = JSON.parse(item.icon)[0].url
+                            }
+                            console.log(item.icon)
+                        })
+                        
+                        
+                        this.report.reportTime =  util.formatTimestamp(this.report.reportTime, 'yyyy-MM-dd hh:mm')
+                    }
+                })
+            }
+        }
+    }
+</script>
+
+<style lang="scss">
+    @import "@/static/HM-chat/css/style.scss"; 
+    page{
+        background: #F6F7FA;
+    }
+    .content{
+        padding: 46upx 66upx;
+        width: calc(100% - 132upx);
+    }
+    .expertSign{
+        width:300upx;
+        position: absolute;
+        right: -50upx;
+        top: -110upx;
+    }
+    .recordBtn{
+        margin-top: 30upx;
+        text-align: center;
+        color: #03BE90;
+        font-size: 28upx;
+    }
+    .diandao{
+        transform:rotate(180deg);
+    }
+    .recordBtn image{
+        width: 33upx;
+        height: 21upx;
+    }
+    .title{
+        font-size:43upx;
+        text-align: center;
+        color: #16202E;
+        margin-bottom: 28upx;
+    }
+    .login-btn {
+        margin-left: 178upx;
+        margin-right: 178upx;
+        margin-top: 50upx;
+        height: 74upx;
+        line-height: 74upx;
+        border-radius: 37upx;
+        color: #FFFFFF;
+        font-size: 31upx;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+        box-shadow:0px 6upx 31upx 0px rgba(3,190,144,0.3);
+    }
+    .basicInfoBox{
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        font-size:28upx;
+        color: #16202E;
+    }
+    .childTitle{
+        margin-top: 62upx;
+        margin-left: 6upx;
+        font-size:36upx;
+        color: #16202E;
+    }
+    .childContent{
+        margin-top: 33upx;
+        color: #434E5E;
+        font-size: 26upx;
+        
+    }
+    
+    .plan-box{
+        display: flex;
+        flex-direction: row;
+        
+        font-size:29upx;
+        font-family:NotoSansCJKsc-Regular,NotoSansCJKsc;
+        font-weight:400;
+        color:rgba(67,78,94,1);
+        flex-wrap: wrap;
+        
+    }
+    .plan-box-title{
+        display: flex;
+        flex-direction: row;
+        margin-left: 33upx;
+        margin-right: 33upx;
+        margin-top: 30upx;
+        margin-bottom: 30upx;
+        width: calc(100% - 66upx);
+    }
+    .plan-box-title image{
+        width: 118upx;
+        height: 118upx;
+        border-radius:10upx;
+    
+    }
+    .plan-box-name{
+        margin-left: 12upx;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+    .remarksBox{
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        font-size:24upx;
+        font-family:PingFangSC-Regular,PingFang SC;
+        font-weight:400;
+        color:rgba(162,169,186,1);
+        line-height:34upx;
+        /* width: 100%; */
+    }
+    .remarksText{
+        height:32upx;
+        background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+        border-radius:32upx;
+        font-size:20upx;
+        font-family:PingFangSC-Regular,PingFang SC;
+        font-weight:400;
+        color:rgba(255,255,255,1);
+        line-height:28upx;
+        padding: 10upx;
+        margin-right: 10upx;
+    }
+    .moneyBox{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    .disabledBtn{
+        box-shadow:0px 0upx 0upx 0px rgba(3,190,144,0.3);
+        background: #E4E7F2;
+    }
+</style>

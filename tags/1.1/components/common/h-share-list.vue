@@ -1,0 +1,108 @@
+<template>
+	<view class="u-f u-column health-list" @tap="click(item.id,item.type)">
+		<image v-if="item.type=='VIDEO'" class="play" src="/static/healthy-mall/play.png" mode="aspectFit"></image>
+		<image class="avaImg" :src="JSON.parse(item.pics)[0].url" mode="aspectFill"></image>
+		<view class="health-list-title">{{item.title}}</view>
+		<view class="health-list-price">
+			<view class="u-f-ajc">
+				<image :src="JSON.parse(item.publishAvatar)[0].url" mode="scaleToFill"></image>
+				<text>{{item.publishName}}</text>
+			</view>
+			<view class="u-f-ajc">
+				<uni-icons type="eye" size="15" color="#414449"></uni-icons>
+				<text>{{item.visitNum?item.visitNum:0}}</text>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	export default {
+		props: {
+			item: Object,
+		},
+		data() {
+			return {
+
+			};
+		},
+		computed:{
+			// info(){
+			// 	return this.item
+			// }
+		},
+		methods: {
+			click(id,type) {
+				this.$emit('click',{id,type})
+			}
+		},
+	}
+</script>
+
+<style lang="scss" scoped>
+	
+	.border-bottom{
+		flex: 1;
+		border-bottom: 1px solid #F6F6F6;
+		padding-bottom:30rpx ;
+	}
+	.health-list {
+		position: relative;
+		margin-bottom: 40rpx;
+		padding-bottom: 16rpx;
+		width: 320rpx;
+		background-color: #FFFFFF;
+		border-radius: 8px;
+		overflow: hidden;
+		.avaImg {
+			width: 320rpx;
+			height: 310rpx;
+		}
+		.play{
+			width: 100rpx;
+			height: 100rpx;
+			position: absolute;
+			top:0rpx;
+			right: 0;
+		}
+		&-title {
+			font-size: 24rpx;
+			font-weight: 500;
+            height: 68upx;
+            line-height: 1.5;
+			color: #16202E;
+			padding: 20rpx 8rpx 8rpx 20rpx;
+			display: -webkit-box;
+			word-break: break-all;
+			-webkit-box-orient: vertical;
+			-webkit-line-clamp: 2;
+			text-overflow: ellipsis;
+			overflow: hidden;
+		}
+	
+		&-price {
+			color: #868E9D;
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content:space-between;
+			padding: 0 8rpx 0 20rpx;
+			image{
+				width: 30rpx;
+				height: 30rpx;
+				border-radius: 100%;
+				overflow: hidden;
+			}
+			text {
+				font-size: 20rpx;
+				position: relative;
+				margin-left: 10rpx;
+			}
+	
+			// text:nth-child(2) {
+			// 	font-size: 24rpx;
+			// 	color: #C6CAD4;
+			// }
+		}
+	}
+</style>

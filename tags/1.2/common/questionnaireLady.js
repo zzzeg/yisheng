@@ -1,0 +1,383 @@
+var questionLadyData = [{
+  "question": "头部",
+  "value": [],
+  "answer": [{
+    "label": "头痛",
+    "value": "tt"
+  }, {
+    "label": "头晕眼花",
+    "value": "xy"
+  }, {
+    "label": "无",
+    "value": null
+  }]
+}, {
+  "question": "饮食",
+  "value": [],
+  "answer": [{
+    "label": "爱喝凉的",
+    "value": "phldys"
+  }, {
+    "label": "食欲差",
+    "value": "sybz"
+  }, {
+    "label": "无",
+    "value": null
+  }]
+},  {
+  "question": "睡眠，情绪情况",
+  "value": [],
+  "answer": [{
+    "label": "失眠多梦",
+    "value": "smdm"
+  },{
+    "label": "爱叹息",
+    "value": "jctx"
+  }, {
+    "label": "爱发脾气",
+    "value": "yn"
+  }, {
+    "label": "精神疲劳",
+    "value": "jspj"
+  }, {
+    "label": "无",
+    "value": null
+  }]
+},  {
+  "question": "眼，耳，声等情况",
+  "value": [],
+  "answer": [{
+    "label": "眼干",
+    "value": "yg"
+  },{
+    "label": "耳鸣",
+    "value": "em"
+  }, {
+    "label": "健忘",
+    "value": "jw"
+  },{
+    "label": "声音小",
+    "value": "syx"
+  }, {
+    "label": "声音嘶哑",
+    "value": "sysy"
+  },  {
+    "label": "无",
+    "value": null
+  }]
+}, {
+  "question": "口腔情况",
+  "value": [],
+  "answer": [{
+    "label": "口苦",
+    "value": "kk"
+  }, {
+    "label": "口淡无味",
+    "value": "kdww"
+  }, {
+    "label": "口气重",
+    "value": "kzyw"
+  }, {
+    "label": "咽干易上火",
+    "value": "kzyg"
+  }, {
+    "label": "口腔溃疡",
+    "value": "kqky"
+  },  {
+    "label": "牙龈容易出血",
+    "value": "yyrycx"
+  }, {
+    "label": "无",
+    "value": null
+  }]
+}, {
+  "question": "出汗身热情况",
+  "value": [],
+  "answer": [{
+    "label": "出虚汗",
+    "value": "cxh"
+  }, {
+    "label": "盗汗",
+    "value": "crdh"
+  }, {
+    "label": "一会热一会冷",
+    "value": "hlhr"
+  }, {
+    "label": "无",
+    "value": null
+  }]
+},  {
+  "question": "肢体状况",
+  "value": [],
+  "answer": [{
+    "label": "腰膝发冷疼痛",
+    "value": "yxfltt/xffltt"
+  },{
+    "label": "手心或脚心发热",
+    "value": "sxhjxfr"
+  },{
+    "label": "腰膝酸软",
+    "value": "yxsr"
+  }, {
+    "label": "指甲无光泽",
+    "value": "zjwgz"
+  }, {
+    "label": "四肢麻木",
+    "value": "szmm"
+  }, {
+    "label": "形体消瘦",
+    "value": "xtxs"
+  }, {
+    "label": "无",
+    "value": null
+  }]
+}, {
+  "question": "过敏情况",
+  "value": [],
+  "answer": [{
+    "label": "麦麸过敏",
+    "value": "麦麸过敏"
+  }, {
+    "label": "花粉过敏",
+    "value": "花粉过敏"
+  }, {
+    "label": "无",
+    "value": null
+  }]
+}, {
+  "question": "病史状况",
+  "value": [],
+  "answer": [{
+    "label": "痛风",
+    "value": "痛风"
+  }, {
+    "label": "高血糖",
+    "value": "高血糖"
+  }, {
+    "label": "高血脂",
+    "value": "高血脂"
+  }, {
+    "label": "高血压",
+    "value": "高血压"
+  }, {
+    "label": "尿酸高",
+    "value": "尿酸高"
+  }, {
+    "label": "无",
+    "value": null
+  }]
+}, {
+  "question": "怀孕，哺乳情况",
+  "value": [],
+  "answer": [{
+    "label": "处于孕期",
+    "value": "处于孕期"
+  }, {
+    "label": "处于哺乳期",
+    "value": "处于哺乳期"
+  }, {
+    "label": "无",
+    "value": null
+  }]
+}, {
+  "question": "脸色异常",
+  "value": [],
+  "answer": [{
+    "label": "脸色发暗",
+    "value": "lsfa"
+  }, {
+    "label": "两颊发红",
+    "value": "lqfh"
+  }, {
+    "label": "脸色发黄",
+    "value": "lsfh"
+  }, {
+    "label": "脸色发白",
+    "value": "lsfb"
+  }, {
+    "label": "脸部和眼睛发红",
+    "value": "lbhyjfh"
+  },{
+    "label": "面目肌肤发黄，色泽鲜明如橘子",
+    "value": "mmjffhszxmrjz"
+  }, {
+    "label": "无",
+    "value": null
+  }]
+}, {
+  "question": "胸部不适",
+  "value": [],
+  "answer": [{
+    "label": "心悸伴心慌",
+    "value": "xjbyxh"
+  }, {
+    "label": "心悸伴健忘",
+    "value": "xjbyjw"
+  }, {
+    "label": "心悸伴咳喘",
+    "value": "xjbykc"
+  }, {
+    "label": "胸胁部胀痛",
+    "value": "xhlbzt"
+  }, {
+    "label": "心口痛",
+    "value": "xkt"
+  }, {
+    "label": "胸闷",
+    "value": "xm"
+  }, {
+    "label": "无",
+    "value": null
+  }]
+}, {
+  "question": "胃部情况",
+  "value": [],
+  "answer": [{
+    "label": "胃部疼痛不断，遇寒加剧，得温则减缓",
+    "value": "wbttbdyhjjywzjh"
+  }, {
+    "label": "胃部灼热样疼痛",
+    "value": "wbzrytt"
+  }, {
+    "label": "胃部隐痛",
+    "value": "wbyyzt"
+  }, {
+    "label": "胃部闷胀感",
+    "value": "wbmzg"
+  }, {
+    "label": "打嗝反酸",
+    "value": "dgfs"
+  }, {
+    "label": "恶心呕吐",
+    "value": "exot"
+  }, {
+    "label": "无",
+    "value": null
+  }]
+},  {
+  "question": "腹部情况",
+  "value": [],
+  "answer": [{
+    "label": "腹痛隐隐，喜按压喜温   ",
+    "value": "fbytayhwfkyjh"
+  }, {
+    "label": "腹部坠胀感",
+    "value": "fbzm"
+  }, {
+    "label": "腹部胀满",
+    "value": "dbbbxhsw"
+  }, {
+    "label": "下腹发冷疼痛",
+    "value": "yxfltt/xffltt"
+  }, {
+    "label": "无",
+    "value": null
+  }]
+}, {
+  "question": "大便情况",
+  "value": [],
+  "answer": [{
+    "label": "大便不成形",
+    "value": "dbbcx"
+  }, {
+    "label": "大便干燥",
+    "value": "dbgz"
+  }, {
+    "label": "大便粘马桶",
+    "value": "dbzmt"
+  }, {
+    "label": "大便伴不消化食物",
+    "value": "dbbbxhsw"
+  }, {
+    "label": "排气多",
+    "value": "pqd"
+  }, {
+    "label": "大便酸臭",
+    "value": "dbsc"
+  }, {
+    "label": "每天大便超过2次",
+    "value": "mtdbcg2c"
+  }, {
+    "label": "无",
+    "value": null
+  }]
+}, {
+  "question": "小便情况",
+  "value": [],
+  "answer": [{
+    "label": "尿频",
+    "value": "np"
+  }, {
+    "label": "排尿困难",
+    "value": "pnkn"
+  }, {
+    "label": "尿道灼烧感",
+    "value": "ndzsg"
+  }, {
+    "label": "血尿",
+    "value": "nx"
+  }, {
+    "label": "小便色黄",
+    "value": "xbsh"
+  },{
+    "label": "尿少",
+    "value": "xbds"
+  }, {
+    "label": "无",
+    "value": null
+  }]
+}, {
+  "question": "咳嗽咳痰情况",
+  "value": [],
+  "answer": [{
+    "label": "清痰",
+    "value": "tdeq"
+  }, {
+    "label": "干咳",
+    "value": "ghwt"
+  }, {
+    "label": "粘痰",
+    "value": "tsez"
+  }, {
+    "label": "痰粘色白",
+    "value": "tbsyzx"
+  }, {
+    "label": "咳血",
+    "value": "kx"
+  }, {
+    "label": "咳嗽伴气急气喘",
+    "value": "ksbqjqc"
+  }, {
+    "label": "痰多易咳出",
+    "value": "tdyhc"
+  }, {
+    "label": "无",
+    "value": null
+  }]
+}, {
+  "question": "其他身体感受",
+  "value": [],
+  "answer": [{
+    "label": "易感冒",
+    "value": "ygm"
+  }, {
+    "label": "气短乏力，活动时更严重",
+    "value": "qdflhdsjz"
+  },  {
+    "label": "肢体沉重",
+    "value": "ztcz"
+  }, {
+    "label": "全身肿胀",
+    "value": "qszz"
+  }, {
+    "label": "怕冷,手脚发凉",
+    "value": "plsjfl"
+  }, {
+    "label": "皮肤发痒",
+    "value": "pffy"
+  },{
+    "label": "无",
+    "value": null
+  }]
+}]
+export default questionLadyData;

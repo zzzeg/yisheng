@@ -1,0 +1,64 @@
+<template>
+    <view class="serverlists" >
+    	<view class="disinline" style="margin:10rpx 20rpx 0 0;">
+    		<image :src="item.icon" style="width:160rpx; height:160rpx; border-radius: 20rpx;"></image>
+    	</view>
+    	<view class="disinline" style="width:calc(100% - 210rpx); font-size:20rpx; line-height:28rpx;color:#A2A9BA;">
+    		<view class="serverTitle">{{ item.name }}</view>
+    		<view>服务站类型：<text class="color_gre">{{ item.tagPName ? item.tagPName :'' }}</text></view>
+    		<view class="disinline" style="width:calc(100% - 9em); margin-right:20rpx;overflow: hidden;height: 34rpx;">健康管家：{{item.mangerName?item.mangerName:''}}</view>
+    		<view class="disinline">{{item.addr ? item.addr : ''}}</view>
+    		<view class="disinline" style="width:calc(100% - 9em); margin-right:20rpx">
+    			评价：
+    			<image class="disinline" style="width:20rpx; height:20rpx; vertical-align: middle;" :src="item.score && $util.round(item.score) > xi?'/static/image/img_star_14yellow.png':'/static/image/img_star_14gray.png'" v-for="xi in 5" :key="xi"></image>
+    		</view>
+    		<view class="disinline">用户数：{{ item.joinCount }}</view>
+    		<view class="color_gre" style="overflow: hidden;text-overflow: ellipsis;word-break: break-all;display: -webkit-box;-webkit-box-orient: vertical;-webkit-line-clamp: 1;"><text class="xiegang color_gre" v-for="(xx, x) in item.tags" :key="x">{{ xx }}</text></view>
+    	</view>
+    	<view class="disinline" style="font-size:21rpx; color:#A2A9BA;margin-right: 30upx; line-height: 2;display: flex;justify-content: space-between;">
+    		<text>站主：{{!item.companyName ? (item.contactName?item.contactName:'') : item.companyName}}</text>
+            <text v-if="showDefault && !item.first" style="color: #03BE90;" @click.stop="clickDefault(item)">设为默认</text>
+            <text v-if="showDefault && item.first" style="width:75upx;color: #FFFFFF; height:34upx;text-align:center;line-height: 34upx; background:rgba(3,190,144,1);border-radius:17upx;">默认</text>
+    	</view>
+    </view>
+</template>
+
+<script>
+    
+    export default {
+		props: {
+			item: Object,
+            showDefault:false
+		},
+		data() {
+			return {
+				info:{}
+			};
+		},
+		mounted() {
+			this.info = Object.assign({},this.item);
+		},
+        methods:{
+            clickDefault:function(item){
+                console.log(item)
+                this.$emit('clickDefault',item)
+            }
+        }
+    }
+</script>
+
+<style scoped lang="scss">
+    view{
+        line-height: 1.7;
+    }
+    .disinline{ display:inline-block; vertical-align: top; }
+    .serverlists{ padding:30rpx 0rpx 10rpx 26rpx;background:rgba(255,255,255,1);box-shadow:0px 2px 10px 0px rgba(85,112,105,0.1);border-radius:10px; margin: 0 0 40rpx 0;
+    	.serverTitle{ color: #434E5E;font-weight: 500;font-size: 28upx;}
+    }
+    .color_gre{ color:#03BE90 }
+    .xiegang{
+    	display:inline-block;vertical-align: middle;
+    	&:after{ content: '/'; display:inline-block; }
+    	&:last-child:after{ content: '';}
+    }
+</style>

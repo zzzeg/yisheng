@@ -1,0 +1,449 @@
+<template>
+	<view v-if="info" class="sharing-detail">
+		<uni-swiper-dot v-if="info.bannerPic.length>0" :info="info.bannerPic" :current="current" :mode="mode" :dots-styles="dotsStyles" field="content">
+			<swiper class="swiper-box" @change="change">
+				<swiper-item v-for="(item, index) in info.bannerPic" :key="index">
+					<view :class="item.colorClass" class="swiper-item">
+						<image class="image" :src="item.url" mode="aspectFill" />
+					</view>
+				</swiper-item>
+			</swiper>
+		</uni-swiper-dot>
+		<view class="content">
+			<view class="content-title">
+				{{info.title ? info.title : ''}}
+			</view>
+			<view class="content-desc">
+                <u-parse v-if="info.content" :content="info.content" @preview="preview" @navigate="navigate" ></u-parse>
+				<!-- {{info.content ? info.content : ''}} -->
+			</view>
+			<view class="content-time">
+				<text>{{info.createTime}}</text>
+				<template v-if="!isShare">
+					<uni-icons type="eye" size="15" color="#868E9D"></uni-icons>
+					<text>{{info.visitNum?info.visitNum:0}}</text>
+				</template>
+			</view>
+		</view>
+		<h-community-share v-if="isShare && communityId" :info="communityInfo" >
+		</h-community-share>
+		<template v-else>
+			<view class="comment-box">
+				<view class="comment-allnum">
+					共{{articleDetail.commentNum}}条评论
+				</view>
+				<view class="">
+					<block v-for="(item,index) in commentList" :key="index">
+						<h-comment-list :item="item" :index="index" @ding="commentPraise"></h-comment-list>
+					</block>
+				</view>
+				<uni-load-more v-if="showMore" :status="status"  :icon-size="16" :content-text="contentText" />
+			</view>
+			<view class="comment-box-bottom">
+			<view class="u-f-ajc comment-input" v-if="!showFlag">
+				<view class="comment-input-box">
+					<input 
+					type="text" 
+					v-model.trim="inputMsg" 
+					placeholder-style="color:#868E9D" 
+					placeholder="喜欢TA的分享就评论支持下吧！"
+					/>
+				</view>
+				<view class="comment-input-send" @tap="send">发送</view>
+			</view>
+			<h-comment-bottom
+				:detail="articleDetail" 
+				:show="showFlag" 
+				@onInputClick="inputClick" 
+				@icon-click="iconClick"  >
+			</h-comment-bottom>
+		</view>
+		</template>
+	</view>
+</template>
+
+<script>
+    import uParse from '@/components/u-parse/u-parse.vue'
+	export default {
+        components: {
+            uParse
+        },
+		data() {
+			return {
+				pageNum:1,
+				totalPages:0,
+				inputMsg:'',
+				info:{},
+				materialId:'',
+				current:0,
+				showFlag:true,
+				status: 'more',
+                showMore:false,
+				contentText: {
+					contentdown: '上拉加载更多',
+					contentrefresh: '加载中',
+					contentnomore: '－THE END －'
+				},
+				dotsStyles: {
+					width: 4,
+					height: 4,
+					bottom: -15,
+					backgroundColor: 'rgba(236,239,244,1)',
+					border: '1px rgba(236,239,244,1) solid',
+					color: '#fff',
+					selectedBackgroundColor: 'rgba(3, 190, 144, 1)',
+					selectedBorder: '1px rgba(3, 190, 144, 1) solid'
+				},
+				articleDetail: {
+					dingNum: 0,
+					dingStatus: false,
+					collectNum: 0,
+					collectStatus: false,
+					commentNum: 0
+				},
+				mode: 'dot',
+				commentList: [],
+				communityId:'',
+				isShare: false,
+				communityInfo: {}
+			};
+		},
+		onLoad(options) {
+			this.materialId = options.id || options.scene
+			console.log(options.communityId);
+			this.communityId = options.communityId || (this.$store.getters.communityId ? this.$store.getters.communityId : '');
+			let pages = getCurrentPages()
+			this.isShare = pages.length === 1
+			this.getData(this.materialId)
+			if (!this.isShare) {
+				this.getcommentList(1)
+			}
+		},
+		methods: {
+			change(e) {
+				console.log(e);
+				this.current = e.detail.current
+			},
+			iconClick(type) {
+				console.log(type);
+				switch (type) {
+					case 'ding':
+						if(this.articleDetail.dingStatus){
+							this.praiseCancel()
+							this.articleDetail.dingStatus = false
+							this.articleDetail.dingNum -= 1
+						}else{
+							this.praiseAdd()
+							this.articleDetail.dingStatus = true
+							this.articleDetail.dingNum += 1
+						}
+						break;
+					case 'collect':
+						if(this.articleDetail.collectStatus){
+							this.cancelMark()
+							this.articleDetail.collectStatus = false
+							this.articleDetail.collectNum -= 1
+						}else{
+							this.mark()
+							this.articleDetail.collectStatus = true
+							this.articleDetail.collectNum += 1
+						}
+						break;
+					case 'comment':
+						break;
+				}
+			},
+			getData(id){
+				this.$api.marketMaterialDetail({
+					id:id,
+					communityId:this.communityId
+				}).then(res=>{
+					console.log(res);
+					if(res.status=="OK"){
+						this.info = res.data
+						this.communityId = res.data.communityId
+						if (this.isShare&&this.communityId) this.getCommunityByIdOmit(this.communityId)
+						this.info.bannerPic = JSON.parse(this.info.bannerPic)
+						this.info.createTime = this.$util.formatTimestamp(this.info.createTime,'yyyy-MM-dd')
+						this.articleDetail={
+							dingNum: res.data.praiseCount,
+							dingStatus: res.data.praiseStatus,
+							collectNum: res.data.markCount,
+							collectStatus: res.data.mark,
+							commentNum: res.data.commentCount,
+						}
+					}
+				}).catch(err=>{
+					console.log(err);
+				})
+			},
+			getCommunityByIdOmit (id) {
+				this.$api.getCommunityByIdOmit({
+					id: id
+				}).then(res => {
+					if(res.status=="OK"){
+						this.communityInfo = res.data
+					}
+				})
+			},
+			praiseAdd(){
+				this.$api.materialPraiseAdd({
+					communityId:this.communityId,
+					materialId:this.materialId
+				}).then(res=>{
+					console.log(res);
+					if(res.status=="OK"){
+					}
+				}).catch(err=>{
+					console.log(err);
+				})
+			},
+			praiseCancel(){
+				this.$api.materialPraiseCancel({
+					materialId:this.materialId
+				}).then(res=>{
+					if(res.status=="OK"){
+					}
+				}).catch(err=>{
+					console.log(err);
+				})
+			},
+			mark(commentId,index){
+				this.$api.marketMaterialMark({
+					id:this.materialId,
+					communityId: this.communityId
+				}).then(res=>{
+					if(res.status=="OK"){
+						console.log(res);
+					}
+				}).catch(err=>{
+					console.log(err);
+				})
+			},
+			cancelMark(commentId,index){
+				this.$api.marketMaterialCancelMark({
+					id:this.materialId
+				}).then(res=>{
+					if(res.status=="OK"){
+						console.log(res);
+						// this.commentList[index].praiseCount+=1
+						// this.commentList[index].praiseStatus=true
+					}
+				}).catch(err=>{
+					console.log(err);
+				})
+			},
+			commentPraise({item,index}){
+				if(item.praiseStatus){
+					this.commentPraiseCancel(item.id,index)
+				}else{
+					this.commentPraiseAdd(item.id,index)
+				}
+			},
+			commentPraiseAdd(commentId,index){
+				this.$api.materialCommentPraiseAdd({
+					commentId:commentId
+				}).then(res=>{
+					if(res.status=="OK"){
+						console.log(this.commentList[index])
+						this.commentList[index].praiseCount+=1
+						this.commentList[index].praiseStatus=true
+					}
+				}).catch(err=>{
+					console.log(err);
+				})
+			},
+			commentPraiseCancel(commentId,index){
+				this.$api.materialCommentPraiseCancel({
+					commentId:commentId
+				}).then(res=>{
+					if(res.status=="OK"){
+						console.log(this.commentList[index])
+						this.commentList[index].praiseCount-=1
+						this.commentList[index].praiseStatus=false
+					}
+				}).catch(err=>{
+					console.log(err);
+				})
+			},
+			getcommentList(num){
+				this.status = 'loading';
+				this.$api.materialCommentPage({
+					size:10,
+					page:num,
+					materialId:this.materialId
+				}).then(res=>{
+					console.log(res);
+					if(res.status=="OK"){
+						if(num == 1){
+							this.commentList = res.list;
+							this.pageNum = res.page
+							this.totalPages = res.totalPages
+							this.status = 'more'
+                            if(res.list.length==10){
+                                this.showMore = true
+                            }
+						}else{
+							this.commentList = Array.prototype.concat.call(this.commentList,res.list)
+							this.pageNum = res.page
+							this.totalPages = res.totalPages
+							this.status = 'more'
+						}
+						this.articleDetail.commentNum = res.totalElements
+					}
+				}).catch(err=>{
+					console.log(err);
+				})
+			},
+			send(){
+				let content = this.inputMsg
+				console.log(content);
+				if(content=='') return;
+				this.$api.materialCommentAdd({
+					communityId:this.communityId,
+					materialId:this.materialId,
+					content:content
+				}).then(res=>{
+					if(res.status=="OK"){
+						uni.showToast({
+							title:'评论成功',
+							icon:'none'
+						})
+						this.inputMsg = ''
+						this.showFlag = true
+						// 可优化不调接口直接插入数据  this.commentList.unshift（）  返回数据待完善
+						this.pageNum = 1;
+						this.getcommentList(this.pageNum);
+				
+					}
+					console.log(res);
+				}).catch(err=>{
+					console.log(err);
+				})
+			},
+			inputClick(){
+				this.showFlag = false
+			},
+			parse (str, initValue) { 
+			    let ret = initValue
+			    try {
+					ret = JSON.parse(str)
+			    } catch (e) {}
+			    return ret || initValue
+			},
+			
+			onShareAppMessage () {
+				let pages = getCurrentPages()
+				let curPage = pages[pages.length - 1]
+				console.log("curPage.route::",curPage.route + '?id=' + this.materialId+"&communityId="+this.communityId)
+				return {
+					title: this.info.title,
+					path: curPage.route + '?id=' + this.materialId+"&communityId="+this.communityId,
+					imageUrl: this.parse(this.info.pics, [{}])[0].url
+				}
+			}
+			
+		},
+		onReachBottom() {
+			console.log('bottom');
+			this.pageNum+=1
+			if(this.pageNum>this.totalPages){
+				this.status="noMore"
+				return
+			}
+			this.getcommentList(this.pageNum)
+		}
+	}
+</script>
+
+<style lang="scss">
+	.sharing-detail {
+		background-color: #FFFFFF;
+		min-height: 100%;
+		padding-bottom: 100rpx;
+	}
+
+	.swiper-box {
+	    flex: 1;
+	}
+	.swiper-item {
+	    display: flex;
+	    flex-direction: row;
+		height: 100%;
+		// border-radius: 20rpx;
+		overflow: hidden;
+	}
+
+	.image {
+		width: 750rpx;
+        height: 1000upx;
+	}
+
+	.content {
+		margin: 0 32rpx;
+		margin-top: 30px;
+		border-bottom: 1px solid #E7E7E7;
+
+		&-title {
+			font-size: 32rpx;
+			font-family: PingFang-SC-Bold, PingFang-SC;
+			font-weight: bold;
+			color: rgba(22, 32, 46, 1);
+		}
+
+		&-desc {
+			padding-top: 20rpx;
+			font-size: 28rpx;
+			font-family: PingFang-SC-Medium, PingFang-SC;
+			font-weight: 500;
+			color: rgba(67, 78, 94, 1);
+		}
+
+		&-time {
+			padding-top: 60rpx;
+			font-size: 22rpx;
+			color: #868E9D;
+			display: flex;
+			align-items: center;
+			&>text {
+				margin-right: 20rpx;
+			}
+		}
+	}
+	.comment-box{
+		.comment-allnum{
+			font-size: 26rpx;
+			color: #16202E;
+			margin-top: 15rpx;
+			margin-left: 32rpx;
+		}
+	}
+	.comment-box-bottom {
+		position: fixed;
+		width: 750rpx;
+		bottom: 0;
+		.comment-input{
+			display: flex;
+			background-color: #FFFFFF;
+			padding: 30rpx 17rpx;
+			box-shadow:0px 2px 4px 0px rgba(0,0,0,0.5);
+			.comment-input-box{
+				border-radius:15px;
+				border:1px solid rgba(156,156,156,1);
+				padding: 16rpx;
+				flex: 1;
+				font-size: 26rpx;
+				line-height: 30rpx;
+			}
+			.comment-input-send{
+				color: #03BE90;
+				font-size: 30rpx;
+				width: 80rpx;
+				text-align: center;
+			}
+		}
+	}
+    swiper {
+        height: 1000upx;
+    }
+</style>

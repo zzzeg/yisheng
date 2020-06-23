@@ -1,0 +1,265 @@
+<template>
+	<view v-if="liveList.length==0 && noticeList.length==0 && backList.length==0">
+		<view class="empty" >
+			<image class="empty-img" src="../../static/image/img_zwnr@3x.png"></image>
+			<view class="empty-tips">敬请期待~</view>
+		</view>
+	</view>
+	<view class="cont" v-else>
+		<!--明我直播-->
+		<view class="living" v-if="liveList.length>0">
+			<view class="titleb color_gre">正在直播</view>
+			<view class="box" v-for="(item, index) in liveList" :key="index" v-if="item.status == 2" @click="goLive(item.roomNumber)">
+				<view class="disinline" style="width:3em">
+					主题：
+				</view>
+				<view class="disinline" style="width:calc(100% - 3em)">
+					{{ item.title }}
+				</view>
+				<view class="disinline" style="width:3em">
+					时间：
+				</view>
+				<view class="disinline color_gray" style="width:calc(100% - 3em)">
+					{{ item.endTime }}
+				</view>
+				<view class="videos" :style="'background:url(' + item.horizontalCover[0].url + '); background-size:100% 100%;'">
+					<!-- <video src="" controls></video> -->
+					<view class="status">{{ '直播中' }}</view>
+					<!-- <view class="time">15:06</view> -->
+				</view>
+				<view class="disinline color_gray" style="font-size:24rpx;">
+					<view class="disinline liveIco" style="width:50rpx; height:50rpx;">
+						<image style="width:50rpx; height:50rpx; border-radius: 25upx;" :src="item.avatar" mode=""></image>
+					</view>
+					{{item.name}}
+				</view>
+				<!-- <view class="disinline color_gray nums" style="font-size:24rpx; float:right;">
+					<image src="../../static/image/eyes@2x.png" class="disinline" style="width:40rpx; height:26rpx; vertical-align: middle;" mode=""></image>
+					3.5万
+				</view> -->
+			</view>
+		</view>
+		
+		<view class="living" v-if="noticeList.length>0">
+			<view class="titleb color_gre" >直播预告</view>
+			<view class="box yugao" style="text-align: center;"  v-for="(item, index) in noticeList" :key="index" v-if="item.status == 1">
+				<view class="disinline liveIco" style="width:80rpx; height:80rpx;">
+					<image style="width:80rpx; height:80rpx; border-radius: 40upx;" :src="item.avatar" mode=""></image>
+				</view>
+				<view class="color_gray" style="font-size: 32rpx; margin-top:16rpx;">
+					{{item.name}}
+				</view>
+				<view style="font-size: 36rpx; margin:60rpx 0 40rpx 0; font-weight: 500; line-height: 48rpx;">
+					{{ item.title }}
+				</view>
+				<view class="color_gray" style="font-weight: 500; font-size:28rpx; line-height: 40rpx; margin-bottom:40rpx">
+					{{ item.startTime }}
+				</view>
+				<view>
+					<button type="default" size="mini" class="btns" @tap="goNoticeInfo(item.id)">了解详细</button>
+				</view>
+			</view>
+		</view>
+		
+		<view class="living"  v-if="backList.length>0">
+			<view class="titleb" style="color:#434E5E">往期回放</view>
+			<view class="box" v-for="(item, index) in backList" :key="index" @click="gobackinfo(item.id)">
+				<view class="disinline" style="width:3em">
+					主题：
+				</view>
+				<view class="disinline" style="width:calc(100% - 3em)">
+					{{ item.live.title }}
+				</view>
+				<view class="disinline" style="width:3em">
+					时间：
+				</view>
+				<view class="disinline color_gray" style="width:calc(100% - 3em)">
+					{{ item.live.endTime }}
+				</view>
+				<view class="videos" :style="'background:url(' + item.live.horizontalCover[0].url + '); background-size:100% 100%;'">
+					<!-- <view>
+						<video class="myVideo" src="https://www.w3school.com.cn/i/movie.ogg" @error="videoErrorCallback" :danmu-list="danmuList" enable-danmu danmu-btn controls></video>
+					</view> -->
+					<!-- <view class="time">15:06</view> -->
+				</view>
+				<view class="disinline color_gray" style="font-size:24rpx;">
+					<view class="disinline liveIco" style="width:50rpx; height:50rpx;">
+						<image style="width:50rpx; height:50rpx; border-radius: 25upx;" :src="item.live.avatar" mode=""></image>
+					</view>
+					{{item.live.name}}
+				</view>
+			</view>
+		</view>
+        <view v-if="ismore">
+        	<uni-load-more :status="status"  :content-text="contentText" color="#007aff"  />
+        </view>
+	</view>
+</template>
+
+<script>
+	import api from '../../common/api.js';
+	import util from '../../common/util.js';
+	import uniLoadMore from "../../components/uni-load-more/uni-load-more.vue"
+	export default{
+	    components: {uniLoadMore},
+		data() {
+			return {
+	            ismore:false,
+	            contentText: {
+	                contentdown: '查看更多',
+	                contentrefresh: '加载中',
+	                contentnomore: '没有更多',
+	            },
+	            page:1,
+	            size:10,
+                
+				backList: [],
+				liveList: [],
+				noticeList: [],
+                
+                communityId:''
+			}
+		},
+		onLoad(options) {
+            this.communityId = options.communityId
+			this.getvideoList()
+            this.getBackLive()
+		},
+        onPullDownRefresh() {
+            console.log('onPullDownRefresh')
+            this.page = 1
+            this.getBackLive()
+            
+        },
+        onReachBottom() {
+            console.log('onReachBottom')
+            this.status = 'loading'
+            uni.showNavigationBarLoading()
+            
+            this.page++
+            this.getBackLive()
+        },
+		methods: {
+            goInfo(id) {
+            	uni.navigateTo({
+            		url: `/pages/liveborad/liveInfo?id=${id}`
+            	})
+            },
+            goNoticeInfo(id) {
+            	uni.navigateTo({
+            	    url: '/pages/liveborad/noticeInfo?id='+ id
+            	})
+            },
+			gobackinfo(id) {
+				uni.navigateTo({
+				    url: '/pages/liveborad/liveback?id='+ id
+				})
+			},
+			goLive(id) {
+				let roomId = id // 填写具体的房间号，可通过下面【获取直播房间列表】 API 获取
+                let customParams = encodeURIComponent(JSON.stringify({ communityId: this.communityId })) 
+				uni.navigateTo({
+					url: `plugin-private://wx2b03c6e691cd7370/pages/live-player-plugin?room_id=${roomId}&custom_params=${customParams}`
+				})
+			},
+			videoErrorCallback: function(e) {
+				uni.showModal({
+					content: e.target.errMsg,
+					showCancel: false
+				})
+			},
+            getBackLive:function(){
+                api.getbacklives({
+                    page:this.page,
+                    size:this.size
+                }).then(res=>{
+                    console.log(res)
+                    if(res.status == 'OK'){
+                        if(this.page == 1){
+                            this.backList = []
+                            if(res.list.length>=this.size){
+                                this.ismore = true
+                            }
+                        }
+                        res.list.map(item=>{
+                        	// item.live.startTime = util.formatTimestamp(item.live.startTime, 'yyyy年MM月dd日 hh:mm')
+                        	// item.live.endTime = util.formatTimestamp(item.live.endTime, 'yyyy年MM月dd日 hh:mm')
+                        	item.live.horizontalCover = JSON.parse(item.live.horizontalCover)
+                            if(item.live.avatar && JSON.parse(item.live.avatar).length > 0){
+                                item.live.avatar = JSON.parse(item.live.avatar)[0].url
+                            }
+                            this.backList.push(item)
+                        })
+                    }
+                	uni.stopPullDownRefresh();
+                	uni.hideNavigationBarLoading()
+                })
+            },
+			getvideoList() {
+				// 获取当前直播和预告的直播
+				api.getlives().then(res=>{
+					res.data.map(item=>{
+						item.startTime = util.formatTimestamp(item.startTime, 'yyyy年MM月dd日 hh:mm')
+						item.endTime = util.formatTimestamp(item.endTime, 'yyyy年MM月dd日 hh:mm')
+						item.horizontalCover = JSON.parse(item.horizontalCover)
+                        if(item.avatar && JSON.parse(item.avatar).length > 0){
+                            item.avatar = JSON.parse(item.avatar)[0].url
+                        }
+						if(item.status == 2){
+							this.liveList.push(item);
+						}
+						if(item.status == 1){
+							this.noticeList.push(item);
+						}
+					})
+					console.log('res is sssss', this.liveList,this.noticeList)
+				})
+			}
+			
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.disinline{ display:inline-block; vertical-align: top; }
+	.cont{overflow:auto; background:#EFF1F6; box-sizing:border-box; padding:20rpx 32rpx; }
+	.color_gre{ color:#03BE90 }
+	.color_gray{ color:#868E9D }
+	.living { 
+		overflow: hidden;
+		.titleb{ font-size:32rpx; line-height: 44rpx; font-weight: 500; margin-bottom:1em; margin-top:32rpx;}
+		.box{ background:rgba(255,255,255,1);box-shadow:0px 4rpx 20rpx 0px rgba(85,112,105,0.1);border-radius:20rpx; padding:24rpx;margin:20rpx 0 32rpx 0;
+		overflow: hidden;
+			> .disinline{ font-size:28rpx; line-height:1.8; }
+			.videos{ position: relative; z-index:1;  background:#ddd; margin:20rpx 0;font-size:24rpx; min-height:360rpx;
+				.myVideo{ width:100%; }
+				.status{
+					background:rgba(0,0,0,0.3);border-radius:5px; color:#fff; font-weight: 400; 
+					padding: 10rpx 10rpx; position:absolute; top: 26rpx; right:16rpx;
+					&::before{ content: ''; display:inline-block; vertical-align: middle; width:16rpx; height:16rpx; 
+					border-radius:50%; background:red; margin-right:10rpx; }
+				}
+				.time{ position:absolute; color:#fff; bottom:22rpx; right:16rpx; background:rgba(0,0,0,0.3);border-radius:40rpx; padding: 10rpx 20rpx; }
+			 }
+		}
+		.yugao{ padding: 46rpx 68rpx 60rpx 68rpx; 
+			.btns{ background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%); width: 260rpx; line-height:64rpx;
+			box-shadow:0px 3px 15px 0px rgba(3,190,144,0.3);border-radius:16px; font-size:28rpx; color:#fff; font-weight: 400;}
+		}
+	}
+    .empty{
+    	text-align: center;
+    	.empty-img{
+    		margin-top: 52rpx;
+    		width: 360rpx;
+    		height: 320rpx;
+    	}
+    	.empty-tips{
+    		color: #A2A9BA;
+    		font-size: 32rpx;
+    		line-height: 48rpx;
+    	}
+    }
+	.liveIco { vertical-align: middle; border-radius: 50%; background: #01AC82; text-align:center; margin-right:6rpx;}
+	.whiteline{ width:10%; height:36%; border-radius: 50%; transform: rotate(30deg); margin:32% 5rpx 0 0; background:rgba(255, 255, 255, 0.8); }
+</style>

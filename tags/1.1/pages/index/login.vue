@@ -1,0 +1,396 @@
+<template>
+    <view class="content">
+    	<image v-if="load" class="logo" src="https://coffer.bainuo.cn/mdt-pub/img_mwwwdl_bg.png"></image>
+    	<view v-if="load" class="login-box">
+    		<!-- <view class="welcome-text">
+    		    </image>欢迎登录
+    		</view> -->
+            <view class="title-text">
+               <image src="../../static/image/logo_mw.png" mode=""> 
+            </view>
+            <view class="name-text">
+                手机号
+            </view>
+            <input class="input" type="text" v-model="username" v-on:input="watchNum" 
+                placeholder-class ="inputps" :placeholder="nameTitle" />
+            <view class="name-text">
+                验证码
+            </view>
+            <input class="input" type="text" v-on:input="watchNum" v-model="userpass"
+                placeholder-class ="inputps" :placeholder="passTitle" />
+            <button v-if="testCode =='' " @click="clickGetCode" :class="{disabled:isSend}" class="code-btn">{{sendTitle}}</button>
+            
+            <view class="tips-text">
+                {{tips}}
+            </view>
+            <button @click="clickLogin" @getuserinfo="getUserList" hover-class="button-hover" class="login-btn" :class="{btnopacity:isActive}">{{buttonTitle}}</button>
+            
+    	</view>
+    </view>
+</template>
+
+<script>
+    import api from '../../common/api.js';
+    import util from '../../common/util.js';
+    export default {
+    	data() {
+    		return {
+    			nameTitle: "请输入手机号",
+    			passTitle: '请输入密码',
+                buttonTitle: '登录',
+                username: "",
+                userpass: "",
+                sendTitle:"获取验证码",
+                isSend: false,
+                // username: "bnshequ",
+                // userpass: "bn##123",
+                load:false,
+                isActive:false,
+                tips:'',
+                login:false,
+                
+                from:'',
+                testCode:''
+    		}
+    	},
+    	onLoad(op) {
+            this.from = op.from
+            this.testCode = op.testCode
+            var sessionKey = uni.getStorageSync('sessionKey');
+            if(sessionKey.length>10){
+                uni.switchTab({
+                    url: '../statistics/statistics'
+                });
+            }
+            this.load = true
+    	},
+    	methods: {
+           
+            watchNum: function() {
+                if (this.userpass.length > 0 && this.username.length>0) {
+                    this.isActive = true
+                }else{
+                    this.isActive = false
+                }
+            },
+            clickLogin:function(){
+                if (this.username == '') {
+                    
+                    this.tips = '请输入手机号码'
+                    return;
+                }
+                console.log(!util.verifyMobile(this.username));
+                if (!util.verifyMobile(this.username)) {
+                   
+                    this.tips = '请输入正确的手机号码'
+                    return;
+                }
+                if (this.userpass == '') {
+                 
+                    this.tips = '请输入验证码'
+                    return;
+                }
+                if (this.userpass.length < 6) {
+                    
+                    this.tips = '验证码不正确'
+                       
+                    return;
+                }
+                if(this.from == 'phone'){
+                    if (this.userpass != '123456' || this.username != '13866668888') {
+                        uni.showLoading({
+                            title: '加载中' // 数据请求前loading
+                        })
+                        setTimeout(function() {
+                            uni.hideLoading()
+                            uni.showToast({
+                                title: '账号或密码不正确',
+                                icon: "none",
+                                duration: 2000
+                            })
+                                
+                        }, 3000)
+                                
+                        return;
+                    }
+                                
+                    api.getTempAccount({
+                        data: {
+                            code: this.testCode
+                        }
+                    }).then(userRes => {
+                        console.log(userRes)
+                        if (userRes.status == 'OK') {
+                            if (userRes.data.errcode == '0') {
+                                uni.setStorageSync('sessionId', userRes.data.sessionId)
+                                const userObj = {
+                                    userId: userRes.data.data.id,
+                                }
+                                api.findUserById({
+                                    data:userObj
+                                }).then(res => {
+                                    console.log(res)
+                                    if(res.status == 'OK'){
+                                        uni.setStorageSync('userinfo', res.data)
+                                        if( res.data && res.data.followCommunityId && res.data.followCommunityId.length > 3 ){
+                                            this.emchatLogin(userRes.data.data.id)
+                                            
+                                            uni.reLaunch({
+                                                url:'index?communityid='+res.data.followCommunityId
+                                            })
+                                            // var pages = getCurrentPages();
+                                            // var prevPage = pages[pages.length - 2];
+                                            // prevPage.searchCommunityid = res.data.followCommunityId
+                                        }else{      //跳转加入服务站
+                                            uni.navigateTo({
+                                            				  url: '/pages/serverStation/main'
+                                            })
+                                        }
+                                    }
+                                })
+                            }
+                        }
+                    })
+                }else{
+                    if (this.userid == null || this.userid == '' || this.userid == 'null') {
+                 
+                        var unionid = uni.getStorageSync('unionid');
+                        var obj = {
+                            'verifycode': this.userpass,
+                            'phone': this.username,
+                            'unionid':unionid
+                        }
+                        api.createUser({
+                            data: obj
+                        }).then(userRes => {
+                            console.log('userRes:')
+                            console.log(userRes)
+                            if (userRes.status == "OK") {
+                                uni.showToast({
+                                    title: '绑定成功',
+                                    icon: "success",
+                                    duration: 2000
+                                })
+                            }else{
+                                this.tips = userRes.message
+                                return
+                            }
+                            const userObj = {
+                                userId: userRes.data.id,
+                            }
+                            api.findUserById({
+                                data:userObj
+                            }).then(res => {
+                                console.log(userRes)
+                                if(res.status == 'OK'){
+                                    uni.setStorageSync('userinfo', res.data)
+                                    if( res.data && res.data.followCommunityId && res.data.followCommunityId.length > 3 ){
+                                        this.emchatLogin(userRes.data.id)
+                                        
+                                        uni.reLaunch({
+                                            url:'index?communityid='+res.data.followCommunityId
+                                        })
+                                        // var pages = getCurrentPages();
+                                        // var prevPage = pages[pages.length - 2];
+                                        // prevPage.searchCommunityid = res.data.followCommunityId
+                                    }else{      //跳转加入服务站
+                                        uni.navigateTo({
+                                        				  url: '/pages/serverStation/main'
+                                        })
+                                    }
+                                }
+                            })
+                        })
+                    }
+                }
+                
+            },emchatLogin:function(userid){
+                
+                var pwd = userid.substring(1,userid.length-1)
+                this.$conn.open({
+                	apiUrl: this.$im.config.apiURL,
+                	user: userid,
+                	pwd: pwd,
+                	grant_type: "password",
+                	appKey: this.$im.config.appkey
+                });
+            },
+            clickGetCode:function(){
+                if (this.username == '') {
+                    if(!this.loginType){
+                        
+                        this.tips = '请输入手机号码'
+                    }else{
+                        uni.showToast({
+                            title: '请输入手机号码',
+                            icon: "none",
+                            duration: 2000
+                        })
+                        this.tips = '请输入手机号码'
+                    }
+                    return;
+                }
+                if(this.isSend){
+                    return
+                }
+                this.isSend = true
+                var _self = this
+                var data = {
+                    'phone': this.username,
+                    'type':'4'
+                }
+                api.getMsgCode({
+                    data: data
+                }).then(res => {
+                    console.log(res)
+                    
+                    var time = 60;
+                    if (res.status == "OK") {
+                        var set = setInterval(function() {
+                            _self.sendTitle = --time + 's'
+                        }, 1000);
+                        setTimeout(function() {
+                            _self.sendTitle = "获取验证码"
+                            _self.isSend = false
+                            clearInterval(set);
+                        }, 60000);
+                        
+                        uni.showToast({
+                            title: '发送成功',
+                            icon: "success",
+                            duration: 2000
+                        })
+                    }else{
+                        _self.sendTitle = "获取验证码"
+                        _self.isSend = false
+                    }
+                })
+            }
+    	}
+    }
+</script>
+
+<style>
+    
+    .login-btn {
+        margin-left: 63upx;
+        margin-right: 63upx;
+        margin-top: 83upx;
+        height: 104upx;
+        line-height: 104upx;
+        border-radius: 52upx;
+        opacity: 0.4;
+        color: #FFFFFF;
+        font-size: 31upx;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+        box-shadow:0px 6upx 31upx 0px rgba(3,190,144,0.3);
+    }
+    .code-btn{
+        margin-top: -80upx;
+        margin-bottom: 16upx;
+        margin-left: calc(100% - 230upx);
+        width:200upx;
+        height:64upx;
+        border: none;
+        background:#FFFFFF;
+        font-size:24upx;
+        line-height: 64upx;
+        color: #03BE90;
+        z-index: 99999;
+    }
+    
+    .inputps{
+        font-size:33upx;
+        font-weight:400;
+        /* color: #F0AD4E; */
+        color:#C6CAD4;
+        line-height:46upx;
+        
+    }
+    .input{
+        text-align: left;
+        margin-top: 16upx;
+        /* width: 100%; */
+        margin-left: 63upx;
+        margin-right: 63upx;
+        margin-right: 63upx;
+        height: 92upx;
+        font-size: 40upx;
+        color: #2A3441;
+        -moz-border-radius: 46upx;
+        border-bottom: 2upx solid #E0E2E6;
+    }
+    .name-text{
+        margin-left: 63upx;
+        margin-top: 63upx;
+        font-size:38upx;
+        font-family:NotoSansCJKsc-Regular,NotoSansCJKsc;
+        font-weight:400;
+        color:#16202E;
+        line-height:56upx;
+    }
+    .title-text{
+        margin-left: 63upx;
+        font-size:58upx;
+        font-family:NotoSansCJKsc-Medium,NotoSansCJKsc;
+        font-weight:500;
+        color:rgba(22,32,46,1);
+        line-height:85upx;
+        margin-top: 63upx;
+    }
+    .title-text image{
+        width: 280upx;
+        height: 72upx;
+        /* background: #808080; */
+    }
+    .tips-text{
+        color: #FE3636;
+        font-size: 25upx;
+        text-align: center;
+    }
+    .content {
+    	display: flex;
+    	flex-direction: column;
+    	align-items: center;
+    	justify-content: center;
+        
+    }
+    
+    .logo {
+    	height: 692upx;
+    	width: 100%;
+    	margin-top: 0upx;
+    	margin-left: auto;
+    	margin-right: auto;
+    	margin-bottom: 0upx;
+    }
+    
+    .login-box{
+        width: 90%;
+        height: 940upx;
+        /* margin-top: -310upx; */
+        background:#FFFFFF;
+        box-shadow:0upx 42upx 208upx 0upx rgba(22,32,46,0.15);
+        border-radius:31upx;
+        position: absolute;
+        top: 60%;
+        left: 50%;
+        transform-style: preserve-3d;
+        transform: translate(-50%, -50%);
+    }
+    .welcome-text{
+        margin-left: 63upx;
+        margin-top: 63upx;
+        font-size:42upx;
+        font-family:NotoSansCJKsc-Regular,NotoSansCJKsc;
+        font-weight:400;
+        color:rgba(42,52,65,1);
+        line-height:60upx;
+    }
+    .btnopacity {
+        opacity: 1;
+    }
+</style>

@@ -1,0 +1,1108 @@
+<template>
+    <view >
+        
+        <view class="content" @touchstart="hideDrawer">
+            <view class="hintBox" v-if="chatType!=1">
+                <view style="color: #FF5A5A;padding: 10upx 33upx 10upx 33upx;">
+                    注意：急重症不适合网上问诊，请立即前往医院就诊
+                </view>
+                <view style="color: #868E9D;padding: 0upx 33upx">
+                    您好，我们非常重视您的每一次问诊，问诊人数较多时，请您耐心等待，多谢理解！
+                </view>
+            </view>
+            <scroll-view class="msg-list" scroll-y="true" :style="chatType==1?'top:0':''" :show-scrollbar='0' :scroll-with-animation="scrollAnimation" :scroll-top="scrollTop" :scroll-into-view="scrollToView" @scrolltoupper="loadHistory" upper-threshold="50">
+            	<!-- 加载历史数据waitingUI -->
+            	<view v-if="isHistoryLoading" class="loading">
+            		<view class="spinner">
+            			<view class="rect1"></view>
+            			<view class="rect2"></view>
+            			<view class="rect3"></view>
+            			<view class="rect4"></view>
+            			<view class="rect5"></view>
+            		</view>
+            	</view>
+                <view class="row" v-for="(row,index) in msgList" :key="index" :id="'msg'+row.msg.id">
+                	<block v-if="row.type=='product'" >
+                        <view class="my" @click="clickProduct(row.msg.content.extContent)" >
+                            <view class="left" style="background: #03BE90; width: 326upx; height: 550upx; padding:0upx 32upx;border-radius:30upx;">
+                                <view style="border-radius:30upx;background: #FFFFFF;width: 100%;">
+                                    <image style="width: 100%; height: 330upx;border-radius:30upx 30upx 0 0;" :src="row.msg.content.extContent.icon" mode="aspectFill"></image>
+                                    <view style="line-height: 22px;margin:6upx 20upx 10upx 20upx; overflow: hidden;text-overflow: ellipsis;word-break: break-all;display: -webkit-box;-webkit-box-orient: vertical;-webkit-line-clamp: 1;">
+                                        {{row.msg.content.extContent.name ? row.msg.content.extContent.name : ''}}
+                                    </view>
+                                    <view v-if="row.msg.content.extContent.type != 'GOODS'" style="line-height: 1;margin:0 20upx 0upx 20upx; color: #A0A8BC;font-size: 21upx;">
+                                        {{row.msg.content.extContent.desc}}
+                                    </view>
+                                    <view style="line-height: 18px;margin:0 20upx; color: #03BE90;display: flex;">
+                                        <text v-if="row.msg.content.extContent.type == 'GOODS'" style="width: 80upx; font-size: 21upx;">
+                                        {{row.msg.content.extContent.zhekou}}折
+                                        </text>
+                                        <text style="font-size: 25upx;">
+                                        ￥{{row.msg.content.extContent.price}}
+                                        </text>
+                                    </view>
+                                    <view v-if="row.msg.content.extContent.type == 'GOODS'" style="line-height: 1;margin:0 20upx 0upx 20upx; color: #A0A8BC;display: flex;">
+                                        <text style="width: 80upx; font-size: 21upx;">原价</text><text style="font-size: 23upx;text-decoration:line-through">￥{{row.msg.content.extContent.originalPrice}}</text>
+                                    </view>
+                                    <view style="height: 20upx; width: 100%;"></view>
+                                </view>
+                            </view>    
+                            <!-- 右-头像 -->
+                	    	<view class="right">
+                	    		<image :src="row.msg.userinfo.face"></image>
+                	    	</view>
+                	    </view>
+                	</block>
+                    <block v-if="row.type=='suggest'" >
+                	    <view class="other" >
+                	    	<!-- 左-头像 -->
+                	    	<view class="left">
+                	    		<image :src="expertPics"></image>
+                	    	</view>
+                	    	<!-- 右-用户名称-时间-消息 -->
+                	    	<view class="right">
+                	            <view class="text bubble" @click="clickReport(row.msg.content.extContent)" style="line-height: 1.2;">
+                	            	<text >健康调理报告已发送，请到<text style="color: #03BE90;">查看报告</text>里查看</text>
+                	            </view>
+                	        </view>
+                	    </view>
+                	    <view class="system">
+                	    	<!-- 文字消息 -->
+                	    	<view style="margin-top: 20upx;" class="text">
+                	    		本次问诊已完成
+                	    	</view>
+                	    
+                	    </view>
+                	    <!-- <button style="" @click="clickWenzhen" class="wenzhen-btn" >再次问诊</button> -->
+                	</block>
+                    <!-- 系统消息 -->
+                	<block v-if="row.type=='system'" >
+                		<view class="system">
+                			<!-- 文字消息 -->
+                			<view v-if="row.msg.type=='text'" class="text">
+                				{{row.msg.content.text}}
+                			</view>
+                			
+                		</view>
+                	</block>
+                	<!-- 用户消息 -->
+                	<block v-if="row.type=='user'">
+                		<!-- 自己发出的消息 -->
+                		<view class="my" v-if="row.msg.userinfo.uid==myuid">
+                			<!-- 左-消息 -->
+                			<view class="left">
+                				<!-- 文字消息 -->
+                				<view v-if="row.msg.type=='text'" class="bubble">
+                					<rich-text :nodes="row.msg.content.text"></rich-text>
+                				</view>
+                				<!-- 语言消息 -->
+                				<view v-if="row.msg.type=='voice'" :style="{'width': row.msg.content.length/60*70+15 +'%' }" class="bubble voice" @tap="playVoice(row.msg)" :class="playMsgid == row.msg.id?'play':''">
+                					<view class="length">{{row.msg.content.length+'"'}} </view>
+                					<view class="icon my-voice"></view>
+                				</view>
+                				<!-- 图片消息 -->
+                				<view v-if="row.msg.type=='img'" class="bubble img" @tap="showPic(row.msg)">
+                					<image :src="row.msg.content.url" :style="{'width': row.msg.content.w+'px','height': row.msg.content.h+'px'}"></image>
+                				</view>
+                			</view>
+                			<!-- 右-头像 -->
+                			<view class="right">
+                				<image :src="row.msg.userinfo.face"></image>
+                			</view>
+                		</view>
+                		<!-- 别人发出的消息 -->
+                		<view class="other" v-if="row.msg.userinfo.uid!=myuid">
+                			<!-- 左-头像 -->
+                			<view class="left">
+                				<image :src="row.msg.userinfo.face"></image>
+                			</view>
+                			<!-- 右-用户名称-时间-消息 -->
+                			<view class="right">
+                				<!-- <view class="username">
+                					<view class="name">{{row.msg.userinfo.username}}</view> <view class="time">{{row.msg.time}}</view>
+                				</view> -->
+                				<!-- 文字消息 -->
+                				<view v-if="row.msg.type=='text'" class="bubble">
+                					<rich-text :nodes="row.msg.content.text"></rich-text>
+                				</view>
+                				<!-- 语音消息 -->
+                				<view v-if="row.msg.type=='voice'" class="bubble voice" @tap="playVoice(row.msg)" :class="playMsgid == row.msg.id?'play':''">
+                					<view class="icon other-voice"></view>
+                					<view class="length">{{row.msg.content.length}}</view>
+                				</view>
+                				<!-- 图片消息 -->
+                				<view v-if="row.msg.type=='img'" class="bubble img" @tap="showPic(row.msg)">
+                					<image :src="row.msg.content.url" :style="{'width': row.msg.content.w+'px','height': row.msg.content.h+'px'}"></image>
+                				</view>
+                				
+                			</view>
+                		</view>
+                	</block>
+                </view>
+            </scroll-view>
+        
+        </view>
+        <!-- 底部输入栏 -->
+        <view v-if='isFinish != 1' class="input-box" :class="popupLayerClass" @touchmove.stop.prevent="discard">
+        	<!-- <view class="picbox" @click="getImage('album')">
+        	    <image src="../../static/image/icon_lt_fstp.png" class="img" mode=""></image>
+        	</view> -->
+            <view class="picbox" @tap="switchVoice">
+                <image :src="jianpanicon" class="img" mode=""></image>
+            	<!-- <view class="icon" :class="isVoice?'jianpan':'yuyin'" @tap="switchVoice"></view> -->
+            </view>
+        	<view class="textbox">
+        		<view class="voice-mode" :class="[isVoice?'':'hidden',recording?'recording':'']" @touchstart="voiceBegin" @touchmove.stop.prevent="voiceIng" @touchend="voiceEnd" @touchcancel="voiceCancel">{{voiceTis}}</view>
+        		<view class="text-mode"  :class="isVoice?'hidden':''">
+        			<view class="box">
+        				<input style="width: 100%;" v-if="showPlaceholder" placeholder-class="input-placeholder" auto-height="true" @confirm="sendText" v-model="textMsg" @focus="textareaFocus" placeholder="请输入内容" confirm-type="send" />
+        			</view>
+        			<!-- <view class="em" @tap="chooseEmoji">
+        				<view class="icon biaoqing"></view>
+        			</view> @tap="sendText"-->
+        		</view>
+        	</view>
+        	
+        	<view style="margin-left: 20upx;" class="picbox"  @click="getImage('album')">
+        		<!-- <view class="btn">发送</view> -->
+                <image src="../../static/image/icon_lt_fstp.png" class="img" mode=""></image>
+        	</view>
+        </view>
+        <!-- 录音UI效果 -->
+        <view class="record" :class="recording?'':'hidden'">
+        	<view class="ing" :class="willStop?'hidden':''"><view class="icon luyin2" ></view></view>
+        	<view class="cancel" :class="willStop?'':'hidden'"><view class="icon chehui" ></view></view>
+        	<view class="tis" :class="willStop?'change':''">{{recordTis}}</view>
+        </view>
+      
+    </view>
+</template>
+
+<script>
+    import api from '../../common/api.js';
+    import util from '../../common/util.js';
+    // import xyDialog from '../../components/xy-dialog/xy-dialog.vue'
+    let msgStorage = require("@/components/easemob/comps/chat/msgstorage");
+    let msgType = require("@/components/easemob/comps/chat/msgtype");
+    let disp = require("@/components/easemob/utils/broadcast");
+    
+    export default {
+        // components: {
+        //     xyDialog
+        // },
+    	data() {
+    		return {
+                jianpanicon:'../../static/image/icon_yysr.png',
+                showPlaceholder:true,
+                isRequest:false,
+                dialogtype:1,
+                score:null,
+                draft:null,
+                content:'',
+                lastMsgTime:'',
+                page:1,
+                size:10,
+                userId:null,
+                instanceId:null,
+                recordId:'',
+                expertId:null,
+                expertPics:null,
+                uploadParams:null,
+                
+                messageList:[],
+                
+                isFinish:null,
+                isload:false,
+    			//文字消息
+    			textMsg:'',
+    			//消息列表
+    			isHistoryLoading:false,
+    			scrollAnimation:false,
+    			scrollTop:0,
+    			scrollToView:'',
+    			msgList:[],
+    			msgImgList:[],
+    			myuid:0,
+    			
+    			//录音相关参数
+    			// #ifndef H5
+    			//H5不能录音
+    			RECORDER:uni.getRecorderManager(),
+    			// #endif
+    			isVoice:false,
+    			voiceTis:'按住 说话',
+    			recordTis:"手指上滑 取消发送",
+    			recording:false,
+    			willStop:false,
+    			initPoint:{identifier:0,Y:0},
+    			recordTimer:null,
+    			recordLength:0,
+    			//播放语音相关参数
+    			AUDIO:uni.createInnerAudioContext(),
+    			playMsgid:null,
+    			VoiceTimer:null,
+    			// 抽屉参数
+    			popupLayerClass:'',
+    			// more参数
+    			hideMore:true,
+    			//表情定义
+    			hideEmoji:true,
+                communityId:null,
+                title:'',
+                userinfo:null,
+                chatType:1
+    		}
+    	},
+        onHide() {
+            
+        },
+        onUnload(){
+            
+        },
+        onReady() {
+            this.create_or_onready();
+        },
+    	onLoad(option) {
+            this.chatType = option.chatType
+            
+            this.userinfo = uni.getStorageSync('userinfo');
+            
+            this.userId = this.userinfo.userId
+            this.expertId = option.to
+            this.recordId = option.recordId
+            this.communityId = option.communityId
+			this.findCommunity(this.communityId );
+            this.isFinish = option.isFinish
+            this.title = option.title ? option.title : '';
+            this.expertPics = option.topic
+            uni.setNavigationBarTitle({
+                title:this.title
+            });
+            const data = {
+            	purpose: 'useravatar'
+            }
+            api.getUploadParams({
+            	data: data
+            }).then(res => {
+            	console.log('getUploadParams')
+            	console.log(res)
+            	this.uploadParams = res.data
+            })
+            
+            this.initMsgList();
+            var _self = this
+            // this.interval = setInterval(function(){ 
+            //     _self.updateLastMsg()
+            // }, 10000);
+            
+            //语音自然播放结束
+            this.AUDIO.onEnded((res)=>{
+            	this.playMsgid=null;
+            });
+            // #ifndef H5
+            //录音开始事件
+            this.RECORDER.onStart((e)=>{
+            	this.recordBegin(e);
+            })
+            //录音结束事件
+            this.RECORDER.onStop((e)=>{
+            	this.recordEnd(e);
+            })
+            // #endif
+    	},
+        filters: {
+        	toFixed2: function(value) {
+        		return value.toFixed(2);
+        	},
+        },
+    	methods: {
+            clickProduct:function(item){
+                console.log(item)
+                if( item.type && item.type == "GOODS"){
+                    uni.navigateTo({
+                    	url: `/pages/health-product-detail/health-product-detail?id=${item.id}&type=${item.goodsType}`,
+                    });
+                }else if( item.type && item.type == "DOCTOR"){
+                    uni.navigateTo({
+                        url: `/pages/privateDoctor/info?id=${item.id}&type=doctor`
+                    })
+                }else if( item.type && item.type == "KK"){
+                    uni.navigateTo({
+                        url: `/pages/health-examination/product-info?code=${item.id}&hospId=${item.hospId}`
+                    })
+                }
+            },
+            clickWenzhen:function(){
+                var data = {
+                    expertId:this.expertId,
+                    type:'IMAGE',
+                    communityId:this.communityId
+                }
+                
+                api.addAdvisoryRecord({
+                    data:data
+                }).then(res=>{
+                    if(res.status == 'OK'){
+                        uni.navigateTo({
+                            url:"chatRoom?chatType=2&recordId=" + res.data.id +"&to=" + this.communityId+"&communityId="
+                            + this.community.id +"&title=" + this.community.expert.name+"&topic=" + this.community.expert.pics
+                        })
+                    }
+                })
+            },
+			findCommunity:function(id){
+				if(!id){
+					return;
+				}
+			    const data = {
+			        id:id
+			    }
+			    api.findCommunityById({
+			        data:data
+			    }).then(res => {
+			        console.log(res)
+			        if(res.status == 'OK'){
+						if(this.title===''){
+							this.title = res.data.mangerName;
+							this.expertPics = JSON.parse(res.data.mangerAvatar)&&JSON.parse(res.data.mangerAvatar)[0]&&JSON.parse(res.data.mangerAvatar)[0].url;
+						}
+						
+					}
+				});
+			},
+            create_or_onready() {
+                let me = this;
+                disp.on('em.xmpp.error.sendMsgErr', function(err) {
+                    console.log(err)
+                	// curMsgMid = err.data.mid
+                	// isFail = true
+                	return
+                });
+                
+                msgStorage.on("newChatMsg", function(renderableMsg, type, curChatMsg, sesskey){
+                    
+                	console.log(renderableMsg)
+                    
+                    if(renderableMsg.info.from == me.expertId && renderableMsg.info.to == me.userId){
+                        
+                        if(renderableMsg.msg.data[0].data == "健康调理报告已发送，请到查看报告里查看。"){
+                            me.initMsgList()
+                        }else{
+                            var nowDate = new Date();
+                            let lastid = 1
+                            if(me.msgList && me.msgList.length>0){
+                                lastid = me.msgList[me.msgList.length-1].msg.id;
+                            }
+                            lastid = lastid + 1;
+                            
+                            var message = {}
+                            message.type = 'user'
+                            message.msg = {}
+                            message.msg.id = lastid
+                            message.msg.content = {}
+                            if(renderableMsg.msg.type=='txt'){       //文字类型
+                                message.msg.type = "text"
+                                message.msg.content.text = renderableMsg.msg.data[0].data
+                            }else if(renderableMsg.msg.type=='img'){     //图片类型
+                                message.msg.type = "img"
+                                message.msg.content.url = renderableMsg.msg.url
+                            }else if(renderableMsg.msg.type=='audio'){
+                                message.msg.type = "voice"
+                                message.msg.content.length = renderableMsg.msg.content
+                                message.msg.content.url = renderableMsg.msg.url
+                                me.msgImgList.push(message.msg.content.url);
+                            }
+                            
+                            message.msg.time = nowDate.getHours()+":"+nowDate.getMinutes()
+                            message.msg.userinfo = {}
+                                          
+                            message.msg.userinfo.uid = me.expertId
+                            message.msg.userinfo.username = me.title
+                            message.msg.userinfo.face = me.expertPics
+                            me.msgList.push(message)
+                                                   
+                            me.$nextTick(function() {
+                            	// 滚动到底
+                                
+                            	me.scrollToView = 'msg'+message.msg.id
+                            });
+                        }
+                    }
+                    
+                });
+            },
+            clickReport:function(extContent){
+                uni.navigateTo({
+                    url:'doctorReport?rid='+ extContent.recordId
+                })
+            },
+          
+            // 切换语音/文字输入
+            switchVoice(){
+            	this.hideDrawer();
+            	this.isVoice = this.isVoice?false:true;
+                if(!this.isVoice){
+                    this.jianpanicon = '../../static/image/icon_yysr.png'
+                }else{
+                    this.jianpanicon = '../../static/image/icon_sxsr.png'
+                }
+            },
+            // 发送文字消息
+            sendText(){
+            	this.hideDrawer();//隐藏抽屉
+            	if(!this.textMsg){
+            		return;
+            	}
+            	let content = this.textMsg;
+            	let msg = {text:content}
+            	this.sendMsg(msg,'text');
+            	this.textMsg = '';//清空输入框
+            },
+            //获取焦点，如果不是选表情ing,则关闭抽屉
+            textareaFocus(){
+                console.log('textareaFocus')
+            	if(this.popupLayerClass=='showLayer' && this.hideMore == false){
+            		this.hideDrawer()
+            	}
+                // this.sendText()
+            },
+            // 预览图片
+            showPic(msg){
+                console.log(msg)
+            	uni.previewImage({
+            		indicator:"none",
+            		current:msg.content.url,
+            		urls: this.msgImgList
+            	});
+            },
+            // 添加语音消息到列表
+            addVoiceMsg(msg){
+            	this.msgList.push(msg);
+            },
+            // 添加文字消息到列表
+            addTextMsg(msg){
+            	this.msgList.push(msg);
+            },
+            // 添加图片消息到列表
+            addImgMsg(msg){
+            	msg.msg.content = this.setPicSize(msg.msg.content);
+            	this.msgImgList.push(msg.msg.content.url);
+            	this.msgList.push(msg);
+            },
+            // 发送消息
+            sendMsg(content,type){
+            	//实际应用中，此处应该提交长连接，模板仅做本地处理。
+            	var nowDate = new Date();
+                
+            	let lastid = 1
+                if(this.msgList && this.msgList.length>0){
+                    lastid = this.msgList[this.msgList.length-1].msg.id;
+                }
+            	lastid = lastid + 1;
+                var data 
+                if(type == 'text'){
+          
+                    data = {
+                        expertId:this.expertId,
+                        toId:this.expertId,
+                        type:'txt',
+                        content:content.text,
+                        communityId:this.communityId
+                    }
+                }else if(type== 'img'){
+                          
+                    data = {
+                        expertId:this.expertId,
+                        toId:this.expertId,
+                        type:'img',
+                        content:'[图片]',
+                        url:content.url,
+                        communityId:this.communityId
+                    }
+                }else if(type== 'voice'){
+                    type == 'audio'
+                    data = {
+                        expertId:this.expertId,
+                        toId:this.expertId,
+                        type:'audio',
+                        content:content.sec,
+                        url:content.url,
+                        communityId:this.communityId
+                    }
+                }
+                
+                var _self = this
+                if(this.chatType == 1){
+                    api.addCommunityMessage({
+                         data: data
+                    }).then(addRes => {
+                        console.log(addRes)
+                        if(addRes.status == 'OK'){
+                            var accountinfo = uni.getStorageSync('userinfo');
+                            var headUrl = accountinfo.avatarPath
+                            let msg = {type:'user',msg:{id:lastid,time:nowDate.getHours()+":"+nowDate.getMinutes(),type:type,userinfo:{uid:0,username:accountinfo.name,face:headUrl},content:content}}
+                            _self.msgList.push(msg)
+                            if(type== 'img'){
+                                _self.msgImgList.push(msg.msg.content.url);
+                            }
+                            _self.$nextTick(function() {
+                            	// 滚动到底
+                            	_self.scrollToView = 'msg'+msg.msg.id
+                            });
+                        }
+                        
+                    })
+                }else{
+                    api.addByExpert({
+                        data: data
+                    }).then(addRes => {
+                        console.log(addRes)
+                        if(addRes.status == 'OK'){
+                            var accountinfo = uni.getStorageSync('userinfo');
+                            var headUrl = accountinfo.avatarPath
+                            let msg = {type:'user',msg:{id:lastid,time:nowDate.getHours()+":"+nowDate.getMinutes(),type:type,userinfo:{uid:0,username:accountinfo.name,face:headUrl},content:content}}
+                            _self.msgList.push(msg)
+                            if(type== 'img'){
+                                _self.msgImgList.push(msg.msg.content.url);
+                            }
+                            _self.$nextTick(function() {
+                            	// 滚动到底
+                            	_self.scrollToView = 'msg'+msg.msg.id
+                            });
+                        }
+                        
+                    })
+                }
+                
+                
+            },
+            //选照片 or 拍照
+            getImage(type){
+            	this.hideDrawer();
+                var _self = this
+            	uni.chooseImage({
+                    count: 1,
+            		sourceType:[type],
+            		sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
+            		success: (res)=>{
+            			for(let i=0;i<res.tempFilePaths.length;i++){
+            				uni.getImageInfo({
+            					src: res.tempFilePaths[i],
+            					success: (image)=>{
+            						
+                                    if (_self.uploadParams) {
+                                    	uni.showLoading({
+                                    		title: '图片上传中'
+                                    	})
+                                    	uni.uploadFile({
+                                    		url: _self.uploadParams.url,
+                                    		filePath: res.tempFilePaths[0],
+                                    		name: 'userAvatar',
+                                    		formData: {
+                                    			policy: _self.uploadParams.policy,
+                                    			Signature: _self.uploadParams.Signature
+                                    		},
+                                    		success(result) {
+                                    			if (result.data) {
+                                                    
+                                    				let r = JSON.parse(result.data)
+                                    				if (r.status === 'OK') {
+                                    					let msg = {url:r.data.location + r.data.filepath};
+                                    					_self.sendMsg(msg,'img');
+                                    				} else {
+                                    					uni.showToast({
+                                    						title: r.message,
+                                    						icon: "none",
+                                    						duration: 2000
+                                    					})
+                                    				}
+                                    			}
+                                    		},
+                                    		fail() {
+                                                    
+                                    		},
+                                    		complete(res) {
+                                    			uni.hideLoading()
+                                    			if (res.statusCode !== 200) {
+                                    				uni.showToast({
+                                    					title: res.errMsg,
+                                    					icon: "none",
+                                    					duration: 2000
+                                    				})
+                                    			}
+                                    		}
+                                    	})
+                                    } else {
+                                    	uni.showToast({
+                                    		title: 'getUploadParams failed!',
+                                    		icon: "none",
+                                    		duration: 2000
+                                    	})
+                                    }
+                                    
+            						
+            					}
+            				});
+            			}
+            		}
+            	});
+            },
+            // 接受消息(筛选处理)
+            screenMsg(msg){
+            	//从长连接处转发给这个方法，进行筛选处理
+            	if(msg.type=='system'){
+            		// 系统消息
+            		switch (msg.msg.type){
+            			case 'text':
+            				this.addSystemTextMsg(msg);
+            				break;
+            			case 'redEnvelope':
+            				this.addSystemRedEnvelopeMsg(msg);
+            				break;
+            		}
+            	}else if(msg.type=='user'){
+            		// 用户消息
+            		switch (msg.msg.type){
+            			case 'text':
+            				this.addTextMsg(msg);
+            				break;
+            			case 'voice':
+            				this.addVoiceMsg(msg);
+            				break;
+            			case 'img':
+            				this.addImgMsg(msg);
+            				break;
+            			case 'redEnvelope':
+            				this.addRedEnvelopeMsg(msg);
+            				break;
+            		}
+            		console.log('用户消息');
+            		//非自己的消息震动
+            		if(msg.msg.userinfo.uid!=this.myuid){
+            			console.log('振动');
+            			uni.vibrateLong();
+            		}
+            	}
+            	this.$nextTick(function() {
+            		// 滚动到底
+            		this.scrollToView = 'msg'+msg.msg.id
+            	});
+            },
+            initMsgList(){
+                this.page = 1
+                this.msgList = []
+                this.getMsgList(null)
+            },
+            // 加载初始页面消息
+            getMsgList(Viewid){
+                
+                if(this.chatType == 1){
+                    var data = {
+                        page:this.page,
+                        size:this.size,
+                        communityId:this.communityId,
+                    }
+                    let _self = this;
+                    var list = []
+                    var currentDate = ''
+                    api.getCommunityMessage({
+                        data:data
+                    }).then(listRes=>{
+                        console.log(listRes)
+                        if(listRes.status=='OK' && listRes.list.length>0 ){
+                            
+                            this.formattingMessage(listRes,Viewid)
+                            
+                        }
+                        _self.isHistoryLoading = false;
+                    })
+                }else{
+                    var data = {
+                        page:this.page,
+                        size:this.size,
+                        communityId:this.communityId,
+                        expertId:this.expertId
+                    }
+                    let _self = this;
+                    var list = []
+                    var currentDate = ''
+                    api.expertMessage({
+                        data: data
+                    }).then(listRes => {
+                    
+                        if(listRes.status=='OK' && listRes.list.length>0 ){
+                            
+                            this.formattingMessage(listRes,Viewid)
+                            
+                        }
+                        _self.isHistoryLoading = false;
+                    })
+                }
+                
+                
+            },
+            formattingMessage:function(listRes,Viewid){
+                let _self = this;
+                this.messageList = listRes.list
+                var today = util.formatDate(new Date, 'yyyy-MM-dd')
+                var tempDate
+                var tempHhhh 
+                var tempMmmm = 0
+                
+                listRes.list.forEach((item,index)=>{
+                    
+                    var date = util.formatTimestamp(item.time, 'yyyy-MM-dd')
+                                            
+                    var time = util.formatTimestamp(item.time,'hh:mm')
+                    
+                    if(!item.extJson){
+                        var message = {}
+                        message.type = 'user'
+                        message.msg = {}
+                        message.msg.id = item.id
+                        
+                        if(item.type=='txt'){       //文字类型
+                            message.msg.type = "text"
+                        }else if(item.type=='img'){     //图片类型
+                            message.msg.type = "img"
+                        }else if(item.type=='audio'){
+                            message.msg.type = "voice"
+                        }
+                        
+                        message.msg.time = time
+                        message.msg.userinfo = {}
+                        if(item.fromId!=_self.expertId){
+                            //自己发的消息
+                            message.msg.userinfo.uid = 0
+                            message.msg.userinfo.username = item.userName
+                            message.msg.userinfo.face = _self.userinfo.avatarPath
+                            
+                        }else{
+                            
+                            message.msg.userinfo = {
+                                uid:_self.expertId,
+                                username:_self.title,
+                                face:this.expertPics
+                            }
+                            
+                        }
+                        message.msg.content = {}
+                        if(item.type=='txt'){       //文字类型
+                            message.msg.content.text = item.content
+                        }else if(item.type=='img'){     //图片类型
+                 
+                            message.msg.content.url = item.url
+                        }else if(item.type=='audio'){
+                            message.msg.content.url = item.url
+                            message.msg.content.length = item.content
+                        }
+                        
+                        _self.msgList.unshift(message)
+                    }else{
+                        var message = {}
+                        
+                        var extContent = JSON.parse(item.extJson)
+                        var message = {}
+                        message.msg = {}
+                        if(item.type == 'product'){
+                            message.msg.userinfo = {
+                                face:this.userinfo.avatarPath
+                            }
+                            message.type = 'product'
+                            extContent.price = extContent.price.toFixed(2) + ''
+                            extContent.originalPrice = extContent.originalPrice.toFixed(2) + ''
+                            extContent.zhekou = (extContent.price/extContent.originalPrice*10).toFixed(2) + ''
+                  
+                        }else{
+                            message.type = 'suggest'
+                        }
+                        
+                        message.msg.id = item.id
+                        
+                        message.msg.time = date + ' ' + time
+                        message.msg.content = {}
+                        // message.msg.content.text = extContent.content
+                        message.msg.content.extContent = extContent
+                        
+                        // message.msg.score = extContent.score
+                        _self.msgList.unshift(message)
+                    }
+                    
+                    if(today!=date ){     //日期不一样加时间消息
+                        if( tempDate != date){
+                            var message = {}
+                            message = {type:"system",msg:{id:0,type:"text",content:{text:date+' '+time}}}
+                            _self.msgList.unshift(message)
+                            tempDate = date
+                        }
+                        
+                    }else{          //今天
+                        var message = {}
+                        var hhhhh = util.formatTimestamp(item.time,'hh')
+                        var mmmm = util.formatTimestamp(item.time,'mm')
+                        if(tempHhhh!=hhhhh){        //不同小时
+                            message = {type:"system",msg:{id:0,type:"text",content:{text:hhhhh+':'+mmmm}}}
+                            _self.msgList.unshift(message)
+                            tempHhhh = hhhhh
+                        }else{      //同一个小时
+                            
+                            if(mmmm - tempMmmm <-2 ){
+                                message = {type:"system",msg:{id:0,type:"text",content:{text:hhhhh+':'+mmmm}}}
+                                _self.msgList.unshift(message)
+                            }
+                            tempMmmm = mmmm
+                        }
+                        
+                    }
+                    
+                })
+                for(let i=0;i<_self.msgList.length;i++){
+                	if(_self.msgList[i].type=='user'&&_self.msgList[i].msg.type=="img"){
+                		_self.msgList[i].msg.content = _self.setPicSize(_self.msgList[i].msg.content);
+                		_self.msgImgList.push(_self.msgList[i].msg.content.url);
+                	}
+                }
+                var message = {}
+                                
+                
+                var message = {}
+                message.type = 'goods'
+                message.msg = {}
+                message.msg.id = 'item.id'
+                message.msg.content = {}
+                message.msg.content.text = 'extContent.content'
+                _self.msgList.push(message)
+                // 滚动到底部     
+                _self.$nextTick(function() {
+                	//进入页面滚动到底部
+                	_self.scrollTop = 9999;
+                	_self.$nextTick(function() {
+                		_self.scrollAnimation = true;
+                	});
+                	
+                });
+                if(Viewid != null){
+                    //这段代码很重要，不然每次加载历史数据都会跳到顶部
+                    _self.$nextTick(function() {
+                    	_self.scrollToView = 'msg'+Viewid;//跳转上次的第一行信息位置
+                    	_self.$nextTick(function() {
+                    		_self.scrollAnimation = true;//恢复滚动动画
+                    	});
+                    	
+                    });
+                    
+                }
+            },
+            //处理图片尺寸，如果不处理宽高，新进入页面加载图片时候会闪
+            setPicSize(content){
+            	// 让图片最长边等于设置的最大长度，短边等比例缩小，图片控件真实改变，区别于aspectFit方式。
+            	let maxW = uni.upx2px(350);//350是定义消息图片最大宽度
+            	let maxH = uni.upx2px(350);//350是定义消息图片最大高度
+            	if(content.w>maxW||content.h>maxH){
+            		let scale = content.w/content.h;
+            		content.w = scale>1?maxW:maxH*scale;
+            		content.h = scale>1?maxW/scale:maxH;
+            	}
+            	return content;
+            },
+            //触发滑动到顶部(加载历史信息记录)
+            loadHistory(e){
+            	if(this.isHistoryLoading){
+            		return ;
+            	}
+                this.page++
+                
+                
+            	this.isHistoryLoading = true;//参数作为进入请求标识，防止重复请求
+            	this.scrollAnimation = false;//关闭滑动动画
+            	var Viewid = this.msgList[0].msg.id;//记住第一个信息ID
+                
+                this.getMsgList(Viewid)
+            },
+            // 录音开始
+            voiceBegin(e){
+                console.log('voiceBegin')
+            	if(e.touches.length>1){
+            		return ;
+            	}
+                this.recording = true;
+            	this.initPoint.Y = e.touches[0].clientY;
+            	this.initPoint.identifier = e.touches[0].identifier;
+            	this.RECORDER.start({format:"mp3"});//录音开始,
+            },
+            // 播放语音
+            playVoice(msg){
+                console.log(this.AUDIO.paused)
+                
+                if(this.playMsgid && this.AUDIO.paused && this.AUDIO.src == msg.content.url){
+                    this.AUDIO.stop()
+                    this.playMsgid=null
+                }else{
+                    this.playMsgid=msg.id;
+                    this.AUDIO.src = msg.content.url;
+                    this.$nextTick(function() {
+                    	this.AUDIO.play();
+                    });
+                }
+            	
+            },
+            //录音开始UI效果
+            recordBegin(e){
+            	if(!this.recording){
+            		return;
+            	}
+            	this.voiceTis='松开 结束';
+            	this.recordLength = 0;
+            	this.recordTimer = setInterval(()=>{
+            		this.recordLength++;
+            	},1000)
+            },
+            // 录音被打断
+            voiceCancel(){
+                console.log('voiceCancel')
+            	this.recording = false;
+            	this.voiceTis='按住 说话';
+            	this.recordTis = '手指上滑 取消发送'
+            	this.willStop = true;//不发送录音
+            	this.RECORDER.stop();//录音结束
+            },
+            // 录音中(判断是否触发上滑取消发送)
+            voiceIng(e){
+                console.log('voiceIng')
+            	if(!this.recording){
+            		return;
+            	}
+            	let touche = e.touches[0];
+            	//上滑一个导航栏的高度触发上滑取消发送
+            	if(this.initPoint.Y - touche.clientY>=uni.upx2px(100)){
+            		this.willStop = true;
+            		this.recordTis = '松开手指 取消发送'
+            	}else{
+            		this.willStop = false;
+            		this.recordTis = '手指上滑 取消发送'
+            	}
+            },
+            // 结束录音
+            voiceEnd(e){
+                console.log('voiceEnd：'+this.recording)
+            	if(!this.recording){
+            		return;
+            	}
+                
+            	this.recording = false;
+            	this.voiceTis='按住 说话';
+            	this.recordTis = '手指上滑 取消发送'
+            	this.RECORDER.stop();//录音结束
+                console.log('recordTis')
+            },
+            //录音结束(回调文件)
+            recordEnd(e){
+            	clearInterval(this.recordTimer);
+            	if(!this.willStop){
+            		
+                    if(this.recordLength<2){
+                        uni.showToast({
+                            title: '录音时间太短',
+                            icon: "none",
+                            duration: 2000
+                        })
+                        return
+                    }
+                    
+                    uni.showLoading({
+                    	title: '语音发送中'
+                    })
+                    var _self = this
+                    var uploadTask = uni.uploadFile({
+                    	url: _self.uploadParams.url,
+                    	filePath: e.tempFilePath,
+                    	name: 'userAvatar',
+                    	formData: {
+                    		policy: _self.uploadParams.policy,
+                    		Signature: _self.uploadParams.Signature
+                    	},
+                    	success(result) {
+                    		if (result.data) {
+                                console.log(result.data);
+                    			let r = JSON.parse(result.data)
+                    			if (r.status === 'OK') {
+                                    
+                                    let min = parseInt(_self.recordLength/60);
+                                    let sec = _self.recordLength%60;
+                                    min = min<10?'0'+min:min;
+                                    sec = sec<10?'0'+sec:sec;
+                                    console.log("e: " + JSON.stringify(e));
+                                    let msg = {
+                                    	length:min+':'+sec,
+                                        url:r.data.location + r.data.filepath,
+                                        sec:min+':'+sec
+                                    }
+                                    
+                    				_self.sendMsg(msg,'voice');
+                    			} else {
+                    				uni.showToast({
+                    					title: r.message,
+                    					icon: "none",
+                    					duration: 2000
+                    				})
+                    			}
+                    		}
+                    	},
+                    	fail() {
+                                
+                    	},
+                    	complete(res) {
+                    		uni.hideLoading()
+                    		if (res.statusCode !== 200) {
+                    			uni.showToast({
+                    				title: res.errMsg,
+                    				icon: "none",
+                    				duration: 2000
+                    			})
+                    		}
+                    	}
+                    })
+                    
+            		// this.sendMsg(msg,'voice');
+            	}else{
+            		console.log('取消发送录音');
+            	}
+            	this.willStop = false;
+            },
+            
+            // 打开抽屉
+            openDrawer(){
+            	this.popupLayerClass = 'showLayer';
+            },
+            // 隐藏抽屉
+            hideDrawer(){
+            	this.popupLayerClass = '';
+            	setTimeout(()=>{
+            		this.hideMore = true;
+            		this.hideEmoji = true;
+            	},150);
+            },
+            discard(){
+            	return;
+            }
+    	}
+    }
+</script>
+
+<style lang="scss">
+	@import "@/static/HM-chat/css/style.scss"; 
+    .wenzhen-btn{
+        color: #03BE90;
+        background: #FFFFFF;
+        border-radius: 20upx;
+        box-shadow:0 0 0 0;
+        width: 180upx;
+        margin-top: 50upx;
+        height: 74upx;
+        line-height: 74upx;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 26upx;
+    }
+</style>
