@@ -1,0 +1,279 @@
+
+.login-btn {
+    position: absolute;
+    z-index: 25;
+    margin-top: 40rpx;
+    height: 90rpx;
+    width: 100%;
+    line-height: 90rpx;
+    border-radius: 45rpx;
+    color: #FFFFFF;
+    font-size: 31rpx;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+            justify-content: center;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+            align-items: center;
+    background:-webkit-linear-gradient(217deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+    background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+    -webkit-box-shadow:0px 6rpx 31rpx 0px rgba(3,190,144,0.3);
+            box-shadow:0px 6rpx 31rpx 0px rgba(3,190,144,0.3);
+}
+.envelopeBox{
+    position: absolute;
+    bottom: 0rpx;
+    left: calc(50% - 210rpx);
+    width: 420rpx;
+    height: 440rpx;
+}
+.succeesText{
+    font-size:42rpx;
+    font-family:NotoSansCJKsc-Medium,NotoSansCJKsc;
+    font-weight:500;
+    color:rgba(255,255,255,1);
+    line-height:62rpx;
+}
+.envelopeBox image{
+    width: 96rpx;
+    height: 96rpx;
+}
+.envelopebg{
+    position: absolute;
+    z-index: 23;
+    top: 155rpx;
+    width: 100%;
+    height: 285rpx;
+    border-radius: 0rpx 0rpx 40rpx 40rpx;
+    background: #0D6E56;
+}
+.envelopeContent{
+    position: absolute;
+    z-index: 25;
+    top: 155rpx;
+    width: 100%;
+    height: 285rpx;
+}
+.envelopeContent image{
+    width: 100%;
+    height: 285rpx;
+}
+.envelopeCap{
+    position:absolute;
+    height: 310rpx;
+    width: 420rpx;
+    z-index: 23;
+}
+.envelopeCap image{
+    height: 155rpx;
+    width: 100%;
+}
+.itemContent{
+    font-size:24rpx;
+    font-family:NotoSansCJKsc-Regular,NotoSansCJKsc;
+    font-weight:400;
+    color:rgba(162,169,186,1);
+    line-height:40rpx;
+    text-align: left;
+}
+.itemTop{
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: row;
+            flex-direction: row;
+}
+.itemTop image{
+    width: 47rpx;
+    height: 46rpx;
+}
+.itemTopText{
+    text-align: left;
+    margin-left: 20rpx;
+    font-size:36rpx;
+    font-family:NotoSansCJKsc-Medium,NotoSansCJKsc;
+    font-weight:500;
+    color:rgba(22,32,46,1);
+    line-height:54rpx;
+    -webkit-box-flex: 1;
+    -webkit-flex: 1;
+            flex: 1;
+}
+.itemTopBtn{
+    border-radius:20rpx;
+    border:2rpx solid rgba(3,190,144,1);
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+            align-items: center;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+            justify-content: center;
+    width: 110rpx;
+    height: 40rpx;
+    font-size:24rpx;
+    font-family:NotoSansCJKsc-Regular,NotoSansCJKsc;
+    font-weight:400;
+    color:rgba(3,190,144,1);
+    /* line-height:36upx; */
+}
+.itemTopBtn image{
+    width: 26rpx;
+    height: 26rpx;
+}
+.contentBox{
+    position: relative;
+    z-index: 22;
+    margin-top: 30rpx;
+    height: 880rpx;
+}
+.contentItem{
+    position:absolute;
+    z-index: 24;
+    height: 140rpx;
+    margin-left: 30rpx;
+    width: calc(100% - 140rpx);
+    padding: 40rpx;
+    border-radius: 40rpx;
+    background: #FFFFFF;
+    margin-bottom: 20rpx;
+}
+.sssssss{
+    overflow:overflow;
+}
+.topContentText{
+    font-size:30rpx;
+    font-family:NotoSansCJKsc-Regular,NotoSansCJKsc;
+    font-weight:400;
+    color:rgba(255,255,255,1);
+    line-height:45rpx;
+    margin-top: 20rpx;
+}
+.topTitleText{
+    font-size:42rpx;
+    font-family:NotoSansCJKsc-Medium,NotoSansCJKsc;
+    font-weight:500;
+    color:rgba(255,255,255,1);
+    line-height:62rpx;
+    margin-left: 20rpx;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+            align-items: center;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+            justify-content: center;
+}
+.topTitleBox{
+    margin-top: 64rpx;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: row;
+            flex-direction: row;
+}
+.topTitleBox image{
+    width: 100rpx;
+    height: 100rpx;
+}
+.boxTop{
+    position: relative;
+    z-index: 22;
+    text-align: left;
+    padding: 0 30rpx;
+}
+.content{
+    width: 100%;
+    height: 100%;
+    background: url('https://coffer.bainuo.cn/mdt-pub/ing_hyy_bg.png') no-repeat ;
+    background-size: 100% ; 
+    text-align: center;
+    position: relative;
+}
+.box{
+    top: calc(50% - 50rpx);
+    left: calc(50% - 50rpx);
+    height: 100rpx;
+    width: 100rpx;
+    border-radius: 50rpx;
+    background: #148973;
+    position: absolute;
+    z-index: 11;
+}
+.navigation{
+    position: relative;
+    width: 100%;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+            flex-direction: column;
+    z-index: 22;
+}
+.titleNav{
+    width:152rpx;
+    height:56rpx;
+    font-size:38rpx;
+    font-family:NotoSansCJKsc-Medium,NotoSansCJKsc;
+    font-weight:300;
+    color:rgba(255,255,255,1);
+    line-height:56rpx;
+    position: absolute;
+    bottom: 21rpx;
+    left: calc(50% - 76rpx);
+}
+.backBtn{
+    position: absolute;
+    width: 50rpx;
+    height: 50rpx;
+    bottom: 21rpx;
+    left: 21rpx;
+}
+.discriminate-btn{
+    /* margin-left: 100%; */
+    width: calc(100% - 320rpx);
+    /* margin-top: 83upx; */
+    height: 90rpx;
+    line-height: 90rpx;
+    border-radius: 45rpx;
+    /* opacity: 0.4; */
+    color: #C6CAD4;
+    font-size: 31rpx;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+            justify-content: center;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+            align-items: center;
+    background:#FFFFFF;
+}
+.zIndex{
+    z-index: 26;
+}
+.yellowBorder{
+    border:2rpx solid #F7CF41;
+}
+.grayBorder{
+    border:2rpx solid #C6CAD4;
+    color: #C6CAD4;
+}
+.btnopacity{
+    color: #148973;
+}
+

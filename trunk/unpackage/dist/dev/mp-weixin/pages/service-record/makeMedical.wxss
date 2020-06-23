@@ -1,0 +1,119 @@
+
+page{
+    background: #EFF1F6;
+}
+picker-view {
+    width: 100%;
+    height: calc(100% - 120rpx);
+    margin-top:20rpx;
+}
+.topBox{
+    margin: 30rpx 0rpx 20rpx 0rpx;
+    height: 244rpx;
+    width: 100%;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: row;
+            flex-direction: row;
+    background: #FFFFFF;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+            align-items: center;
+}
+.topBox image{
+    width: 142rpx;
+    height: 142rpx;
+    margin: 50rpx 20rpx 50rpx 30rpx;
+    background: #C0C0C0;
+    border-radius: 15rpx;
+}
+.topBox .title{
+    color: #434E5E;
+    font-size:29rpx;
+}
+.topBox .desc{
+    color: #A2A9BA;
+    font-size:25rpx;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-all;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+}
+.topBox .price{
+    color: #16202E;
+    font-size:29rpx;
+}
+.infoBox{
+    font-size:31rpx;
+    background: #FFFFFF;
+}
+.infoBox .item{
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: row;
+            flex-direction: row;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+            align-items: center;
+    height: 108rpx;
+}
+.activate{
+    color: #16202E;
+}
+.line{
+    background: #EAEDF4;
+    height: 2rpx;
+    width: 100%;
+}
+.greyColor{
+    color: #C6CAD4;
+}
+.greyImage{
+    opacity: 0.4;
+}
+.infoTitle{
+    width: 160rpx;
+    text-align: left;
+    padding-left: 32rpx;
+}
+.login-btn {
+    margin: 146rpx 125rpx 100rpx 125rpx;
+    height: 88rpx;
+    line-height: 88rpx;
+    border-radius: 44rpx;
+    color: #FFFFFF;
+    font-size: 31rpx;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+            justify-content: center;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+            align-items: center;
+    background:-webkit-linear-gradient(217deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+    background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+    -webkit-box-shadow:0px 6rpx 31rpx 0px rgba(3,190,144,0.3);
+            box-shadow:0px 6rpx 31rpx 0px rgba(3,190,144,0.3);
+}
+.calendarBox{
+    background: #FFFFFF;
+    opacity: 1;
+    position:fixed;
+    top: 25%;
+    width: 100%;
+    z-index: 100;  
+    border-radius: 30rpx 30rpx 0rpx 0rpx;
+    color: #6D7480;
+    font-size: 30rpx;
+}
+

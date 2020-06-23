@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "预约体检",
+  "navigationBarBackgroundColor": "#fff",
+  "backgroundColor": "#F6F7FA",
+  "usingComponents": {
+    "v-calendar": "/components/tale-calendar/tale-calendar"
+  }
+}

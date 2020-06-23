@@ -1,0 +1,463 @@
+<template>
+	<view class="cont">
+		<view class="health-top-content">
+			<view class="address">
+				<view style="display: inline-block; vertical-align: middle; text-align: center;font-size: 15px;margin-left: 32rpx;"  @tap="showall(true)">
+					<view class="disinline" style="max-width:4em; overflow: hidden;white-space: nowrap; text-overflow: ellipsis;">{{ addrCheck[0] }}</view>
+					<image class="disinline" style="width:28rpx; height:34rpx; margin-left:10rpx; vertical-align: text-bottom" src="../../static/image/location@2x.png"></image>
+				</view>
+				<view style="width: calc(100% - 6em); display: inline-block; vertical-align: middle;">
+					<uni-search-bar radius="100" cancelButton="none" placeholder="输入名称或关键字" @confirm="search" />
+				</view>
+			</view>
+			
+			<!-- <uni-swiper-dot :info="bannerList" :current="current" :mode="mode" :dots-styles="dotsStyles" field="content">
+				<swiper class="swiper-box" @change="change">
+					<swiper-item v-for="(item, index) in bannerList" :key="index">
+						<view :class="item.colorClass" class="swiper-item"> -->
+							<image class="imageiiii" src="https://coffer.bainuo.cn/mdt-pub/img_tijianbgbgbg.png" mode="" />
+					<!-- 	</view>
+					</swiper-item>
+				</swiper>
+			</uni-swiper-dot> -->
+			
+			<view class="sliderselects">
+				<view :class="{'ischeck': zoomCheck == 'level'}" @tap="choiseSlider('level', hospitalType)">
+					{{(hospRank && hospRank!='不限')?hospRank:'医院等级'}}
+					<image :src="zoomCheck == 'level' ? '../../static/image/icon_md_xzcs.png' : '../../static/image/icon_xxzk@2x.png'" class="disinline"></image>
+				</view>
+				<view :class="{'ischeck': zoomCheck == 'zoom'}" @tap="choiseSlider('zoom', areaChidren)">
+					{{(areaName && areaName!='不限')?areaName:'区域'}}
+					<image :src="zoomCheck == 'zoom' ? '../../static/image/icon_md_xzcs.png' : '../../static/image/icon_xxzk@2x.png'" class="disinline"></image>
+				</view>
+			</view>
+			
+			<!--下拉的弹窗-->
+			<view class="silderList" v-if="cacheType && cacheType.length > 0 && zoomCheck != ''">
+				<view class="datalist">
+					<view :class="{'ditem ischeck': hospRank == item || areaName == item , 'ditem': item}" v-for="(item, index) in cacheType" :key="index" @tap="checkSlideItem(zoomCheck, item)">
+						{{ item }}
+					</view>
+				</view>
+			</view>
+			
+		</view>
+		
+		<view class="chanpinList" v-for="(item, index) in chanpinList" :key="index" @tap="goDetail(item)">
+			<view class="image"><image :src="item.snapshot.hospImage"></image></view>
+			<view class="text">
+				<view class="title">{{ item.hospName }}</view>
+				<view class="tips">
+					<view class="tip">{{ item.hospRank }}</view>
+					<!-- <view class="tip">{{ item.label }}</view> -->
+				</view>
+				<view class="price">
+					￥<text>{{ item.minPrice }}</text>起
+				</view>
+				<view class="desc">{{ item.snapshot.hospAddress }}</view>
+			</view>
+		</view>
+		
+		<view class="dialog" v-if="showdialog">
+			<view class="close" @tap="showall(false)"><image src="../../static/image/icon_md_gb@2x.png" class="disinline" style="width:48rpx; height:48rpx;"></image></view>
+			<view class="searchCityBar">
+				<image src="../../static/image/icon_md_sousuo@2x.png" class="disinline" style="width:40rpx; height:40rpx; vertical-align: middle;"></image>
+				<input placeholder="请输入城市名称" class="searchInput" type="text" @input="goSearchList(searchVal1)" v-model="searchVal1" />
+			</view>
+			<view v-if="cityList.length > 0">
+				<!-- <view style="margin-top:40rpx;">
+					<view :class="{'defaultsBig': addrCheck, 'active': !addrCheck[0]}" @tap="checkItem('addrCheck')">全部城市</view>
+				</view> -->
+				<view class="provinces" v-for="(items, index) in cityList" :key="index">
+					<view class="province">
+						<image src="../../static/image/icon_md_dwh@2x.png" class="disinline" style="width:32rpx; height:32rpx; margin:0 6rpx 4rpx 0; vertical-align: middle;"></image>
+						{{ items.name }}
+					</view>
+					<view :class="{'defaultsBig': addrCheck, 'active': addrCheck[0] == item.name }" v-for="(item, ind) in items.children" :key="ind" style="margin-right:12rpx;" @tap="checkItem('addrCheck', item.name, item)">{{ item.name }}</view>
+				</view>
+			</view>
+			<view v-else style="text-align: center; margin:80rpx 0; font-size:30rpx;">
+				{{ '该城市还没有健康服务站~' }}
+			</view>
+		</view>
+        <view class="gwcClass" @click="clickGwjl"><image src="../../static/image/goumaijiluffff@2x.png" mode=""></image></view>
+	</view>
+</template>
+
+<script>
+	import api from '../../common/api.js';
+	import QQMapWX  from '../../common/qqmap-wx-jssdk.min.js';
+	export default {
+		data() {
+			return {
+				bannerList: [],
+				current: 0,
+				mode: 'dot',
+				dotsStyles: {
+					backgroundColor: 'rgba(249, 249, 251, 1)',
+					border: 'none',
+					color: '#fff',
+					selectedBackgroundColor: 'rgba(3, 190, 144, 1)',
+					selectedBorder: 'none'
+				},
+				chanpinList: [],
+				page: 1,
+				size: 10,
+				totalpage: 0,
+				showdialog: false,
+				cityList: [],
+				addrCheck: [],
+				addrList: ['深圳', '北京', '广州', '上海'],
+				searchVal1: '',
+				cacheDataList: [],
+				hospitalType: [], // 医院级别的下拉列表
+				hospRank: '',
+				areaChidren: [], // 区域的下拉列表
+				areaName: '',
+				slideList: [],
+				cacheType: [],// 医院级别和区域的下拉备选
+				zoomCheck: '',
+				searchValue:''
+			}
+		},
+		onLoad() {
+			// 查询城市对应的服务站
+			this.getAreaList()
+			// banner列表
+			this.getBannerList()
+			// 获取城市列表的医院级别
+			this.getHospitalType()
+			// 获取套餐类型
+		},
+		methods: {
+            clickGwjl:function(){
+                uni.navigateTo({
+                    url:'buyRecord'
+                })
+            },
+			choiseSlider(type, list){
+				// 判断点击 医院等级 和  区域  的下拉  是否显示
+				if(this.zoomCheck == type) {
+					// 再次点击关闭  
+					this.zoomCheck = ''
+					this.cacheType = []
+				} else {
+					// 正常点击赋值 
+					this.zoomCheck = type
+					this.cacheType = JSON.parse(JSON.stringify(list))
+				}
+			},
+			checkSlideItem(zoomCheck, item) {
+				console.log('ssssss', zoomCheck, item, this.zoomCheck)
+				if(zoomCheck == 'level') {
+					this.hospRank = item
+				} else if(zoomCheck == 'zoom') {
+					this.areaName = item
+				}
+				// 再查询医院
+				this.getHospitalList(true)
+				// 关闭下拉弹窗窗口
+				this.zoomCheck = ''
+			},
+			getlocaltion() {
+				let that = this
+				uni.getLocation({
+					type: 'wgs84',
+					geocode: true,//设置该参数为true可直接获取经纬度及城市信息
+					success: function (res) {
+						console.log(res)
+						// that.addrCheck[0] = res.address ? res.address.city : that.cityList[0].name
+						// console.log(that.addrCheck[0])
+						that.getArea(res.latitude,res.longitude)
+						
+					},
+					fail: function () {
+						uni.showToast({
+							title: '获取地址失败，您可以手动选择城市信息',
+							icon:'none'
+						});
+                        
+						that.addrCheck[0] = that.cityList[0].children[0].name
+                        var province = that.cityList[0].name;
+						that.areaChidren = ["不限"];
+						that.cacheDataList.map(q=>{
+							if(q.name == province){
+								q.children.map(i=> {
+									if(i.name==that.addrCheck[0]) {
+										i.children.forEach(it=>{
+											that.areaChidren.push(it.name);
+										})
+									}
+								})
+							}
+						})
+						// 获取分页列表内容
+						that.getHospitalList(true)
+					}
+				});
+				
+				
+			},
+			getArea(latitude,longitude){
+				let that = this
+				var qQMapWX = new QQMapWX({key:"TNUBZ-XIFKD-D2Y4G-HBF6N-2Q777-MFBS2"});
+				 //2、根据坐标获取当前位置名称，显示在顶部:腾讯地图逆地址解析
+				qQMapWX.reverseGeocoder({
+					location: {
+						latitude: latitude,
+						longitude: longitude
+					}, //坐标
+					get_poi: 1, //是否获取坐标对应附近列表
+					poi_options: 'policy=2;radius=3000;page_size=10;page_index=1', //poi 参数
+					success: function(res) {
+						var province = res.result.address_component.province;
+						that.addrCheck[0] = res.result.address_component.city;
+						that.areaChidren = ["不限"];
+						that.cacheDataList.map(q=>{
+							if(q.name == province){
+								q.children.map(i=> {
+									if(i.name==that.addrCheck[0]) {
+										i.children.forEach(it=>{
+											that.areaChidren.push(it.name);
+										})
+									}
+								})
+							}
+						})
+						// 获取分页列表内容
+						that.getHospitalList(true)
+					}
+				})
+				
+				
+			},
+			search: function(res) {
+				this.pageNum = 1;
+				this.searchValue = res.value;
+				this.getHospitalList(true)
+			},
+			change(e) {
+				this.current = e.detail.current
+			},
+			goDetail(id){
+				uni.navigateTo({
+					url: `/pages/health-examination/hospital-info?id=${id.id}&hospId=${id.hospId}`
+				})
+			},
+			getBannerList(){
+				this.$api.communityProductList({
+					size:999,
+					page:1,
+					banner:true,
+				}).then(res=>{
+					if(res.status=="OK"){
+						res.list.map(item=>{
+							this.bannerList.push({
+								url:JSON.parse(item.bannerPic)[0].url,
+								name:item.name,
+								id:item.id
+							})
+						})
+					}
+				}).catch(err=>{
+					console.log(err);
+				})
+			},
+			getAreaList() {
+				// 获取区域列表
+				api.healthKKhospitalAreas().then(res=>{
+					this.cityList = res.data
+					this.cacheDataList = res.data
+				})
+				
+				// 获取用户当前城市
+				this.getlocaltion()
+			},
+			goSearchList(value) {
+				// 模糊遍历城市列表
+				let cacheList = []
+				var reg = new RegExp(value,"g");
+				this.cacheDataList.map(q=>{
+					let z = {
+						name: '',
+						children: []
+					}
+					q.children.map(i=> {
+						if(reg.test(i.name)) {
+							z.name = q.name
+							z.children.push(i)
+						}
+					})
+					if (z.children.length > 0) {
+						cacheList.push(z)
+					}
+				})
+				this.cityList = cacheList
+			},
+			checkItem(pitem, item, itemall) {
+				// 选中城市
+				console.log('itemall is',itemall)
+				if(!item) {
+					this[pitem] = []
+				} else{
+					if(this[pitem] == item) {
+						this[pitem] = []
+					} else {
+						this[pitem] = []
+						this[pitem].push(item)
+					}
+				}
+				this.areaName = "";
+				// 重置选择城市的区域
+				this.areaChidren = ["不限"]
+				if(itemall.children.length > 0) {
+					itemall.children.map(items=>{
+						this.areaChidren.push(items.name)
+					})
+				}
+			    this.page = 1
+				this.getHospitalList(true)
+				this.showdialog = false
+			},
+			getTypeList() {
+				// 获取套餐列表 ???
+			},
+			getHospitalList(isNeedResetPage) {
+				// 获取医院列表
+				if(isNeedResetPage) {
+					this.page = 1
+					this.chanpinList = []
+				}
+				this.$api.healthKKhospitalList({
+					size: this.size,
+					page: this.page,
+					provenceName: '',
+					hospRank: this.hospRank&&this.hospRank!='不限'?this.hospRank:'',
+					keywords: this.searchValue,
+					cityName: this.addrCheck[0] ? this.addrCheck[0] : '',
+					areaName: this.areaName&&this.areaName!='不限'?this.areaName:''
+				}).then(res=>{
+					res.list.map(item=>{
+						item.snapshot = JSON.parse(item.snapshot)
+                        item.minPrice = (item.minPrice/100).toFixed(2)
+						this.chanpinList.push(item)
+						// this.chanpinList.snapshot = JSON.parse(item.snapshot)
+					})
+					this.totalpage = res.totalPages
+				})
+			},
+			showall(value) {
+				// 触发弹窗搜索城市
+				this.showdialog = value
+				if(value) {
+					// 可选功能：关闭城市搜索框的时候，初始化查询的值
+					// this.searchVal1 = ''
+					// this.goSearchList(this.searchVal1)
+					this.page = 1
+				}
+			},
+			getHospitalType() {
+				// 获取医院等级
+				this.$api.healthKKhospitalType().then(res=>{
+					this.hospitalType = ['不限'];
+					this.hospitalType = this.hospitalType.concat(res.data)
+				})
+			}
+		},
+		onReachBottom() {
+			if(this.page < this.totalpage) {
+				this.status = 'loading'
+				uni.showNavigationBarLoading()
+				this.page++
+				this.getHospitalList(false)
+			}
+		}
+	}
+</script>
+
+<style scoped lang="scss">
+	.cont{ position:relative; z-index:1; }
+	.disinline{ display:inline-block; }
+	.health-top-content{
+		background-color: #FFFFFF;
+	}
+	swiper{
+	    height:313upx;
+	}
+	.swiper-box {
+	    flex: 1;
+		padding: 0 31rpx;
+	}
+    .gwcClass{
+        position: fixed;
+        top: 540upx;
+        width:40upx;
+        height:44upx;
+        padding: 12upx 18upx;
+        right: 30upx;
+        z-index: 95;
+        border-radius:22upx;
+        background: #D8FAE9;
+    }
+    .gwcClass image{
+        width: 40upx;
+        height: 44upx;
+    }
+	// .swiper-item {
+	   
+	//     display: flex;
+	//     flex-direction: row;
+	// 	height: 100%;
+	// 	border-radius: 20rpx;
+	// 	overflow: hidden;
+		.imageiiii {
+			width: calc(100% - 60upx);
+            margin-left: 30upx;
+		    height: 300upx;
+		    border-radius:31upx;
+		}
+	// }
+	.sliderselects{ display: flex; justify-content: center;  box-sizing:border-box; padding: 40rpx 0;
+		.disinline{ width:20rpx; height:20rpx; margin:0 58rpx 0 22rpx;  vertical-align: middle;}
+		.ischeck{
+			color: #03BE90;
+			.disinline{ transform: rotate(180deg); height:10rpx;}
+		}
+	}
+	.chanpinList{ background: #fff; border-radius:30rpx; margin:30rpx 32rpx; padding:32rpx 22rpx; box-sizing:border-box; display:flex;
+		.image{ margin:0 30rpx 0 0; 
+			image{ 
+				width:86rpx;
+				height:86rpx;
+				border-radius: 86rpx;
+			}
+		}
+		.text{
+			width:80%;
+			.title{ font-size:32rpx; line-height:44rpx; font-weight: 500; }
+			.tips{ display:flex; justify-content: flex-start; margin:22rpx 0 10rpx 0;
+				.tip{ margin:0 20rpx 0 0; font-size:20rpx; color:#03BE90; background: #EFF1F6; border-radius:6rpx; line-height:32rpx; padding:0 8rpx; }
+			 }
+			 .price{ color:#03BE90; font-size:24rpx;
+				text{ font-size:32rpx; }
+			  }
+			.desc{ color:#A2A9BA; font-size:20rpx; line-height:28rpx; height:28rpx; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+		}
+	}
+	.dialog{ position:fixed; overflow: auto; top:0; left:0; right:0; bottom:0; background:#fff; box-sizing: border-box; padding:32rpx;  z-index:9999;
+		.close{ text-align:right;}
+		.searchCityBar{ height:80rpx;background:rgba(241,242,247,1); border-radius:50rpx;box-sizing: border-box;padding: 0 40rpx; font-size:28rpx; }	
+		.province{ font-size:30rpx; color:#A2A9BA; margin:40rpx 0 20rpx 0;}
+		.defaultsBig{ font-size:28rpx; line-height:34rpx; padding:16rpx 20rpx; border-radius:20rpx; color:#434E5E; display:inline-block; vertical-align: middle; background:#F1F2F7; margin:0 28rpx 10rpx 0;
+			&.active{ background:#03BE90; color:#fff; }
+		 }
+	}
+	.searchInput{ height:80rpx;background:rgba(241,242,247,1); border-radius:50rpx; display:inline-block; width:calc(100% - 100rpx); vertical-align: middle;box-sizing: border-box;padding: 0 40rpx; font-size:28rpx; }
+	.silderList{ position: absolute; top:292px; left:0; height:100%; width:100%; box-sizing: border-box; background:rgba(0,0,0,.6); overflow:hidden; 
+		.datalist{ background:#fff; box-sizing:border-box; margin:0 auto; padding:10rpx 0; max-height:100%; overflow:auto; border-top:solid 1px #eee;
+			.ditem{ font-size:28rpx; line-height: 40rpx; margin:14rpx auto; width:14em; padding:10px 1em; 
+				&.ischeck{ color:#03BE90; }
+			}
+		 }
+	}
+</style>

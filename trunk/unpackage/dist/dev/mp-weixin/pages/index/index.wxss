@@ -136,7 +136,7 @@ page.data-v-6bcaba4d {
   -webkit-box-pack: center;
   -webkit-justify-content: center;
           justify-content: center;
-  margin: 110rpx 33rpx;
+  margin: 82rpx 33rpx;
   width: 683rpx;
   height: 410rpx;
   background: white;
@@ -177,30 +177,6 @@ page.data-v-6bcaba4d {
           align-items: center;
   font-size: 29rpx;
   color: #16202e;
-}
-.alal.data-v-6bcaba4d {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-  -webkit-flex-direction: row;
-          flex-direction: row;
-}
-.authorBox.data-v-6bcaba4d {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-  -webkit-flex-direction: row;
-          flex-direction: row;
-  -webkit-box-align: center;
-  -webkit-align-items: center;
-          align-items: center;
-  margin: 25rpx 28rpx;
-  font-size: 25rpx;
-  color: #868E9D;
 }
 .shareContent.data-v-6bcaba4d {
   -webkit-box-flex: 1;
@@ -275,9 +251,9 @@ page.data-v-6bcaba4d {
           justify-content: start;
 }
 .authorTitle.data-v-6bcaba4d {
-  margin: 10rpx 28rpx 0rpx;
+  margin: 10rpx 28rpx 0rpx 28rpx;
   font-size: 28rpx;
-  margin-left: 10rpx;
+  height: 90rpx;
   -webkit-box-flex: 1;
   -webkit-flex: 1;
           flex: 1;
@@ -323,6 +299,19 @@ page.data-v-6bcaba4d {
   text-align: center;
   color: #FFFFFF;
   margin-right: 46rpx;
+}
+.gkfxbtnfloat.data-v-6bcaba4d {
+  position: absolute;
+  margin-top: -33rpx;
+  margin-left: -16rpx;
+  width: 28px;
+  height: 28px;
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+  line-height: 28px;
+  background-color: #d0021b;
+  border-radius: 50%;
 }
 .doctorBox.data-v-6bcaba4d {
   display: -webkit-box;
@@ -536,7 +525,7 @@ page.data-v-6bcaba4d {
   -webkit-box-direction: normal;
   -webkit-flex-direction: row;
           flex-direction: row;
-  margin-top: 30rpx;
+  padding-top: 30rpx;
 }
 .authorBox.data-v-6bcaba4d {
   display: -webkit-box;
@@ -549,7 +538,7 @@ page.data-v-6bcaba4d {
   -webkit-box-align: center;
   -webkit-align-items: center;
           align-items: center;
-  margin: 15rpx 28rpx;
+  margin: 0rpx 28rpx;
   font-size: 25rpx;
   color: #868E9D;
 }
@@ -773,6 +762,7 @@ page.data-v-6bcaba4d {
   width: 122rpx;
   height: 64rpx;
   text-align: right;
+  margin-right: 28rpx;
   border-radius: 30rpx;
   /* opacity:0.5; */
   background: #008A67;
@@ -793,7 +783,6 @@ page.data-v-6bcaba4d {
   margin-top: -310rpx;
   margin-left: 64rpx;
   width: calc(100% - 128rpx);
-  height: 400rpx;
   display: -webkit-box;
   display: -webkit-flex;
   display: flex;
@@ -819,7 +808,7 @@ page.data-v-6bcaba4d {
 }
 .authorBox image.data-v-6bcaba4d {
   width: 98rpx;
-  height: 64rpx;
+  height: 84rpx;
   margin-top: 10rpx;
 }
 .authorBox .authorHeader.data-v-6bcaba4d {

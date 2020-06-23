@@ -1,0 +1,67 @@
+<template>
+	<view class="conts">
+		<view class="xx">
+			<view class="flex">
+				<image src="../../static/image/gouxuan@2x.png"></image>
+				<text>支付成功</text>
+			</view>
+			<view>
+				重要提示：<text style="color:red">在体检前须完成预约，</text>如需预约或修改时间，可以点击页面中的购买记录浮动图标进入页面进行操作。
+			</view>
+			<view>
+				<button @tap="yuyue()" class="yuyuebtn">立即预约</button>
+			</view>
+			<view>
+				<button @tap="chakan()" class="chakanbtn">查看订单</button>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return{
+				orderId: '',
+                productId:'',
+                hospId:''
+			}
+		},
+		onLoad(option) {
+			this.orderId = option.id
+            this.productId = option.productId
+            this.hospId = option.hospId
+		},
+		methods: {
+			yuyue() {
+				
+                uni.navigateTo({
+                    url:'/pages/service-record/makeMedical?reserveStatus=null&hospId='+this.hospId + "&procudtId=" +this.productId + "&orderId=" +this.orderId
+                })
+			},
+			chakan() {
+				uni.navigateTo({
+				    url:"/pages/order-detail/order-detail?from=1&orderid="+ this.orderId + '&type=&orderType=KK'
+				})
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.conts{
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height:100%;
+		.xx{ margin-top:-100rpx; padding:0 80rpx;
+			.flex{ align-items: center;display: flex;justify-content: center; 
+				image{width:48rpx; height:48rpx; margin-right:20rpx;}
+			}
+			view{ margin-bottom:48rpx; }
+		}
+	}
+	.yuyuebtn{background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);box-shadow:0px 3px 15px 0px rgba(3,190,144,0.3);
+border-radius:43px; line-height: 84rpx; color:#fff; font-size:30rpx; width:80%;}
+	.chakanbtn{background:#fff;box-shadow:0px 3px 15px 0px rgba(65,68,73,0.2);border-radius:37px; line-height: 84rpx; color:#03BE90; font-size:30rpx; width:80%;}
+</style>

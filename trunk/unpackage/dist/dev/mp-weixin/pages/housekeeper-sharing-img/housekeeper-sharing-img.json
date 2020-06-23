@@ -2,6 +2,7 @@
   "navigationBarTitleText": "管家分享",
   "usingComponents": {
     "uni-swiper-dot": "/components/uni-swiper-dot/uni-swiper-dot",
+    "u-parse": "/components/u-parse/u-parse",
     "uni-icons": "/components/uni-icons/uni-icons",
     "h-community-share": "/components/common/h-community-share",
     "h-comment-list": "/components/common/h-comment-list",

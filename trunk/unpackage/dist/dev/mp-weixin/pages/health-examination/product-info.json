@@ -1,0 +1,9 @@
+{
+  "navigationBarTextStyle": "black",
+  "navigationBarTitleText": "健康体检",
+  "navigationBarBackgroundColor": "#fff",
+  "backgroundColor": "#F6F7FA",
+  "usingComponents": {
+    "uni-goods-nav": "/components/uni-goods-nav/uni-goods-nav"
+  }
+}

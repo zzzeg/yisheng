@@ -38,7 +38,7 @@
 .list .item .item-img {
   font-size: 0;
   padding: 0;
-  margin-bottom: 100rpx;
+  margin-bottom: 120rpx;
 }
 .list .item .item-img ._img {
   width: 100%;

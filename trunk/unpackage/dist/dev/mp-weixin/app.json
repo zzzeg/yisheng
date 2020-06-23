@@ -3,21 +3,10 @@
     "pages/index/index",
     "pages/index/auth",
     "pages/index/login",
-    "pages/index/aldiscriminate/index",
-    "pages/index/aldiscriminate/basicInfo",
-    "pages/index/aldiscriminate/healthInfo",
-    "pages/index/aldiscriminate/faceCamera",
-    "pages/index/aldiscriminate/faceRecognize",
-    "pages/index/aldiscriminate/tongueFront",
-    "pages/index/aldiscriminate/tongueContrary",
-    "pages/index/aldiscriminate/recognizeFailure",
-    "pages/index/alskin/welcome",
-    "pages/index/alskin/faceCamera",
-    "pages/index/alskin/faceRecognize",
-    "pages/index/aldiscriminate/questionnaireResult",
     "pages/index/connectVideoInterrogation",
     "pages/index/doctorInfo",
     "pages/index/videoInterrogation",
+    "pages/index/deleteReport",
     "pages/index/skinPos",
     "pages/index/skinDetail/skinDetail",
     "pages/index/doctorReport",
@@ -50,16 +39,59 @@
     "pages/liveborad/liveInfo",
     "pages/mine/collectList",
     "pages/liveborad/share",
-    "pages/mine/protocol",
     "pages/liveborad/liveback",
-    "pages/consultation-report/consultation-report"
+    "pages/consultation-report/consultation-report",
+    "pages/service-record/makeMedical",
+    "pages/upload-report/upload-report",
+    "pages/privateDoctor/list",
+    "pages/privateDoctor/info",
+    "pages/health-examination/hospital-info",
+    "pages/health-examination/index",
+    "pages/health-examination/product-info",
+    "pages/health-examination/orderToPay",
+    "pages/health-examination/orderPaid",
+    "pages/doctor-report/doctor-report",
+    "pages/checkup-report/checkup-report",
+    "pages/look-report/look-report",
+    "pages/health-examination/buyRecord"
   ],
-  "subPackages": [],
+  "subPackages": [
+    {
+      "root": "pages/aldiscriminate",
+      "pages": [
+        "pages/index",
+        "pages/basicInfo",
+        "pages/healthInfo",
+        "pages/faceCamera",
+        "pages/faceRecognize",
+        "pages/tongueFront",
+        "pages/tongueContrary",
+        "pages/recognizeFailure",
+        "pages/questionnaireResult",
+        "pages/alskin/faceExample",
+        "pages/alskin/faceCamera",
+        "pages/alskin/faceRecognize",
+        "pages/alskin/welcome",
+        "pages/protocol"
+      ]
+    }
+  ],
   "window": {
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "",
     "navigationBarBackgroundColor": "#FFFFFF",
     "backgroundColor": "#F8F8F8"
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "您的位置信息将用于小程序位置接口的效果展示"
+    }
+  },
+  "plugins": {
+    "live-player-plugin": {
+      "version": "1.0.12",
+      "provider": "wx2b03c6e691cd7370"
+    }
   },
   "usingComponents": {}
 }

@@ -1,6 +1,7 @@
 {
   "navigationBarTitleText": "管家分享",
   "usingComponents": {
+    "u-parse": "/components/u-parse/u-parse",
     "h-community-share": "/components/common/h-community-share",
     "uni-popup": "/components/uni-popup/uni-popup",
     "h-comment-list": "/components/common/h-comment-list",

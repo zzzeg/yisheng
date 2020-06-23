@@ -1,0 +1,1 @@
+{"version":3,"sources":["webpack:///E:/yisheng/trunk/main.js"],"names":["createPage","Page"],"mappings":";;;;wEAAA,qBACA,sBACA,4C,mDACAA,EAAWC,a","file":"pages/mine/protocol.js","sourcesContent":["import 'uni-pages';\nimport Vue from 'vue'\nimport Page from './pages/mine/protocol.vue'\ncreatePage(Page)"],"sourceRoot":""}

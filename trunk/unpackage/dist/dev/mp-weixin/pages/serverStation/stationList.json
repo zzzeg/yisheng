@@ -1,9 +1,9 @@
 {
   "navigationBarTitleText": "已加入服务站",
   "navigationBarBackgroundColor": "#fff",
-  "backgroundColor": "#008A67",
   "enablePullDownRefresh": true,
   "usingComponents": {
+    "h-station-list": "/components/common/h-station-list",
     "uni-load-more": "/components/uni-load-more/uni-load-more"
   }
 }

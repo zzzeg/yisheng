@@ -27,13 +27,6 @@
 view.data-v-5cdc76cf {
   line-height: 1.7;
 }
-.disinline.data-v-5cdc76cf {
-  display: inline-block;
-  vertical-align: top;
-}
-.color_gre.data-v-5cdc76cf {
-  color: #03BE90;
-}
 .cont.data-v-5cdc76cf {
   padding: 32rpx;
   background: -webkit-gradient(linear, left top, left bottom, from(white), to(#eff1f6));
@@ -86,6 +79,14 @@ view.data-v-5cdc76cf {
   height: 40rpx;
   margin-top: 20rpx;
 }
+.searchItemsList.data-v-5cdc76cf {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+          justify-content: space-between;
+}
 .searchItemsList .labels.data-v-5cdc76cf {
   display: inline-block;
   vertical-align: top;
@@ -102,6 +103,9 @@ view.data-v-5cdc76cf {
   width: calc(100% - 10em);
   height: 2.5em;
   overflow: hidden;
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+          flex: 1;
 }
 .searchItemsList .items .defaults.data-v-5cdc76cf {
   font-size: 24rpx;
@@ -110,7 +114,7 @@ view.data-v-5cdc76cf {
   padding: 12rpx 20rpx;
   border-radius: 20rpx;
   background: #f1f2f7;
-  margin: 0px 16rpx 16rpx 0rpx;
+  margin: 0px 15rpx 25rpx 0rpx;
 }
 .searchItemsList .items .defaults.active.data-v-5cdc76cf {
   background: #03BE90;
@@ -139,18 +143,6 @@ view.data-v-5cdc76cf {
   text-overflow: ellipsis;
   white-space: nowrap;
   vertical-align: top;
-}
-.serverlists.data-v-5cdc76cf {
-  padding: 30rpx 0rpx 30rpx 26rpx;
-  background: white;
-  -webkit-box-shadow: 0px 2px 10px 0px rgba(85, 112, 105, 0.1);
-          box-shadow: 0px 2px 10px 0px rgba(85, 112, 105, 0.1);
-  border-radius: 10px;
-  margin: 0 0 40rpx 0;
-}
-.serverlists .title.data-v-5cdc76cf {
-  font-size: 28rpx;
-  font-weight: 500;
 }
 .dialog.data-v-5cdc76cf {
   position: fixed;
@@ -196,16 +188,5 @@ view.data-v-5cdc76cf {
 .dialog .defaultsBig.active.data-v-5cdc76cf {
   background: #03BE90;
   color: #fff;
-}
-.xiegang.data-v-5cdc76cf {
-  display: inline-block;
-  vertical-align: middle;
-}
-.xiegang.data-v-5cdc76cf:after {
-  content: '/';
-  display: inline-block;
-}
-.xiegang.data-v-5cdc76cf:last-child:after {
-  content: '';
 }
 

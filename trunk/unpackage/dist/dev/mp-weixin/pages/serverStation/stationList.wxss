@@ -27,13 +27,6 @@
 view.data-v-030dd8cc {
   line-height: 1.7;
 }
-.disinline.data-v-030dd8cc {
-  display: inline-block;
-  vertical-align: top;
-}
-.color_gre.data-v-030dd8cc {
-  color: #03BE90;
-}
 .cont.data-v-030dd8cc {
   background: #eff1f6;
   height: 100vh;
@@ -41,31 +34,11 @@ view.data-v-030dd8cc {
   -webkit-box-sizing: border-box;
           box-sizing: border-box;
 }
-.serverlists.data-v-030dd8cc {
-  height: 218rpx;
-  padding: 30rpx 0rpx 30rpx 26rpx;
-  background: white;
-  -webkit-box-shadow: 0px 2px 10px 0px rgba(85, 112, 105, 0.1);
-          box-shadow: 0px 2px 10px 0px rgba(85, 112, 105, 0.1);
-  border-radius: 10px;
-  margin: 0 0rpx 40rpx 0rpx;
-}
 .btn.data-v-030dd8cc {
   background: -webkit-linear-gradient(217deg, #88e296 0%, #03be90 100%);
   background: linear-gradient(233deg, #88e296 0%, #03be90 100%);
   border-radius: 40rpx;
   color: #fff;
-}
-.xiegang.data-v-030dd8cc {
-  display: inline-block;
-  vertical-align: middle;
-}
-.xiegang.data-v-030dd8cc:after {
-  content: '/';
-  display: inline-block;
-}
-.xiegang.data-v-030dd8cc:last-child:after {
-  content: '';
 }
 .guanjianame.data-v-030dd8cc {
   white-space: nowrap;

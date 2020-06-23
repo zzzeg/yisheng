@@ -1,5 +1,5 @@
 {
-  "navigationBarTitleText": "健康商城",
+  "navigationBarTitleText": "健康产品",
   "usingComponents": {
     "uni-search-bar": "/components/uni-search-bar/uni-search-bar",
     "uni-swiper-dot": "/components/uni-swiper-dot/uni-swiper-dot",

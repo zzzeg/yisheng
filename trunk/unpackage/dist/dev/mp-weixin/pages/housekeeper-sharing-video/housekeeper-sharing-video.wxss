@@ -170,4 +170,11 @@
   width: 80rpx;
   text-align: center;
 }
+.videoShow.data-v-25329987 {
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+}
+.dddShow.data-v-25329987 {
+  margin-top: 75%;
+}
 

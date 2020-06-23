@@ -1,0 +1,367 @@
+<template>
+	<view class="cont">
+		<scroll-view scroll-y="true" style="height: 100vh;"
+					 :scroll-into-view="scrollToIdis"
+					 scroll-with-animation
+					 @scroll="scrolls"
+					 >
+			<view class="hospimg">
+				<image :src="formData.snapshot.packageImage"></image>
+			</view>
+			
+			<view class="blocks">
+				<view class="price">
+					￥ <text>{{ formData.sealPrice/100 | toFixed}}</text>
+				</view>
+				<view class="title">{{ formData.packageName }}</view>
+				<view class="hosptical">{{ formData.hospName }}<text class="tip">{{ formData.hospRank }}</text></view>
+				<view class="desc">
+					{{ formData.packageCat }}
+				</view>
+				<!--最近可约-->
+				<view class="flex text canyuyue">
+					<view class="flex">
+						<view>
+							<image class="disinline" style="width:28rpx; height:28rpx; margin-right:10rpx; vertical-align:middle; margin-top:-6rpx;" src="../../static/image/shijian1@2x.png"></image>
+						</view>
+						<view>最近可约：<text class="tiem" v-for="(item, index) in 3" :key="index">{{ keyueDate[index].month + '月' + keyueDate[index].day + '日' }}</text></view>
+					</view>
+					<view @tap="showallDate = !showallDate">
+						<image class="disinline" style="width:28rpx; height:28rpx; vertical-align:middle; margin-top:-6rpx;" :src="showallDate ? '../../static/image/icon_xxzk@2x.png' : '../../static/image/icon_xyjt@2x.png'"></image>
+					</view>
+				</view>
+				<scroll-view scroll-x="true" class="scroll" @scroll="inscorll" v-if="showallDate">
+					<view v-for="(item, index) in keyueDate" :key="index" class="disinline box">
+						<view>{{ item.month + '.' + item.day }}</view>
+						<view :class="{'color_green': item.canyue, 'color_gray': item}">{{ item.canyue ? '可约' : '不可约' }}</view>
+						<view class="weekDay">{{ item.week }}</view>
+					</view>
+				</scroll-view>
+				<view class="loadingsteps" v-if="showallDate">
+					<view class="line" :style="'width:'+ loadingWidth +'%'"></view>
+				</view>
+			</view>
+			
+			
+					 
+			<!--tab选项卡-->
+			<view :class="{'tab': !showTabBar, 'tab tabfixed': showTabBar}">
+				<view :class="{'tabitem active': tactive == item, 'tabitem': item}" v-for="(item, ind) in tabs" :key="ind" @tap="tabChange(item)">{{ item }}</view>
+			</view>
+			
+			<!--套餐项目-->
+			<view class="blocks taocan" id="taocan">
+				<view class="f16 fw titles">
+					<b>套餐项目({{formData.snapshot.packageContent.length}}项)</b>
+				</view>
+				<view class="kkpackageTable">
+					<view class="flex kktitle">
+						<view class="kleft">检查项目</view>
+						<view class="kright">检查指标意义</view>
+					</view>
+					<view class="flex kklist" v-for="(items, index) in formData.snapshot.packageContent" :key="index">
+						<view class="cname flex"><view>{{ items.contetnName }}</view></view>
+						<view class="cdes">{{ items.contentDes }}</view>
+					</view>
+				</view>
+			</view>
+			
+			<!--体检须知-->
+			<view class="blocks" id="xuzhi">
+				<view class="content">
+					<view class="f16 fw titles">
+						<b>体检须知</b>
+					</view>
+					<view class="artical-content">
+						<view class="arttitle">体检流程</view>
+						<view class="flex liuchengcontent">
+							<view class="fitem">
+								<image style="width:30rpx; height:30rpx;" src="../../static/image/tc@2x.png"></image>
+							</view>
+							<view class="">
+								<image style="width:24rpx; height:24rpx;" src="../../static/image/jt@2x.png"></image>
+							</view>
+							<view class="fitem">
+								<image style="width:30rpx; height:30rpx;" src="../../static/image/sz@2x.png"></image>
+							</view>
+							<view class="">
+								<image style="width:24rpx; height:24rpx;" src="../../static/image/jt@2x.png"></image>
+							</view>
+							<view class="fitem">
+								<image style="width:34rpx; height:34rpx;" src="../../static/image/yy@2x.png"></image>
+							</view>
+							<view class="">
+								<image style="width:24rpx; height:24rpx;" src="../../static/image/jt@2x.png"></image>
+							</view>
+							<view class="fitem">
+								<image style="width:26rpx; height:34rpx;" src="../../static/image/bg@2x.png"></image>
+							</view>
+						</view>
+						<view class="flex liuchengcontent" style="justify-content: space-between;">
+							<view>选购套餐</view>
+							<view>预约体检</view>
+							<view>前往体检</view>
+							<view>领取报告</view>
+						</view>
+						
+						<view class="xuzhi_describe" style="margin-top:40rpx;">
+							1、选择需要的体检套餐，完成下单。 <br>
+							2、可在付款后预约体检，也可在付款后在我的购买记录中预约体检。 <br>
+							3、体检当日现场出示身份证即可体检，<text class="color_green">注：到医院无需另行支付其他费用（现场加项、申请快递报告除外）</text>。<br>
+							4、检后一般在3-15个工作日出具报告，可去体检中心取报告，或在前台登记快递报告（到付）。<text class="color_green">体检报告一般在3-15个工作日出具报告，部分医院支持在线查询报告、报告邮寄，各医院领取时间、方式不同，具体的报告领取方式和时间可现场咨询医院工作人员。</text>
+						</view>
+					</view>
+				</view>
+			</view>
+			
+			<view class="blocks tabcontent">
+				<view class="content">
+					<view class="f16 fw titles">
+						<b>温馨提醒</b>
+					</view>
+					<view class="artical-content">
+						1、体检前请清淡进食，晚八点后不要进食，保持睡眠充足<br>
+						2、例假期间不宜做妇科、尿液检查<br>
+						3、由于采血时间较早，请尽量早上九点前到达体检中心完成采血<br>
+						4、因个人原因，个别体检项目无法完成，按照医院规定，视为主动放弃此项目，费用不予退还 
+					</view>
+				</view>
+			</view>
+			
+		</scroll-view>
+		
+		<view class="goods-carts">
+			<uni-goods-nav :options="options" :fill="true" :button-group="buttonGroup" @click="onClick" @buttonClick="buttonClick" />
+		</view>
+		
+	</view>
+</template>
+
+<script>
+	const { windowHeight,windowWidth } = uni.getSystemInfoSync();
+	export default {
+		onLoad(option) {
+			this.id = option.id
+			this.hospId = option.hospId
+			this.getPorcudeInfo(option.id)
+			this.gethealthKKhospitalyuyueDate(option.hospId)
+		},
+		data() {
+			return {
+				id: '',
+				hospId: '',
+				formData: {},
+				showTabBar: false,
+				tabs: ['套餐项目', '体检须知', '　　　　'],
+				tactive: '套餐项目',
+				scrollToIdis: '',
+				keyueDate: [],
+				showTabBar: false,
+				loadingWidth: 10,
+				showallDate: false,
+				options: [{
+					icon: 'headphones',
+					color: '#B7B7B7'
+				}],
+				buttonGroup: [
+					{
+						text: '立即购买',
+						background: 'linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%)',
+						boxShadow: '0px 3px 15px 0px rgba(3,190,144,0.3)',
+						color: '#fff'
+					}
+				],
+				type: '',
+				info:{},
+			}
+		},
+		methods: {
+			getPorcudeInfo(id) {
+				this.$api.healthkkPackageById({
+					id: id
+				}).then(res=>{
+					this.formData = res.data
+					this.formData.snapshot = JSON.parse(res.data.snapshot);
+					this.info = {
+						originalPrice: this.formData.originalPrice/100,
+						price: this.formData.sealPrice/100,
+						desc:this.formData.hospName,
+						name:this.formData.packageName,
+						icon:this.formData.snapshot.packageImage_0_thumb,
+						id:this.formData.packageCode,
+					    attributes:this.formData.snapshot,
+						type:"KK",
+						hospId:this.formData.hospId
+					}
+				})
+			},
+			tabChange(item) {
+				this.tactive = item
+				switch(item) {
+					case '套餐项目':
+					this.scrollToIdis = 'taocan'
+					break
+					case '体检须知':
+					this.scrollToIdis = 'xuzhi'
+					break
+				}
+			},
+			scrolls(e) {
+				// 滚动时触发，event.detail = {scrollLeft, scrollTop, scrollHeight, scrollWidth, deltaX, deltaY}
+				// console.log(e.detail)
+				this.showTabBar = e.detail.scrollTop > windowHeight
+			},
+			gethealthKKhospitalyuyueDate(id) {
+				this.$api.healthKKhospitalyuyueDate({
+					hospId: id,
+					packageCode: ''
+				}).then(res=>{
+					this.keyueDate = []
+					res.data.map(item=>{
+						this.keyueDate.push({
+							month: item.date.split('-')[1],
+							day: item.date.split('-')[2],
+							canyue: item.maxNum - item.usedNum > 0,
+							week: item.week
+						})
+					})
+				})
+			},
+			inscorll(e) {
+				// 滚动时触发，event.detail = {scrollLeft, scrollTop, scrollHeight, scrollWidth, deltaX, deltaY}
+				console.log(e.detail)
+				let length = this.keyueDate.length
+				this.loadingWidth = (e.detail.scrollLeft + windowWidth - 32) / (56 * length) * 100
+			},
+			buttonClick(e){
+				console.log('xxxxxxxxxxxxxxxxxxx')
+				uni.navigateTo({
+					url: `/pages/health-examination/orderToPay?id=${this.id}&hospId=${this.hospId}`
+				})
+				// return false
+				// let data = this.info
+				// this.cartList =[{
+				// 	id:data.id ,
+				// 	image: data.icon,
+				// 	attr_val: data.desc,
+				// 	stock: 99,
+				// 	title: data.name,
+				// 	price: data.price,
+				// 	number: 1,
+				// }];
+				// uni.setStorage({
+				// 	key: 'buylist',
+				// 	data: this.cartList,
+				// 	success: () => {
+				// 		uni.navigateTo({
+				// 			url: `/pages/health-examination/orderTopay?id=${this.id}&hospId=${this.hospId}`
+				// 		})
+				// 	}
+				// })
+			},
+			onClick(e) {
+				var data = {
+				    expertId:this.communityId,
+				    toId:this.communityId,
+				    type:'product',
+				    content:'',
+				    communityId:this.communityId,
+				    extJson:JSON.stringify(this.info)
+				}
+				this.$api.addCommunityMessage({
+				     data: data
+				}).then(addRes => {
+				    console.log(addRes)
+				    if(addRes.status == 'OK'){
+				        uni.navigateTo({
+				            url:"/pages/index/chatRoom?chatType=1&to=" + this.communityId +"&communityId="  + this.communityId
+				        })
+				    }
+				})
+			},
+		},computed: {
+			communityId() {
+				return this.$store.getters.communityId 
+			}
+		},
+		filters: {
+			toFixed: function(value) {
+				value = parseFloat(value)
+				return value.toFixed(2);
+			}
+		}
+	}
+</script>
+
+<style scoped lang="scss">
+	.flex{ display: flex;}
+	.text{  font-size:24rpx; line-height:34rpx;  }
+	.tab{display: flex; justify-content: space-between; border-bottom:solid 1px #E2E6EF; background: #fff; padding: 0 32rpx;
+		&.tabfixed{ position: fixed; top:0; left:0; width:100%; z-index:99999; box-sizing:border-box; }
+		.tabitem{
+			color:#16202E; font-size:32rpx; line-height:3;
+			&.active{ color:#03BE90; border-bottom:solid 2px #03BE90; }
+		}
+	}
+	.hospimg{ height:55.5vw; overflow:hidden;
+		image{ width:100%; height:100%; }
+	 }
+	.blocks{
+		background: #fff;
+		padding:40rpx 32rpx 40rpx 32rpx;margin-bottom:26rpx;
+		&:first-child{ padding-top:0; }
+		.block_swiper{position: relative; }
+	}
+	.f16{ font-size:32rpx; }
+	.fw{ font-weight: bold; }
+	.f400{ font-weight: 400; }
+	.color_green{ color:#03BE90; }
+	.color_gray{ color:#A2A9BA }
+	.canyuyue{ padding:20rpx 0; margin:40rpx 0 0rpx 0; border-top:solid 1px #eee; font-size:28rpx; justify-content: space-between;
+		.tiem+.tiem::before{content:'、';}
+	 }
+	 .scroll{ width: 100%;        overflow: hidden;        white-space: nowrap; 
+		.box{ margin:0 20rpx; font-size:24rpx; line-height:40rpx; text-align:center;
+			.weekDay{ color:#9b9b9b; }
+		}
+	 }
+	 .loadingsteps{ width:100rpx; border-radius:2rpx; background:#E2E6EF; overflow:hidden; position:relative; margin:20rpx auto 0 auto; z-index:1; height:6rpx;
+		.line{ position:absolute; height:100%; background:#03BE90; border-radius:2rpx; }
+	  }
+	.title{ font-size:32rpx; line-height:44rpx; font-weight: bold; margin-top:16rpx;}
+	.price{ color:#03BE90; font-size:24rpx;
+		text{ font-size:32rpx; }
+	}
+	.hosptical{ font-size:26rpx; line-height:3;}
+	.tip{ margin:0 20rpx 0 10rpx; font-size:20rpx; color:#fff; background: #03BE90; border-radius:6rpx;  padding:6rpx 8rpx; }
+	.desc{ background:rgba(239,241,246,1);border-radius:16rpx; font-size:24rpx; padding:24rpx 28rpx; line-height:34rpx;}
+	.artical-content{ font-size:24rpx; line-height:40rpx; margin-top:20rpx;}
+	.kkpackageTable{ border-collapse: collapse; border:none;
+		.kktitle{
+			&>view { background:#DFE3EF; font-size:28rpx; padding:14rpx; line-height:42rpx; width: 100%;text-align: center;box-sizing: border-box; font-weight: 500;border-radius:10rpx; margin-bottom:20rpx;
+				&.kleft{ width:7em; margin-right:4rpx;}
+			}
+		}
+		.kklist{
+			justify-content: center;
+			&>view{ background:#F4F7FE; font-size:24rpx; padding:14rpx; line-height:28rpx; width:100%; box-sizing:border-box; font-weight: 500; border-radius:10rpx; margin-bottom:4rpx;
+				&.cname{ width:8em; padding:14rpx 24rpx; margin-right:4rpx; align-items: center;}
+			}
+		}
+	 }
+	 .arttitle{ font-size:28rpx; font-weight: bold; text-align:center; margin:-20rpx 0 20rpx 0; }
+	 .liuchengcontent{ align-items:center; justify-content: space-around; margin-top: 10rpx;
+		.fitem{ border-radius:50%; width:60rpx; height:60rpx; background: #D8FAE9;display: flex;align-items: center;justify-content: center;
+		}
+	 }
+	 .goods-carts {
+	 	/* #ifndef APP-NVUE */
+	 	display: flex;
+	 	/* #endif */
+	 	flex-direction: column;
+	 	position: fixed;
+	 	left: 0;
+	 	right: 0;
+	 	bottom: 0;
+	 }
+</style>

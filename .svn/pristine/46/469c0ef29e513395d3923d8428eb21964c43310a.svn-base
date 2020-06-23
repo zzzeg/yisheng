@@ -1,0 +1,461 @@
+<template>
+	<view>
+		<uni-swiper-dot :info="info.pics" :current="current" :mode="mode" :dots-styles="dotsStyles" field="content">
+			<swiper class="swiper-box" @change="change">
+				<swiper-item v-for="(item, index) in info.pics" :key="index">
+					<view :class="item.colorClass" class="swiper-item">
+						<image class="image" :src="item.url" mode="aspectFill" />
+					</view>
+				</swiper-item>
+			</swiper>
+		</uni-swiper-dot>
+		<view class="u-f u-column desc">
+			<view class="health-list-price">
+				<text>{{info.price/info.originalPrice*10|toFixed2}}折</text>
+				<text>￥{{info.price|toFixed2}}</text>
+				<text style="margin-left: 40upx;">原价</text>
+				<text>￥{{info.originalPrice|toFixed2 }}</text>
+			</view>
+			<view class="health-list-title">{{info.name}}</view>
+		</view>
+		<view class="detail-content">
+			<div class="list" v-if="type === 'customer'" v-html="info.remark"></div>
+			<div class="list" v-else>
+			  <div class="item" v-for="(item, index) in info.attributes" v-if="parse(item.content, [{}])[0] && parse(item.content, [{}])[0].url || item.title" :key="index">
+			    <div class="item-title2" v-if="item.title">{{item.title}}</div>
+			    <div class="item-img" style="padding-top: 20px;" v-if="parse(item.content, [{}])[0] && parse(item.content, [{}])[0].url">
+                    <image style="width: 100%;" :style="{height:imagehight+'px'}" mode="aspectFill" @load="loadImage" :src="parse(item.content, [{}])[0].url"></image>
+                </div>
+			  </div>
+			</div>
+		</view>
+		<view class="goods-carts" v-if="showNav">
+			<uni-goods-nav :options="options" :fill="true" :button-group="buttonGroup" @click="onClick" @buttonClick="buttonClick" />
+		</view>
+	</view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				info:{},
+				type:'',//健康商城 community  自营  customer
+				dotsStyles: {
+					backgroundColor: 'rgba(249, 249, 251, 1)',
+					border: 'none',
+					color: '#fff',
+					selectedBackgroundColor: 'rgba(3, 190, 144, 1)',
+					selectedBorder: 'none'
+				},
+				mode: 'dot',
+				current:0,
+				options: [{
+					icon: 'headphones',
+					color: '#B7B7B7'
+				}, {
+					icon: 'cart',
+					color: '#B7B7B7',
+					info: 2,
+				}, {
+					icon: 'star',
+					color: '#B7B7B7'
+				}],
+				buttonGroup: [{
+						text: '加入购物车',
+						background: '#FFFFFF ',
+						boxShadow: '0px 3px 15px 0px rgba(65,68,73,0.2)',
+						color: '#03BE90'
+					},
+					{
+						text: '立即购买',
+						background: 'linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%)',
+						boxShadow: '0px 3px 15px 0px rgba(3,190,144,0.3)',
+						color: '#fff'
+					}
+				],
+				cartList:[],
+				comId: '',
+				showNav: true,
+                expenses:0,
+                minimum:0,
+                imagehight:2000,
+                imagewidth:750,
+			};
+		},
+        onShow() {
+            var _self = this
+            uni.getStorage({
+            	key : `${this.type}_cartList`,
+            	success:(res)=> {
+            		console.log(res.data);
+            		_self.cartList = res.data
+                    var num = 0
+            		// _self.cartList.forEach(item => {
+            		//     num += item.number
+            		// })
+                    num = _self.cartList.length
+            		_self.options[1].info = num
+            	},
+            	fail:(err)=> {
+            		console.log(err);
+            		_self.options[1].info = 0
+            		_self.cartList = []
+            	}
+            })
+        },
+		onLoad(e) {
+			if(!e.type){
+				e.type = 'community';
+			}
+			if (e.showNav) {
+				this.showNav = e.showNav === 'true'
+			}
+			this.comId = e.communityId;
+			this.getData(e.id,e.type)
+			this.type = e.type
+            var _self = this
+			uni.getStorage({
+				key : `${e.type}_cartList`,
+				success:(res)=> {
+					console.log(res.data);
+					_self.cartList = res.data
+                    var num = 0
+                    // _self.cartList.forEach(item=>{
+                    //     num += item.number
+                    // })
+                    num = _self.cartList.length
+					_self.options[1].info = num
+                    
+				},
+				fail:(err)=> {
+					console.log(err);
+					this.options[1].info = 0
+					this.cartList = []
+				}
+			})
+		},
+		computed: {
+			communityId(){
+				return this.$store.getters.communityId ? this.$store.getters.communityId : (this.comId?this.comId:'')
+			}
+		},
+		watch: {
+			info:{
+				handler(val,oldVal){
+					console.log(val);
+					if(val.markStatus){
+						this.options[2] = {icon: 'star-filled',color: '#F7CF41'}
+					}else{
+						this.options[2] = {icon: 'star',color: '#B7B7B7'}
+					}
+					
+				},
+				immediate: true, 
+				deep: true
+			}
+		},
+		methods: {
+            loadImage:function(e){
+                  
+                this.imagehight = uni.upx2px(e.detail.height) 
+                
+                if(e.detail.width > uni.upx2px(750)){
+                    this.imagehight = this.imagehight/(e.detail.width/750)
+                }
+            },
+            parse (str, initValue) {
+              let ret = initValue
+              try {
+                ret = JSON.parse(str)
+              } catch (e) {}
+              return ret || initValue
+            },
+			change(e) {
+				this.current = e.detail.current
+			},
+			buttonClick(e){
+				let data = this.info
+				if(e.index==0){
+					let arr = this.cartList
+					let add = true;
+                    var num = 0
+					for(var i =0; i<arr.length; i++){
+						if(arr[i].id == data.id){
+							arr[i].number++;
+							add = false;
+						}
+                        num += arr[i].number
+					}
+					if(add){
+						this.cartList.push({
+							id:data.id ,
+							image: data.icon,
+							attr_val: data.desc,
+							stock: 99,
+							title: data.name,
+							price: data.price,
+							number: 1,
+						})
+                        num++
+					}
+                    console.log(num)
+					// this.options[1].info = this.cartList.length
+                    this.$set(this.options[1], 'info', this.cartList.length)
+					uni.setStorageSync(`${this.type}_cartList`,this.cartList)
+				}else if(e.index==1){
+                    
+					this.cartList =[{
+						id:data.id ,
+						image: data.icon,
+						attr_val: data.desc,
+						stock: 99,
+						title: data.name,
+						price: data.price,
+						number: 1,
+					}];
+                    
+                    uni.setStorage({
+                        key: 'buylist',
+                        data: this.cartList,
+                        success: () => {
+                            
+                            uni.navigateTo({
+                                url: `/pages/pay/confirm/confirm?type=${this.type}&communityId=${this.communityId}`
+                            })
+                        }
+                    })
+                    
+				}
+			},
+			onClick(e) {
+				switch (e.index){
+					case 0:
+                        this.toChatRoom()
+						break;
+					case 1:
+						uni.navigateTo({
+							url:`/pages/cart/cart?type=${this.type}`
+						})
+						break;
+					case 2:
+						this.markProduct(this.info.id)
+						break;
+				}
+			},
+            toChatRoom:function(){
+                this.info.goodsType = this.type
+                var data = {
+                    expertId:this.communityId,
+                    toId:this.communityId,
+                    type:'product',
+                    content:'',
+                    communityId:this.communityId,
+                    extJson:JSON.stringify(this.info)
+                }
+                this.$api.addCommunityMessage({
+                     data: data
+                }).then(addRes => {
+                    console.log(addRes)
+                    if(addRes.status == 'OK'){
+                        uni.navigateTo({
+                            url:"/pages/index/chatRoom?chatType=1&to=" + this.communityId +"&communityId="  + this.communityId
+                        })
+                    }
+                })
+            },
+			markProduct(id){
+				// 收藏与取消收藏
+				if(this.info.markStatus){
+					this.$api.productMarkDelete({
+						productId:id
+					}).then(res=>{
+						if(res.status=="OK"){
+							uni.showToast({
+								title: '取消收藏成功',
+								icon:'none'
+							});
+							this.info.markStatus = false
+						}
+					}).catch(err=>{
+						console.log(err);
+					});
+				}else{
+					this.$api.productMarkAdd({
+						productId:id,
+						communityId:this.communityId
+					}).then(res=>{
+						if(res.status=="OK"){
+							uni.showToast({
+								title: '收藏成功',
+								icon:'none'
+							});
+							this.info.markStatus = true
+						}
+					}).catch(err=>{
+						console.log(err);
+					});
+				}
+			},
+			getData(id,type) {
+				switch (type){
+					// 健康商城
+					case 'community':
+						this.getCommunityProductDetail(id)
+						break;
+					// 自营
+					case 'customer':
+						this.getCustomerProductDetail(id)	
+						break;
+				}
+			},
+			getCommunityProductDetail(id){
+				this.$api.communityProductDetail({
+					id:id
+				}).then(res=>{
+					if(res.status=="OK"){
+						this.info = {
+							originalPrice: res.data.originalPrice/100,
+							price: res.data.price/100,
+							desc:res.data.lcInfo,
+							name:res.data.name,
+							pics:JSON.parse(res.data.pics),
+							icon:JSON.parse(res.data.icon)&&JSON.parse(res.data.icon)[0]&&JSON.parse(res.data.icon)[0].url,
+							id:res.data.id,
+							markStatus:res.data.markStatus,
+                            attributes:this.parse(res.data.attributes,[]),
+							type: res.data.type
+						}
+					}
+				}).catch(err=>{
+					console.log(err);
+				})
+			},
+			getCustomerProductDetail(id){
+				this.$api.customerProductFindById({
+					id:id
+				}).then(res=>{
+					if(res.status=="OK"){
+						this.info = {
+							originalPrice: res.data.originPrice/100,
+							price: res.data.price/100,
+							name:res.data.name,
+							pics:JSON.parse(res.data.playPics),
+							id:res.data.id,
+							icon:JSON.parse(res.data.mainPic)&&JSON.parse(res.data.mainPic)[0]&&JSON.parse(res.data.mainPic)[0].url,
+							desc:res.data.remark,
+							type:res.data.type
+						}
+					}
+				}).catch(err=>{
+					console.log(err);
+				})
+			}
+		},
+		filters: {
+			toFixed2: function(value) {
+				return Number(value).toFixed(2);
+			},
+		}
+		
+	}
+</script>
+
+<style lang="scss">
+    .list{
+      margin-top: 10px;
+      background: white;
+      overflow: hidden;
+      .item{
+        .item-title2{
+          padding: 30px 15px 0;
+          color: #16202E;
+          font-size: 18px;
+          line-height: 25px;
+        }
+        .item-img{
+          font-size: 0;
+          padding: 0;
+          margin-bottom: 120upx;
+          img{
+            width: 100%;
+          }
+        }
+      }
+    }
+	.swiper-box {
+	    height: 750rpx;
+		// padding: 0 16rpx;
+	}
+	.swiper-item {
+	    display: flex;
+	    flex-direction: row;
+		height: 750rpx;
+		// border-radius: 20rpx;
+		// overflow: hidden;
+	}
+	.image {
+		width: 100%;
+		height: 100%;
+	}
+	.desc{
+		background-color: #FFFFFF;
+		padding: 30rpx 20rpx;
+	}
+	.health-list-title {
+		font-size: 36rpx;
+		font-weight: 800;
+		color: #16202E;
+	}
+	.health-list-price {
+		font-weight: 500;
+		color: #03BE90;
+		display: flex;
+		align-items: center;
+		text {
+			font-size: 30rpx;
+			position: relative;
+			margin-left: 10rpx;
+			color: #03BE90;
+		}
+		text:nth-child(1) {
+			font-size: 28rpx;
+		}
+		text:nth-child(2) {
+			font-size: 34rpx;
+			font-weight: 800;
+		}
+		text:nth-child(3) {
+			font-size: 28rpx;
+			color: #A0A8BC;
+		}
+		text:nth-child(4) {
+			font-size: 32rpx;
+			color: #A0A8BC;
+			&::after {
+				font-size: 24rpx;
+				content: '';
+				position: absolute;
+				left: 0;
+				top: 49%;
+				width: 100%;
+				height: 1px;
+				background-color: #A0A8BC;
+			}
+		}
+	}
+	.detail-content{
+		background-color: #FFFFFF;
+		margin-top: 20rpx;
+	}
+	.goods-carts {
+		/* #ifndef APP-NVUE */
+		display: flex;
+		/* #endif */
+		flex-direction: column;
+		position: fixed;
+		left: 0;
+		right: 0;
+		bottom: 0;
+	}
+</style>

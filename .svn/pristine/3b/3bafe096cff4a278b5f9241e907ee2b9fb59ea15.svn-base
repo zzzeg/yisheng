@@ -1,0 +1,32 @@
+<template>
+	<view class="cont">
+		
+	</view>
+</template>
+
+<script>
+	export default {
+		onLoad(option) {
+			this.id = option.id
+			this.getHospitalInfo(option.id)
+		},
+		data() {
+			return {
+				id: '',
+				formData: {}
+			}
+		},
+		methods: {
+			getHospitalInfo(id) {
+				this.$api.getHospitalInfo({
+					id: this.id
+				}).then(res=>{
+					this.formData = res.data
+				})
+			}
+		}
+	}
+</script>
+
+<style scoped lang="scss">
+</style>

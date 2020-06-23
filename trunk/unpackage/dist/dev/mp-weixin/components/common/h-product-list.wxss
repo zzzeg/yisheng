@@ -72,11 +72,11 @@
   color: #A0A8BC;
   padding-left: 20rpx;
 }
-.health-list-price text.data-v-50614279 {
+.health-list-price .lllll.data-v-50614279 {
   position: relative;
   margin-left: 10rpx;
 }
-.health-list-price text.data-v-50614279::after {
+.health-list-price .lllll.data-v-50614279::after {
   content: '';
   position: absolute;
   left: 0;

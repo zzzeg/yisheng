@@ -121,7 +121,6 @@
 }
 .record-item .status.data-v-080e8fa6 {
   margin-top: 20rpx;
-  color: #03BE90;
 }
 .record-item .status view.data-v-080e8fa6:nth-child(2) {
   font-size: 24rpx;

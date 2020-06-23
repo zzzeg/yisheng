@@ -1,7 +1,6 @@
 {
   "navigationBarTitleText": "明医说",
   "navigationBarBackgroundColor": "#fff",
-  "backgroundColor": "#008A67",
   "usingComponents": {
     "h-community-share": "/components/common/h-community-share"
   }

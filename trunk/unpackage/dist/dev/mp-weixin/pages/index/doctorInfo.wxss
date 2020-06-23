@@ -42,7 +42,7 @@ page{
     -webkit-box-direction: normal;
     -webkit-flex-direction: row;
             flex-direction: row;
-    margin: 70rpx 123rpx 90rpx 123rpx;
+    margin: 40rpx 123rpx 90rpx 123rpx;
     -webkit-box-pack: justify;
     -webkit-justify-content: space-between;
             justify-content: space-between;

@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "上传报告",
+  "usingComponents": {
+    "uni-popup": "/components/uni-popup/uni-popup"
+  }
+}

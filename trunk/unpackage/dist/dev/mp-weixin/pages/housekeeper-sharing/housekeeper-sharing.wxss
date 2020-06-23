@@ -41,4 +41,17 @@
   -webkit-justify-content: space-between;
           justify-content: space-between;
 }
+.empty {
+  text-align: center;
+}
+.empty .empty-img {
+  margin-top: 52rpx;
+  width: 360rpx;
+  height: 320rpx;
+}
+.empty .empty-tips {
+  color: #A2A9BA;
+  font-size: 32rpx;
+  line-height: 48rpx;
+}
 

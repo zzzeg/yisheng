@@ -114,7 +114,7 @@
   height: 100%;
   -webkit-transition: .6s;
   transition: .6s;
-  opacity: 0;
+  /* opacity: 0; */
 }
 .cart-item .image-wrapper image.loaded {
   opacity: 1;

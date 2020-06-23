@@ -41,8 +41,8 @@
   overflow: hidden;
 }
 .health-list .avaImg.data-v-0d4eda6e {
-  width: 320rpx;
-  height: 310rpx;
+  width: 325rpx;
+  height: 334rpx;
 }
 .health-list .play.data-v-0d4eda6e {
   width: 100rpx;

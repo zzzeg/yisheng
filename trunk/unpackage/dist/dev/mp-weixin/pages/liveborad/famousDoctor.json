@@ -1,7 +1,6 @@
 {
   "navigationBarTitleText": "明医说",
   "navigationBarBackgroundColor": "#fff",
-  "backgroundColor": "#008A67",
   "enablePullDownRefresh": true,
   "usingComponents": {
     "uni-load-more": "/components/uni-load-more/uni-load-more"

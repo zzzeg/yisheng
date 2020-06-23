@@ -1,0 +1,1 @@
+{"version":3,"sources":["webpack:///E:/yisheng/trunk/main.js"],"names":["createPage","Page"],"mappings":";;;;;;;;;;kDAAA;AACA;AACA,gO;AACAA,UAAU,CAACC,gBAAD,CAAV,C","file":"pages/aldiscriminate/alskin/welcome.js","sourcesContent":["import 'uni-pages';\nimport Vue from 'vue'\nimport Page from './pages/aldiscriminate/alskin/welcome.vue'\ncreatePage(Page)"],"sourceRoot":""}

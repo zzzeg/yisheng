@@ -1,0 +1,10 @@
+{
+  "navigationBarTextStyle": "black",
+  "navigationBarTitleText": "私家医生",
+  "navigationBarBackgroundColor": "#fff",
+  "backgroundColor": "#F6F7FA",
+  "usingComponents": {
+    "uni-swiper-dot": "/components/uni-swiper-dot/uni-swiper-dot",
+    "uni-goods-nav": "/components/uni-goods-nav/uni-goods-nav"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "navigationBarTextStyle": "black",
+  "navigationBarTitleText": "健康体检",
+  "navigationBarBackgroundColor": "#fff",
+  "backgroundColor": "#F6F7FA",
+  "usingComponents": {
+    "uni-swiper-dot": "/components/uni-swiper-dot/uni-swiper-dot",
+    "u-parse": "/components/u-parse/u-parse"
+  }
+}

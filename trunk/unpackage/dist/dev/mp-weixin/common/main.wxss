@@ -354,6 +354,85 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
 	/*每个页面公共css */
 button::after{ border: none;}
@@ -373,6 +452,10 @@ view{
 }
 text{
         font-family:PingFang-SC-Medium,PingFang-SC;
+}
+.greenBtn{
+}
+.disinline{ display:inline-block; vertical-align: top;
 }
 .f1{
 	    -webkit-box-flex:1;

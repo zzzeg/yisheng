@@ -1,0 +1,327 @@
+<template>
+	<view class="cont">
+		<scroll-view scroll-y="true" style="height: 100vh;"
+					 :scroll-into-view="scrollToIdis"
+					 scroll-with-animation
+					 @scroll="scrolls"
+					 >
+					 
+		<view class="blocks">
+			<view class="block_swiper">
+				<uni-swiper-dot :info="bannerList" :current="current" :mode="mode" :dots-styles="dotsStyles" field="content">
+					<swiper class="swiper-box" @change="change">
+						<swiper-item v-for="(item, index) in bannerList" :key="index">
+							<view :class="index" class="swiper-item">
+								<image class="image" :src="item" mode="widthFix" />
+							</view>
+						</swiper-item>
+					</swiper>
+					<view class="nums">{{ (current + 1) + '/' + bannerList.length }}</view>
+				</uni-swiper-dot>
+			</view>
+			
+			<view class="title">{{ formData.hospName }}</view>
+			<view class="tips">
+				<view class="tip">{{ formData.hospRank }}</view>
+			</view>
+			
+			<view class="flex text">
+				<view>
+					<!--图标-->
+					<image class="disinline" style="width:28rpx; height:34rpx; margin-right:10rpx; vertical-align: text-bottom" src="../../static/image/location@2x.png"></image>
+				</view>
+				<view>
+					{{ formData.snapshot.hospAddress }}
+				</view>
+			</view>
+			<view class="flex text">
+				<view>
+					<image class="disinline" style="width:28rpx; height:28rpx; margin-right:10rpx; vertical-align: text-bottom;" src="../../static/image/shijian1@2x.png"></image>
+				</view>
+				<view>最近可约：{{ keyueDate }}</view>
+			</view>
+			
+		</view>
+		
+		<!--套餐-->
+		<view class="blocks" id="taocan">
+			<view class="f16 fw titles">
+				<b>体检套餐</b>
+			</view>
+			
+			<view class="typeList flex">
+				<view v-for="(item, index) in tijianList" :key="index" :class="{'titem active': item == activeItem, 'titem': item}" @tap="setItem(item)">{{ item }}</view>
+			</view>
+			
+			<view class="taocanList" v-for="(item, index) in taocanList" :key="index">
+				<view class="title fw">{{ item.title }}</view>
+				<view class="desc">{{ item.desc }}</view>
+				<view class="intro flex">
+					<view class="price">
+						￥ <text>{{ item.price }}</text>
+					</view>
+					<view>
+						<button class="gobuyBtn">去购买</button>
+					</view>
+				</view>
+			</view>
+		</view>
+		
+		
+		<!--tab选项卡-->
+		<view class="tab">
+			<view :class="{'tabitem active': tactive == item, 'tabitem': item}" v-for="(item, ind) in tabs" :key="ind" @tap="tabChange(item)">{{ item }}</view>
+		</view>
+		
+		<!--tab切换-->
+		<view class="blocks tabcontent" id="jieshao">
+			<view class="content">
+				<view class="f16 fw titles">
+					<b>机构介绍</b>
+				</view>
+				<view :class="{'artical-content':!isHide, 'artical-content artical-content-hide': isHide}">
+					【医院简介】<br/> 
+					北京大学深圳医院，于1999年底建成开业，2001年9月，深圳市政府与北京大学、香港科技大学合作，医院更名为“北京大学深圳医院”和“北京大学深圳临床医学院”，纳入北京大学附属医院管理体系。医院占地面积5.9万平方米，总建筑面积22.3万平方米，编制病床1600张，现实际开放病床1300张。医院拥有总价值超10亿元的现代化医疗设备。现有员工2400多人，其中拥有副高级以上职称的高级技术人才近700名，硕士以上学位人员500多名，有海外留学经历人员100多名。 
+					<br/>【就医环境】 <br/>
+					医院开设53个临床医技科室，其中1个国家级合作重点学科、8个省级临床重点医学专科、8个市级临床重点医学专科、7个省市级重点实验室、2个市级平台和1个国家药物临床试验机构。医院开展的一大批医学高新技术和特色服务项目，吸引了深圳、香港、澳门以及周边地区的大批患者，还有来自全球36个国家和地区的外宾前来就诊。2015年门急诊总量约296万人次，出院病人5.38万人次，手术量3.47万台次。
+				</view>
+				<view class="hide-artical-box" v-if="isHide" @tap="isHide = !isHide">
+					<text>查看更多</text>
+					<image src="../../static/image/icon_xxzk@2x.png" class="disinline openico"></image>
+				</view>
+				<view class="artical-box" v-else @tap="isHide = !isHide">
+					<text>收起全文</text><image src="../../static/image/icon_xxzk@2x.png" class="disinline openico closeico"></image>
+				</view>
+			</view>
+		</view>
+		
+		<view class="blocks tabcontent">
+			<view class="content">
+				<view class="f16 fw titles">
+					<b>预约提示</b>
+				</view>
+				<view class="artical-content">
+					医院地址：深圳市福田区莲花路1120号 门诊北楼一楼体检科 
+					<br/> 营业时间：周一至周日8:00-12:00，14:00-17:00，周六周日只上半天班（体检当天如需取消项目退费（抽血项目不予退费），需到接待室登记。如体检结束后7天内无反馈信息，后续将不处理退款事宜）)
+					<br/> 预约提示：温馨提醒：本机构暂不支持社保报销，包含胃肠镜的项目均不包含药费，需到院自费。
+				</view>
+			</view>
+		</view>
+		
+		<view class="blocks tabcontent">
+			<view class="content">
+				<view class="f16 fw titles">
+					<b>机构服务</b>
+				</view>
+				<view class="artical-content flex">
+					<view>
+						<image class="disinline" src="../../static/image/cw@2x.png"></image>
+						停车位
+					</view>
+					<view>
+						<image class="disinline" src="../../static/image/zc@2x.png"></image>
+						早餐提供
+					</view>
+					<view>
+						<image class="disinline" src="../../static/image/WIFI@2x.png"></image>
+						WIFI
+					</view>
+				</view>
+			</view>
+		</view>
+		
+		<view class="blocks tabcontent" id="xuzhi">
+			<view class="content">
+				<view class="f16 fw titles">
+					<b>体检须知</b>
+				</view>
+				<view class="artical-content">
+					1、提前预约:为了能成功提交订单，请尽早预订。 
+					<br/> 2、体检凭证：体检当天凭借预约成功短信，现场出示身份证即可体检，无需缴纳其他费用（现场加项或快递报告除外）。 
+					<br/> 3、注意事项：当您预约套餐时，即表示接受检测的所有项目。如因自身原因放弃体检套餐中的检查项目，网站将不予退款处理。
+				</view>
+			</view>
+		</view>
+		</scroll-view>
+	</view>
+</template>
+
+<script>
+	const { windowWidth, windowHeight } = uni.getSystemInfoSync();
+	export default {
+		onLoad(option) {
+			this.id = option.id
+			this.getHospitalInfo(option.id)
+			this.gethealthKKhospitalyuyueDate()
+		},
+		data() {
+			return {
+				scrollToIdis: '',
+				bannerList: [],
+				current: 0,
+				mode: 'dot',
+				dotsStyles: {
+					backgroundColor: 'rgba(249, 249, 251, 1)',
+					border: 'none',
+					color: '#fff',
+					selectedBackgroundColor: 'rgba(3, 190, 144, 1)',
+					selectedBorder: 'none'
+				},
+				id: '',
+				formData: {
+					name: '北京大学深圳医院体检中心',
+					tips: ['提前1天预约', '公立三甲'],
+					atten: '周一至周日8:00-12:00，14:00-17:00，周六周日只上半天（体检当天如需取消项目退款（抽血项目不予退款），需到接待室登记。如体检结束后7天内无反馈信息，后续将不处理退款事宜）',
+					address: '深圳市福田区莲花路1120号 门诊北楼一楼体检科门诊楼一楼体检科门诊北楼一楼体检科'
+				},
+				tijianList: ['全部', '全身体健', '青年体检', '老年体检', '基因检测', '疾病筛查'],
+				activeItem: '全部',
+				taocanList: [{
+					title: '感恩升级体检卡（男）',
+					desc: '针对心脑血管、甲状腺、前列腺、胃、骨骼、腰椎等部位高发疾病进行检查，并全面筛查肿瘤，提早发现疾病',
+					price: '3298',
+				},{
+					title: '感恩升级体检卡（女）',
+					desc: '针对心脑血管、甲状腺、前列腺、胃、骨骼、腰椎等部位高发疾病进行检查，并全面筛查肿瘤，提早发现疾病',
+					price: '3298',
+				}],
+				tabs: ['体检套餐', '医院简介', '体检须知'],
+				tactive: '医院简介',
+				isHide: true,
+				keyueDate: '',
+				showTabBar: false,
+			}
+		},
+		methods: {
+			getHospitalInfo(id) {
+				this.$api.healthKKhospitalDetial({
+					id: '455214732244963134'
+				}).then(res=>{
+					this.formData = res.data
+					this.formData.snapshot = JSON.parse(res.data.snapshot)
+					this.bannerList.push(this.formData.snapshot.hospImage)
+				})
+			},
+			change(e) {
+				this.current = e.detail.current
+			},
+			setItem(item) {
+				this.activeItem = item
+			},
+			tabChange(item) {
+				this.tactive = item
+				switch(item) {
+					case '体检套餐':
+					this.scrollToIdis = 'taocan'
+					break
+					case '机构介绍':
+					this.scrollToIdis = 'jieshao'
+					break
+					case '体检须知':
+					this.scrollToIdis = 'xuzhi'
+					break
+				}
+			},
+			gethealthKKhospitalyuyueDate() {
+				this.$api.healthKKhospitalyuyueDate({
+					hospId: '455214732244963134',
+					packageCode: ''
+				}).then(res=>{
+					this.keyueDate = res.data
+				})
+			},
+			scrolls(e) {
+				// 滚动时触发，event.detail = {scrollLeft, scrollTop, scrollHeight, scrollWidth, deltaX, deltaY}
+				console.log(e.detail)
+				if(e.detail.scrollTop > windowHeight) {
+					console.log(windowHeight)
+				}
+			},
+		}
+	}
+</script>
+
+<style scoped lang="scss">
+	.disinline{ display:inline-block; }
+	swiper{
+	    height:400upx;
+	}
+	.swiper-box {
+	}
+	.swiper-item {
+	    display: flex;
+	    flex-direction: row;
+		height: 100%;
+		border-radius: 20rpx;
+		overflow: hidden;
+		.image {
+			width: 100%;
+		    height: 100%!important;
+		    border-radius:31upx;
+		}
+	}
+	.blocks{ 
+		background: #fff;
+		padding:40rpx 32rpx 40rpx 32rpx;margin-bottom:26rpx;
+		&:first-child{ padding-top:0; }
+		.block_swiper{position: relative; }
+	}
+	.nums{ position: absolute; bottom:20rpx; right:50rpx; color:#fff;  font-size:24rpx; background: rgba(0,0,0,1); opacity:.5; padding:8rpx 24rpx; border-radius:24rpx; }
+	.title{ font-size:32rpx; line-height:44rpx; font-weight: 500; margin-top:16rpx;}
+	.tips{ display:flex; justify-content: flex-start; margin:24rpx 0 32rpx 0;
+		.tip{ margin:0 20rpx 0 0; font-size:20rpx; color:#03BE90; background: #EFF1F6; border-radius:6rpx; line-height:32rpx; padding:0 8rpx; }
+	 }
+	 .price{ color:#03BE90; font-size:24rpx;
+		text{ font-size:32rpx; }
+	  }
+	.desc{ font-size:24rpx; font-weight: 500; line-height:34rpx; margin:30rpx 0; }
+	.intro{ justify-content: space-between; }
+	 .flex{ display: flex;}
+	 .text{  font-size:24rpx; line-height:34rpx;  }
+	 .f16{ font-size:32rpx; }
+	 .fw{ font-weight: bold; }
+	 .f400{ font-weight: 400; }
+	 .color_green{ color:#03BE90; }
+	 .typeList{ 
+		 display: flex;
+		 flex-wrap: wrap;
+		 padding:20rpx 0;
+		 border-bottom:solid 1px #EFF1F6;
+		 .titem{ font-size:26rpx; color:#16202E; line-height: 36rpx; padding:14rpx 22rpx; border:solid 1px #E0E2E6; border-radius:32rpx; margin:14rpx 14rpx 14rpx 0;
+			&.active{ border-color:#03BE90; background:#EEFEF6; color:#03BE90; }
+		 }
+	 }
+	 .taocanList{ margin: 0 32rpx; border-bottom:solid 1px #EFF1F6;  padding:32rpx 0;}
+	.gobuyBtn{ background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);box-shadow:0px 3px 15px 0px rgba(3,190,144,0.3);
+border-radius:18px; font-size:30rpx; color:#fff; line-height:40rpx; padding:10rpx 40rpx; }
+	.tabcontent{
+		.artical-content{ margin-top:20rpx; }
+		
+	}
+	.artical-content{ position: relative; z-index:22; height:auto; font-size:24rpx; line-height:40rpx;
+		&.flex{ justify-content: center;
+		 view{ margin:0 30rpx; }
+			.disinline{ vertical-align: middle;width:40rpx; height:32rpx; margin:0 20rpx 0 0;
+			}
+		}
+	}
+	.artical-content-hide{ max-height:714rpx; overflow: hidden; }
+	.hide-artical-box{ padding:140rpx 0 20rpx 0; margin-top:-140rpx; text-align: center; position:relative; z-index:999; width: 100%;
+		    background:linear-gradient(180deg,rgba(255,255,255,0) 0%,rgba(255,255,255,1) 100%); color:#A2A9BA; font-size:28rpx;
+	 }
+	.artical-box{ text-align:center; color:#A2A9BA; font-size:28rpx; padding:0 0 20rpx 0; }
+	 .openico{ width:40rpx; height:30rpx; margin:0 58rpx 0 22rpx;  vertical-align: middle;
+		&.closeico{ transform: rotate(180deg); }
+	  }
+	.tab{display: flex; justify-content: space-between; border-bottom:solid 1px #E2E6EF; background: #fff; padding: 0 32rpx;
+		.tabitem{
+			color:#16202E; font-size:32rpx; line-height:3;
+			&.active{ color:#03BE90; border-bottom:solid 2px #03BE90; }
+		}
+	}
+</style>
+<style lang="scss">
+	.block_swiper{
+		.uni-swiper__dots-box{ display: none!important; }
+	}
+</style>
