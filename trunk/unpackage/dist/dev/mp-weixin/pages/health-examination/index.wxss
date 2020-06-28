@@ -71,8 +71,7 @@ swiper.data-v-42e8ef8a {
   -webkit-box-pack: center;
   -webkit-justify-content: center;
           justify-content: center;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
   padding: 40rpx 0;
 }
 .sliderselects .disinline.data-v-42e8ef8a {
@@ -94,8 +93,7 @@ swiper.data-v-42e8ef8a {
   border-radius: 30rpx;
   margin: 30rpx 32rpx;
   padding: 32rpx 22rpx;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
   display: -webkit-box;
   display: -webkit-flex;
   display: flex;
@@ -158,8 +156,7 @@ swiper.data-v-42e8ef8a {
   right: 0;
   bottom: 0;
   background: #fff;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
   padding: 32rpx;
   z-index: 9999;
 }
@@ -170,8 +167,7 @@ swiper.data-v-42e8ef8a {
   height: 80rpx;
   background: #f1f2f7;
   border-radius: 50rpx;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
   padding: 0 40rpx;
   font-size: 28rpx;
 }
@@ -202,8 +198,7 @@ swiper.data-v-42e8ef8a {
   display: inline-block;
   width: calc(100% - 100rpx);
   vertical-align: middle;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
   padding: 0 40rpx;
   font-size: 28rpx;
 }
@@ -213,15 +208,13 @@ swiper.data-v-42e8ef8a {
   left: 0;
   height: 100%;
   width: 100%;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
   background: rgba(0, 0, 0, 0.6);
   overflow: hidden;
 }
 .silderList .datalist.data-v-42e8ef8a {
   background: #fff;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
   margin: 0 auto;
   padding: 10rpx 0;
   max-height: 100%;

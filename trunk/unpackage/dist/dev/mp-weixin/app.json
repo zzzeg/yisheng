@@ -5,6 +5,7 @@
     "pages/index/login",
     "pages/index/connectVideoInterrogation",
     "pages/index/doctorInfo",
+    "pages/index/doctorInfo2",
     "pages/index/videoInterrogation",
     "pages/index/deleteReport",
     "pages/index/skinPos",
@@ -53,7 +54,9 @@
     "pages/doctor-report/doctor-report",
     "pages/checkup-report/checkup-report",
     "pages/look-report/look-report",
-    "pages/health-examination/buyRecord"
+    "pages/health-examination/buyRecord",
+    "pages/mine/mingwoCard",
+    "pages/index/mangerIndex"
   ],
   "subPackages": [
     {
@@ -87,11 +90,6 @@
       "desc": "您的位置信息将用于小程序位置接口的效果展示"
     }
   },
-  "plugins": {
-    "live-player-plugin": {
-      "version": "1.0.12",
-      "provider": "wx2b03c6e691cd7370"
-    }
-  },
+  "plugins": {},
   "usingComponents": {}
 }

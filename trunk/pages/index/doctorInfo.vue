@@ -66,71 +66,29 @@
             </view>
             <view style="height: 50upx;width: 100%;"></view>
         </view>
-        <view v-if="currentMenu == 1" class="boxTop"  >
-            <view class="doctorBox">
-                <image :src="community.expert.pics" mode=""></image>
-                <view style="flex: 1;" >
-                    <view style="color: #16202E; display: flex; flex-direction: row; ">
-                        <view class="" style="line-height: 62upx;font-size: 35upx;">
-                           发我怕反文旁发
-                        </view>
-                        
-                    </view>
-                    <view class="" style="font-size: 29upx; line-height: 1.5;">
-                        <text style="color: #2A3441;">学科：</text>{{!community.expert.rank ? '' : community.expert.rank}} 
-                    </view>
-                    <view class="" style="font-size: 29upx; line-height: 1.1;">
-                        <text style="color: #2A3441;">职称：</text> {{!community.expert.title ? '' : community.expert.title}}  
-                    </view>
-                </view>
-            </view>
-            <view style="padding: 30upx; font-size: 24upx;">
-                <text style="color: #2A3441;">擅长：</text><text style="color: #868E9D;">运用辨体-辨病-辨证相结合诊治疑难杂病：失眠、偏头痛、抑郁、高血压、心律失常、脂肪肝、肥胖…</text>
-            </view>
-            <view style=" margin: 0 30upx; height: 2upx; border-bottom: 2upx dashed #C6CAD4;"></view>
-      
-            <view class="doctorBox">
-                <image :src="community.expert.pics" mode=""></image>
-                <view style="flex: 1;" >
-                    <view style="color: #16202E; display: flex; flex-direction: row; ">
-                        <view class="" style="line-height: 62upx;font-size: 35upx;">
-                           发我怕反文旁发
-                        </view>
-                        
-                    </view>
-                    <view class="" style="font-size: 29upx; line-height: 1.5;">
-                        <text style="color: #2A3441;">学科：</text>{{!community.expert.rank ? '' : community.expert.rank}} 
-                    </view>
-                    <view class="" style="font-size: 29upx; line-height: 1.1;">
-                        <text style="color: #2A3441;">职称：</text> {{!community.expert.title ? '' : community.expert.title}}  
-                    </view>
-                </view>
-            </view>
-            <view style="padding: 30upx; font-size: 24upx;">
-                <text style="color: #2A3441;">擅长：</text><text style="color: #868E9D;">运用辨体-辨病-辨证相结合诊治疑难杂病：失眠、偏头痛、抑郁、高血压、心律失常、脂肪肝、肥胖…</text>
-            </view>
-            <view style=" margin: 0 30upx; height: 2upx; border-bottom: 2upx dashed #C6CAD4;"></view>
-     
-            <view class="doctorBox">
-                <image :src="community.expert.pics" mode=""></image>
-                <view style="flex: 1;" >
-                    <view style="color: #16202E; display: flex; flex-direction: row; ">
-                        <view class="" style="line-height: 62upx;font-size: 35upx;">
-                           发我怕反文旁发
-                        </view>
-                        
-                    </view>
-                    <view class="" style="font-size: 29upx; line-height: 1.5;">
-                        <text style="color: #2A3441;">学科：</text>{{!community.expert.rank ? '' : community.expert.rank}} 
-                    </view>
-                    <view class="" style="font-size: 29upx; line-height: 1.1;">
-                        <text style="color: #2A3441;">职称：</text> {{!community.expert.title ? '' : community.expert.title}}  
-                    </view>
-                </view>
-            </view>
-            <view style="padding: 30upx; font-size: 24upx;">
-                <text style="color: #2A3441;">擅长：</text><text style="color: #868E9D;">运用辨体-辨病-辨证相结合诊治疑难杂病：失眠、偏头痛、抑郁、高血压、心律失常、脂肪肝、肥胖…</text>
-            </view>
+        <view v-if="currentMenu == 1" class="boxTop" >
+			<block  v-for="(item, index) in doctorTeamList" :key="index">
+				<view class="doctorBox" @tap="goinfos(item.id)">
+					<image :src="item.pics[0].url" mode=""></image>
+					<view style="flex: 1;" >
+						<view style="color: #16202E; display: flex; flex-direction: row; ">
+							<view class="" style="line-height: 62upx;font-size: 35upx;">
+							   {{ item.name }}
+							</view>
+						</view>
+						<view class="" style="font-size: 29upx; line-height: 1.5;">
+							<text style="color: #2A3441;">学科：</text>{{!item.rank ? '' : item.rank}} 
+						</view>
+						<view class="" style="font-size: 29upx; line-height: 1.1;">
+							<text style="color: #2A3441;">职称：</text> {{!item.title ? '' : item.title}}  
+						</view>
+					</view>
+				</view>
+				<view style="padding: 30upx; font-size: 24upx;" @tap="goinfos(item.id)">
+					<text style="color: #2A3441;">擅长：</text><text style="color: #868E9D;">{{ item.speciality }}</text>
+				</view>
+				<view style=" margin: 0 30upx; height: 2upx; border-bottom: 2upx dashed #C6CAD4;"></view>
+			</block>
         </view>
     </view>
     
@@ -156,11 +114,13 @@
 				},
 				communityId:'',
 				doctorid:'',
-      
+				doctorTeamList: [],
+				total: 1,
+				page: 1,
+				size: 10,
             }
         },
         onLoad(options) {
-            
             this.communityId = this.$store.getters.communityId
 			this.doctorid = options.doctorid;
             api.findExpertById({
@@ -177,10 +137,20 @@
                    if(this.doctor.credentials && JSON.parse(this.doctor.credentials).length>0){
                        this.doctor.credentials = JSON.parse(this.doctor.credentials)
                    }
-                   
+                   // 如果成功，就查看团队的医生信息
+                   this.doctorTeam()
                }
             })
         },
+		onReachBottom() {
+		    console.log('onReachBottom')
+			if(this.page >= this.total) {
+				return false
+			}
+		    uni.showNavigationBarLoading()
+		    this.page++
+		    this.doctorTeam()
+		},
         methods:{
             clickMenu:function(tag){
                 this.currentMenu = tag
@@ -229,7 +199,30 @@
 			},
             change(e) {
             	this.current = e.detail.current
-            }
+            },
+			doctorTeam() {
+				api.doctorTeamPage({
+
+						leaderId: this.doctorid,
+						page: this.page,
+						size: this.size
+
+				}).then(res=>{
+					if(this.page == 1) {
+						this.doctorTeamList = []
+					}
+					res.list.map(item=>{
+						item.pics = JSON.parse(item.pics)
+						this.doctorTeamList.push(item)
+					})
+					this.total = res.totalPages
+				})
+			},
+			goinfos(id) {
+				uni.navigateTo({
+				    url:"doctorInfo2?doctorid="+ id
+				})
+			}
         }
     }
 </script>

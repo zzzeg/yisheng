@@ -320,6 +320,7 @@
                     }else{
                         return
                     }
+					let that = this;
                     this.$api.constitutionOrderAddOrder(data).then(res=>{
                     	console.log(res);
                         if(res.status == 'OK'){
@@ -332,14 +333,14 @@
                                 signType: 'MD5',
                                 paySign: res.data.payInfo.sign,
                                 success: function (payres) {
-                                    
+                                    that.isSubmit = false;
                                     uni.navigateTo({
                                         url:'../../order-detail/order-detail?type=99&orderid='+ res.data.id
                                     })
                                 },
                                 fail: function (err) {
                                     console.log('fail:' + JSON.stringify(err));
-                                    
+                                    that.isSubmit = false;
                                 }
                             });
                         }else{

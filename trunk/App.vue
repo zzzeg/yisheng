@@ -287,7 +287,7 @@
                 }else if(this.globalData.scene){
                     communityId = this.globalData.scene
                 }
-                console.log("communityId:",communityId)
+                console.log("communityId: bb",communityId)
                 const data = {
                     encryptedData: res.encryptedData,
                     iv: res.iv,

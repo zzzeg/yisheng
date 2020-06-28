@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "明我健康服务站二维码",
+  "usingComponents": {
+    "tki-qrcode": "/components/tki-qrcode/tki-qrcode"
+  }
+}

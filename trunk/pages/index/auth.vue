@@ -25,7 +25,7 @@
 				</view>
 			</view>
 		</view>
-		
+		  
 		<view class="waiper">
 			<view class="title">
 				数字健康档案<text style="font-size:28rpx;">（全周期生命账户）</text>
@@ -131,7 +131,7 @@
                             uni.setStorageSync('openid', res.data.openid);
                             uni.setStorageSync('unionid', res.data.unionid);
                             if(e != ''){
-                                this.bingPhone(e)
+                                _self.bingPhone(e)
                             }
                             
                         })
@@ -188,6 +188,7 @@
                                     }).then(aes => {
                                         console.log("getTempAccount:",aes)
                                         if (aes.status == 'OK') {
+											console.log('xxxxxxxxxxxxxxxxxxxxxxxxx')
                                             uni.setStorageSync('sessionId', aes.data.sessionId)
                                             this.getUserById(userRes.data.id,this.avatarPath)
                                         }

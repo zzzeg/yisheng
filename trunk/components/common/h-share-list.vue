@@ -68,10 +68,10 @@
 		&-title {
 			font-size: 24rpx;
 			font-weight: 500;
-            height: 68upx;
-            line-height: 1.5;
+            height: 64upx;
+            line-height: 32rpx;
 			color: #16202E;
-			padding: 20rpx 8rpx 8rpx 20rpx;
+			padding: 20rpx 20rpx 14rpx 20rpx;
 			display: -webkit-box;
 			word-break: break-all;
 			-webkit-box-orient: vertical;
@@ -86,7 +86,7 @@
 			flex-direction: row;
 			align-items: center;
 			justify-content:space-between;
-			padding: 0 8rpx 0 20rpx;
+			padding: 0 20rpx 0 20rpx;
 			image{
 				width: 30rpx;
 				height: 30rpx;

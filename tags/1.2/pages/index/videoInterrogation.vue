@@ -199,7 +199,7 @@
                             reason = "会议关闭";
                             break;
                     }
-                    this.clickBack()
+                    _self.clickBack()
             }
             wx.emedia.mgr.onMemberJoined = function(mem){
             	console.log("++++++++++ member", mem)

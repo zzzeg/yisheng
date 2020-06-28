@@ -12,15 +12,26 @@ page{
 	width: 100%;
     position: absolute;
     left: 0rpx;
-    top: 0rpx;
+    top: -110rpx;
     z-index: -99;
+}
+.menuBox{
+    margin: 150rpx 40rpx 0rpx 50rpx;
+}
+.menuText{
+    width: 250rpx;
+    text-align: left;
+    height: 60rpx;
+    padding-left: 10rpx;
+}
+.menuLine{
+     width: 128rpx;height: 100%;border-radius: 3rpx;background: #03BE90;
 }
 .boxTop{
     margin: 30rpx 33rpx;
     width:683rpx;
     background:rgba(255,255,255,1);
-    -webkit-box-shadow:0px 4rpx 21rpx 0px rgba(85,112,105,0.1);
-            box-shadow:0px 4rpx 21rpx 0px rgba(85,112,105,0.1);
+    box-shadow:0px 4rpx 21rpx 0px rgba(85,112,105,0.1);
     border-radius:21rpx;
     font-size: 30rpx;
     color: #868E9D;
@@ -47,13 +58,18 @@ page{
     -webkit-justify-content: space-between;
             justify-content: space-between;
 }
+.headerText{
+    color: #A2A9BA;
+    text-align: left;
+    margin-left: 200rpx;
+    line-height:1.5;
+}
 .gkfxbtn{
     width:197rpx;
     height:67rpx;
     background:-webkit-linear-gradient(217deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
     background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
-    -webkit-box-shadow:0px 6rpx 31rpx 0px rgba(3,190,144,0.3);
-            box-shadow:0px 6rpx 31rpx 0px rgba(3,190,144,0.3);
+    box-shadow:0px 6rpx 31rpx 0px rgba(3,190,144,0.3);
     border-radius:33rpx;
     line-height: 67rpx;
     text-align: center;
@@ -61,10 +77,10 @@ page{
 }
 .login-box{
     width: 683rpx;
-    height: 503rpx;
+    height: 280rpx;
     /* margin-top: -310upx; */
     position: relative;
-    margin-top: 238rpx;
+    margin-top: 125rpx;
     margin-left: 33rpx;
 }
 .boxxxx{
@@ -72,10 +88,9 @@ page{
     z-index: -97;
     width: 100%;
     background:#FFFFFF;
-    -webkit-box-shadow:0rpx 42rpx 208rpx 0rpx rgba(22,32,46,0.15);
-            box-shadow:0rpx 42rpx 208rpx 0rpx rgba(22,32,46,0.15);
+    box-shadow:0rpx 42rpx 208rpx 0rpx rgba(22,32,46,0.15);
     border-radius:31rpx;
-    height: 419rpx;
+    height: 276rpx;
     top: 84rpx;
 }
 .headerBox{
@@ -93,5 +108,28 @@ page{
     border-radius: 50%;
     background: #F8F8F8;
 }
-
+.doctorBox{
+    padding-top: 40rpx;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: row;
+            flex-direction: row;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+            align-items: center;
+    margin:0rpx 30rpx;
+    font-size:23rpx;
+    font-weight:400;
+    color: #868E9D;
+}
+.doctorBox image{
+    width: 133rpx;
+    height: 133rpx;
+    background: #F8F8F8;
+    border-radius: 50%;
+    margin-right: 20rpx;
+}
 

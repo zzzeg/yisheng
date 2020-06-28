@@ -20,8 +20,7 @@
             align-items: center;
     background:-webkit-linear-gradient(217deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
     background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
-    -webkit-box-shadow:0px 6rpx 31rpx 0px rgba(3,190,144,0.3);
-            box-shadow:0px 6rpx 31rpx 0px rgba(3,190,144,0.3);
+    box-shadow:0px 6rpx 31rpx 0px rgba(3,190,144,0.3);
 }
 .envelopeBox{
     position: absolute;

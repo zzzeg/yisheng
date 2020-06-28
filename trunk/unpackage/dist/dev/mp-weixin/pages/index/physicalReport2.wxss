@@ -80,8 +80,7 @@ page{
             align-items: center;
     background:-webkit-linear-gradient(217deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
     background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
-    -webkit-box-shadow:0px 6rpx 31rpx 0px rgba(3,190,144,0.3);
-            box-shadow:0px 6rpx 31rpx 0px rgba(3,190,144,0.3);
+    box-shadow:0px 6rpx 31rpx 0px rgba(3,190,144,0.3);
 }
 .symptomBox{
     padding: 30rpx 0rpx 0rpx 0rpx;
@@ -148,8 +147,7 @@ page{
 }
 .itemBox{
     height: 180rpx;
-    -webkit-box-shadow:0px -14rpx 14rpx 0px rgba(0,49,27,0.02);
-            box-shadow:0px -14rpx 14rpx 0px rgba(0,49,27,0.02);
+    box-shadow:0px -14rpx 14rpx 0px rgba(0,49,27,0.02);
     border-radius:47rpx 47rpx 0px 0px;
     display: -webkit-box;
     display: -webkit-flex;
@@ -309,8 +307,7 @@ page{
             flex-direction: row;
 }
 .disabledBtn{
-    -webkit-box-shadow:0px 0rpx 0rpx 0px rgba(3,190,144,0.3);
-            box-shadow:0px 0rpx 0rpx 0px rgba(3,190,144,0.3);
+    box-shadow:0px 0rpx 0rpx 0px rgba(3,190,144,0.3);
     background: #E4E7F2;
 }
 

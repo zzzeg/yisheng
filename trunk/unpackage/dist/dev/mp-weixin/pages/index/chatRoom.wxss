@@ -304,8 +304,7 @@ page {
   height: 120rpx;
   background: -webkit-linear-gradient(217deg, #88e296 0%, #03be90 100%);
   background: linear-gradient(233deg, #88e296 0%, #03be90 100%);
-  -webkit-box-shadow: 0px 6rpx 30rpx 0px rgba(3, 190, 144, 0.3);
-          box-shadow: 0px 6rpx 30rpx 0px rgba(3, 190, 144, 0.3);
+  box-shadow: 0px 6rpx 30rpx 0px rgba(3, 190, 144, 0.3);
   border-radius: 60rpx;
   display: -webkit-box;
   display: -webkit-flex;
@@ -329,8 +328,7 @@ page {
   width: 120rpx;
   height: 120rpx;
   background: #FFFFFF;
-  -webkit-box-shadow: 0px 6rpx 30rpx 0px #868E9D;
-          box-shadow: 0px 6rpx 30rpx 0px #868E9D;
+  box-shadow: 0px 6rpx 30rpx 0px #868E9D;
   border-radius: 60rpx;
   display: -webkit-box;
   display: -webkit-flex;
@@ -363,8 +361,7 @@ page {
   font-size: 29rpx;
   height: 177rpx;
   background: #FFFFFF;
-  -webkit-box-shadow: 0px 21rpx 21rpx 0px rgba(85, 112, 105, 0.1);
-          box-shadow: 0px 21rpx 21rpx 0px rgba(85, 112, 105, 0.1);
+  box-shadow: 0px 21rpx 21rpx 0px rgba(85, 112, 105, 0.1);
 }
 .input-box {
   width: 98%;
@@ -427,7 +424,6 @@ page {
   -webkit-box-align: center;
   -webkit-align-items: center;
           align-items: center;
-  background: -webkit-gradient(linear, left top, right top, from(#03BE90), to(#88E296));
   background: -webkit-linear-gradient(left, #03BE90, #88E296);
   background: linear-gradient(to right, #03BE90, #88E296);
   color: #fff;
@@ -579,7 +575,6 @@ page {
 }
 }
 .record .ing .icon {
-  background-image: -webkit-gradient(linear, left top, left bottom, from(#f09b37), color-stop(50%, #fff));
   background-image: -webkit-linear-gradient(top, #f09b37, #fff 50%);
   background-image: linear-gradient(to bottom, #f09b37, #fff 50%);
   background-size: 100% 200%;
@@ -811,8 +806,7 @@ page {
   height: 53rpx;
   border-radius: 100%;
   position: absolute;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
 }
 .content .msg-list .row .my .left .bubble.voice .length, .content .msg-list .row .other .right .bubble.voice .length {
   font-size: 28rpx;
@@ -1005,8 +999,7 @@ page {
   -webkit-flex-wrap: wrap;
           flex-wrap: wrap;
   border-radius: 0 0 100% 100%;
-  -webkit-box-shadow: inset 0 -20rpx 0 #9c1712;
-          box-shadow: inset 0 -20rpx 0 #9c1712;
+  box-shadow: inset 0 -20rpx 0 #9c1712;
   margin-bottom: 65rpx;
 }
 .open-redenvelope .top .close-btn {
@@ -1069,8 +1062,7 @@ page {
   color: #03BE90;
   background: #FFFFFF;
   border-radius: 20rpx;
-  -webkit-box-shadow: 0 0 0 0;
-          box-shadow: 0 0 0 0;
+  box-shadow: 0 0 0 0;
   width: 180rpx;
   margin-top: 50rpx;
   height: 74rpx;

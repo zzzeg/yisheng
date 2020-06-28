@@ -103,8 +103,7 @@
 }
 .waiper.data-v-731bdbfd {
   background: white;
-  -webkit-box-shadow: 0px 4rpx 20rpx 0px rgba(85, 112, 105, 0.1);
-          box-shadow: 0px 4rpx 20rpx 0px rgba(85, 112, 105, 0.1);
+  box-shadow: 0px 4rpx 20rpx 0px rgba(85, 112, 105, 0.1);
   border-radius: 20rpx;
   margin: 64rpx 32rpx 0 32rpx;
 }
@@ -185,7 +184,6 @@
           align-items: center;
   background: -webkit-linear-gradient(217deg, #88e296 0%, #03be90 100%);
   background: linear-gradient(233deg, #88e296 0%, #03be90 100%);
-  -webkit-box-shadow: 0px 6rpx 31rpx 0px rgba(3, 190, 144, 0.3);
-          box-shadow: 0px 6rpx 31rpx 0px rgba(3, 190, 144, 0.3);
+  box-shadow: 0px 6rpx 31rpx 0px rgba(3, 190, 144, 0.3);
 }
 

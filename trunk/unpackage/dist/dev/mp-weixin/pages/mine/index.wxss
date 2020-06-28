@@ -74,8 +74,7 @@
 }
 .waiper.data-v-37f25ace {
   background: white;
-  -webkit-box-shadow: 0px 4rpx 20rpx 0px rgba(85, 112, 105, 0.1);
-          box-shadow: 0px 4rpx 20rpx 0px rgba(85, 112, 105, 0.1);
+  box-shadow: 0px 4rpx 20rpx 0px rgba(85, 112, 105, 0.1);
   border-radius: 20rpx;
   margin: 64rpx 32rpx 0 32rpx;
 }

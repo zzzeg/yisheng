@@ -1,5 +1,7 @@
 {
   "navigationBarTitleText": "购买记录",
   "enablePullDownRefresh": true,
-  "usingComponents": {}
+  "usingComponents": {
+    "uni-load-more": "/components/uni-load-more/uni-load-more"
+  }
 }

@@ -2,5 +2,7 @@
   "navigationBarTitleText": "医生简介",
   "navigationBarBackgroundColor": "#FFFFFF",
   "backgroundColor": "#F7F7F8",
-  "usingComponents": {}
+  "usingComponents": {
+    "uni-swiper-dot": "/components/uni-swiper-dot/uni-swiper-dot"
+  }
 }

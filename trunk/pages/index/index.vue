@@ -68,17 +68,17 @@
                 </view>
             </view>
             <view class="doctorBox">
-                <image @click="clickManger" :src="community.mangerAvatar" mode=""></image>
-                <view style="flex: 1;" >
+                <image :src="community.mangerAvatar" mode=""></image>
+                <view style="flex: 1;"  @click="clickManger(1)">
                     <view style="color: #16202E;">{{!community.mangerName ? '' : community.mangerName}}</view>
                     <view class="">
-                        <text @tap="gocommunityManagerImage()" style="overflow: hidden;text-overflow: ellipsis;word-break: break-all;display: -webkit-box;-webkit-box-orient: vertical;-webkit-line-clamp: 1;">健康职业证：<text style="color: #01AC82;">{{community.credentials}} </text></text>   <br>
+                        <text style="overflow: hidden;text-overflow: ellipsis;word-break: break-all;display: -webkit-box;-webkit-box-orient: vertical;-webkit-line-clamp: 1;">健康职业证：<text style="color: #01AC82;">{{community.credentials}} </text></text>   <br>
                         管家活跃榜第{{community.rank && community.rank < 100 ? community.rank : '100+'}}名
                     </view>
                 </view>
             </view>
             <view class="btnBox">
-                <view class="gkfxbtn" @click="clickGuanjiaFenxiang">管家分享</view>
+                <view class="gkfxbtn" @click="clickManger(0)">管家分享</view>
                 <view class="gkfxbtn" @click="clickZixun">管家咨询<text class="gkfxbtnfloat"  v-if="community.newMsgNum">{{community.newMsgNum}}</text></view>
             </view>
 
@@ -137,7 +137,7 @@
                             明医说
                         </view>
                     </view>
-                    <view v-if="community.market" @click="gjziying" class="shareBtn cusstore" >
+                    <view v-if="community.market"  @click="clickManger(2)" class="shareBtn cusstore" >
                         <view class="cusstore-bg"></view>
                         <image style="width: 56upx; height: 60upx;margin-bottom: 7upx;position: relative;z-index: 2;" src="../../static/image/home_shangcheng.png" mode=""></image>
                         <view class="" style="position: relative;z-index: 2;">
@@ -317,7 +317,7 @@
                 }
             }
             getApp().globalData.showIndex = true
-
+			this.getTestCode();
 			this.testCode = getApp().globalData.testCode
         },
 		onLoad(options) {
@@ -332,6 +332,17 @@
             
 		},
 		methods: {
+			getTestCode: function() {
+			    api.getTestCode().then(res => {
+			        console.log(res)
+			        if (res.data == '' || res.data == null) {
+			            this.testCode = ''
+			        } else {
+			            this.testCode = res.data
+			            getApp().globalData.testCode = res.data
+			        }
+			    })
+			},
             clickManger:function(tag){
                 uni.navigateTo({
                     url:'mangerIndex?current='+tag
@@ -401,7 +412,7 @@
                 })
             },
 			clickTjian:function(){
-                if(!this.isShowjoin()){
+				if(!this.isShowjoin()){
                     return
                 }
                 uni.navigateTo({
@@ -1383,7 +1394,7 @@
 		position: relative;
 		height: 292upx;
 		margin-top: 42upx;
-		background-image: url(../../static/image/ziyingbg.png);
+		background-image: url('https://coffer.bainuo.cn/mdt-pub/37/37141fb02b3863762b4987a0ecdb99de.png');
 	}
 	.cusstore-bg{
 		position: absolute;

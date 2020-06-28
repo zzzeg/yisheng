@@ -1,11 +1,11 @@
-const host = 'http://192.168.13.54:8081'
+// const host = 'http://192.168.13.54:8081'
 // const reporthost = 'https://test2-weixin.bainuo.cn/'
 
 // const hostttt = 'http://192.168.33.185:8081'
 const reportqkyshost = 'https://mwsf.bainuojk.com/static/znwz.html'
 // 
 
-// const host = 'https://api.bainuojk.com'
+const host = 'https://api.bainuojk.com'
 const reporthost = 'https://retailer.bainuojk.com/'
 
 const downloadhost = "https://coffer.bainuo.cn/doctorqualification-pub/"

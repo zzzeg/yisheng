@@ -1,0 +1,36 @@
+
+page {
+		background: #EFF1F6;
+}
+.box {
+		margin: 126rpx 30rpx;
+		background: #FFFFFF;
+		border-radius: 16rpx;
+		box-shadow: 0rpx 4rpx 20rpx 0rpx rgba(85, 112, 105, 0.1);
+		height: 840rpx;
+}
+.box2 {
+		margin-top: 80rpx;
+		height: 820rpx;
+}
+.topBox {
+		display: -webkit-box;
+		display: -webkit-flex;
+		display: flex;
+		-webkit-box-orient: horizontal;
+		-webkit-box-direction: normal;
+		-webkit-flex-direction: row;
+		        flex-direction: row;
+		padding: 40rpx;
+}
+.qqqrrrcode {
+		margin: 15rpx 0rpx;
+}
+.can {
+		height: 100%;
+		width: 100%;
+}
+.saveImgbtn{ background:-webkit-linear-gradient(217deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%); background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+box-shadow:0px 6px 30px 0px rgba(3,190,144,0.3);
+border-radius:86px; color:#FFFFFF!important; margin-top:60rpx; width:70%; font-size:30rpx; line-height:2.8;}
+

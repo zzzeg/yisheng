@@ -1,0 +1,117 @@
+
+page{
+        background: #EFF1F6;
+}
+.content{
+        text-align: center;
+        font-size:29rpx;
+        color: #434E5E;
+		margin:32rpx;
+		padding:32rpx;
+		background:#fff;
+		box-shadow: 0px 4rpx 21rpx 0px rgba(85,112,105,0.1);
+		border-radius: 21rpx;
+}
+.logo {
+    	height: 488rpx;
+    	width: 100%;
+        position: absolute;
+        left: 0rpx;
+        top: -110rpx;
+        z-index: -99;
+}
+.menuBox{
+        margin: 150rpx 40rpx 0rpx 50rpx;
+}
+.menuText{
+        width: 250rpx;
+        text-align: left;
+        height: 60rpx;
+        padding-left: 10rpx;
+}
+.menuLine{
+         width: 128rpx;height: 100%;border-radius: 3rpx;background: #03BE90;
+}
+.boxTop{
+        font-size: 30rpx;
+        color: #868E9D;
+        text-align: left;
+}
+.titleBox{
+        padding-top: 32rpx;
+        margin: 0rpx 32rpx;
+        height: 78rpx;
+        border-bottom: 2rpx dashed #C6CAD4;
+        color: #16202E;
+        font-size: 38rpx;
+}
+.btnBox{
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-box-orient: horizontal;
+        -webkit-box-direction: normal;
+        -webkit-flex-direction: row;
+                flex-direction: row;
+        margin: 40rpx 123rpx 90rpx 123rpx;
+        -webkit-box-pack: justify;
+        -webkit-justify-content: space-between;
+                justify-content: space-between;
+}
+.headerText{
+        color: #A2A9BA;
+        line-height:1.5;
+}
+.gkfxbtn{
+        width:197rpx;
+        height:67rpx;
+        background:-webkit-linear-gradient(217deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+        background:linear-gradient(233deg,rgba(136,226,150,1) 0%,rgba(3,190,144,1) 100%);
+        box-shadow:0px 6rpx 31rpx 0px rgba(3,190,144,0.3);
+        border-radius:33rpx;
+        line-height: 67rpx;
+        text-align: center;
+        color: #FFFFFF;
+}
+.login-box{
+        /* margin-top: -310upx; */
+        position: relative;
+}
+.headerBox{
+        width: 168rpx;
+        height: 168rpx;
+        background: #FFFFFF;
+        border-radius: 50%;
+}
+.headerBox image{
+        margin: 8rpx;
+        width: 152rpx;
+        height: 152rpx;
+        border-radius: 50%;
+        background: #F8F8F8;
+}
+.doctorBox{
+        padding-top: 40rpx;
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-box-orient: horizontal;
+        -webkit-box-direction: normal;
+        -webkit-flex-direction: row;
+                flex-direction: row;
+        -webkit-box-align: center;
+        -webkit-align-items: center;
+                align-items: center;
+        margin:0rpx 30rpx;
+        font-size:23rpx;
+        font-weight:400;
+        color: #868E9D;
+}
+.doctorBox image{
+        width: 133rpx;
+        height: 133rpx;
+        background: #F8F8F8;
+        border-radius: 50%;
+        margin-right: 20rpx;
+}
+

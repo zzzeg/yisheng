@@ -314,8 +314,8 @@
                         uni.removeStorageSync('sk');
                         return;
                     }
-                    if(accountRes.data.wxUserInfo && accountRes.data.wxUserInfo.unionid ){
-                        uni.setStorageSync('unionid', accountRes.data.wxUserInfo.unionid);
+                    if(accountRes.data.wxUserInfo && accountRes.data.wxUserInfo.unionId ){
+                        uni.setStorageSync('unionid', accountRes.data.wxUserInfo.unionId);
                     }
                     if(accountRes.data.bnUserInfo && accountRes.data.bnUserInfo.sessionId ){
                         const sessionId = accountRes.data.bnUserInfo.sessionId

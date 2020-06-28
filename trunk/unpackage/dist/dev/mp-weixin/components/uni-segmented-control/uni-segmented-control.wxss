@@ -4,8 +4,7 @@
 	display: -webkit-box;
 	display: -webkit-flex;
 	display: flex;
-	-webkit-box-sizing: border-box;
-	        box-sizing: border-box;
+	box-sizing: border-box;
 
 	-webkit-box-orient: horizontal;
 	-webkit-box-direction: normal;
@@ -19,8 +18,7 @@
 	display: -webkit-inline-box;
 	display: -webkit-inline-flex;
 	display: inline-flex;
-	-webkit-box-sizing: border-box;
-	        box-sizing: border-box;
+	box-sizing: border-box;
 
 	position: relative;
 	/* flex: 1; */

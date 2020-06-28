@@ -227,8 +227,7 @@
   width: 750rpx;
   height: 110rpx;
   padding: 0 30rpx;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
   background: rgba(255, 255, 255, 0.9);
 }
 .action-section .checkbox {
@@ -308,8 +307,7 @@
   font-size: 28rpx;
   background: -webkit-linear-gradient(217deg, #88e296 0%, #03be90 100%);
   background: linear-gradient(233deg, #88e296 0%, #03be90 100%);
-  -webkit-box-shadow: 0px 3px 15px 0px rgba(3, 190, 144, 0.3);
-          box-shadow: 0px 3px 15px 0px rgba(3, 190, 144, 0.3);
+  box-shadow: 0px 3px 15px 0px rgba(3, 190, 144, 0.3);
 }
 .radius {
   border-radius: 15px;

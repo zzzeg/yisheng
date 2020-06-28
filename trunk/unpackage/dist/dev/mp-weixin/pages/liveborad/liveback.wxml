@@ -1,1 +1,1 @@
-<view class="cont data-v-c9b66004"><video class="myVideo data-v-c9b66004" src="{{formData.playUrl}}" autoplay controls data-event-opts="{{[['error',[['videoErrorCallback',['$event']]]]]}}" binderror="__e"></video></view>
+<view class="cont data-v-c9b66004"><video class="myVideo data-v-c9b66004" src="{{formData.playUrl}}" autoplay="{{true}}" controls="{{true}}" data-event-opts="{{[['error',[['videoErrorCallback',['$event']]]]]}}" binderror="__e"></video></view>

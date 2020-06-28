@@ -31,8 +31,7 @@
 .cont.data-v-70c92c55 {
   overflow: auto;
   background: #EFF1F6;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
   padding: 20rpx 32rpx;
 }
 .color_gre.data-v-70c92c55 {
@@ -53,8 +52,7 @@
 }
 .living .box.data-v-70c92c55 {
   background: white;
-  -webkit-box-shadow: 0px 4rpx 20rpx 0px rgba(85, 112, 105, 0.1);
-          box-shadow: 0px 4rpx 20rpx 0px rgba(85, 112, 105, 0.1);
+  box-shadow: 0px 4rpx 20rpx 0px rgba(85, 112, 105, 0.1);
   border-radius: 20rpx;
   padding: 24rpx;
   margin: 20rpx 0 32rpx 0;
@@ -112,8 +110,7 @@
   background: linear-gradient(233deg, #88e296 0%, #03be90 100%);
   width: 260rpx;
   line-height: 64rpx;
-  -webkit-box-shadow: 0px 3px 15px 0px rgba(3, 190, 144, 0.3);
-          box-shadow: 0px 3px 15px 0px rgba(3, 190, 144, 0.3);
+  box-shadow: 0px 3px 15px 0px rgba(3, 190, 144, 0.3);
   border-radius: 16px;
   font-size: 28rpx;
   color: #fff;

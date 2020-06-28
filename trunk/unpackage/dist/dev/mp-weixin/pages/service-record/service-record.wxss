@@ -42,8 +42,7 @@
   height: 67rpx;
   background: -webkit-linear-gradient(217deg, #88e296 0%, #03be90 100%);
   background: linear-gradient(233deg, #88e296 0%, #03be90 100%);
-  -webkit-box-shadow: 0px 6rpx 31rpx 0px rgba(3, 190, 144, 0.3);
-          box-shadow: 0px 6rpx 31rpx 0px rgba(3, 190, 144, 0.3);
+  box-shadow: 0px 6rpx 31rpx 0px rgba(3, 190, 144, 0.3);
   border-radius: 33rpx;
   line-height: 67rpx;
   text-align: center;

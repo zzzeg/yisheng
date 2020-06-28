@@ -1571,6 +1571,18 @@ function findDoctorReport(obj){
         header: header
     },false)
 }
+function doctorTeamPage(obj){
+	const sessionKey = uni.getStorageSync('sessionId');
+    const header = {
+        'sskey': sessionKey,
+        'content-type': 'application/json'
+    }
+    return request.get({
+        url: '/expert/teamPage',
+        data: obj,
+        header: header
+    },false)
+}
 export default {
     getMsgCode,
     getAccountInfo,
@@ -1688,6 +1700,7 @@ export default {
 	// 私人医生
 	docbannerList,
 	doctorItemList,
+	doctorTeamPage,
 	// 健康体检
 	healthKKhospitalAreas,
 	healthKKhospitalType,

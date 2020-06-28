@@ -315,7 +315,7 @@
                 }
             }
             getApp().globalData.showIndex = true
-
+			this.getTestCode();
 			this.testCode = getApp().globalData.testCode
         },
 		onLoad(options) {
@@ -330,6 +330,17 @@
             
 		},
 		methods: {
+			getTestCode: function() {
+			    api.getTestCode().then(res => {
+			        console.log(res)
+			        if (res.data == '' || res.data == null) {
+			            this.testCode = ''
+			        } else {
+			            this.testCode = res.data
+			            getApp().globalData.testCode = res.data
+			        }
+			    })
+			},
 			gocommunityManagerImage: function(){
 				if(this.community.credentialsDtos&&this.community.credentialsDtos.length){
 					uni.navigateTo({

@@ -1,1 +1,0 @@
-{"version":3,"sources":["webpack:///E:/yisheng/trunk/main.js"],"names":["createPage","Page"],"mappings":";;;;;;;;;;kDAAA;AACA;AACA,8G;AACAA,UAAU,CAACC,mBAAD,CAAV,C","file":"pages/index/alskin/faceCamera.js","sourcesContent":["import 'uni-pages';\nimport Vue from 'vue'\nimport Page from './pages/index/alskin/faceCamera.vue'\ncreatePage(Page)"],"sourceRoot":""}

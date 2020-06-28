@@ -31,8 +31,7 @@
 .upload .upload-header {
   height: 83rpx;
   background: white;
-  -webkit-box-shadow: 0px 4px 21px 0px rgba(85, 112, 105, 0.1);
-          box-shadow: 0px 4px 21px 0px rgba(85, 112, 105, 0.1);
+  box-shadow: 0px 4px 21px 0px rgba(85, 112, 105, 0.1);
   margin-top: 31rpx;
   padding-left: 33rpx;
   font-size: 29rpx;
@@ -49,8 +48,7 @@
   padding-left: 33rpx;
   padding-right: 33rpx;
   padding-bottom: 70rpx;
-  -webkit-box-shadow: 0px 4px 21px 0px rgba(85, 112, 105, 0.1);
-          box-shadow: 0px 4px 21px 0px rgba(85, 112, 105, 0.1);
+  box-shadow: 0px 4px 21px 0px rgba(85, 112, 105, 0.1);
   background: white;
 }
 .upload .upload-content .upload-content-header {
@@ -105,8 +103,7 @@
   border: 2px dashed #383e56;
   color: #434E5E;
   font-size: 44rpx;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
 }
 .tips {
   width: 683rpx;
@@ -150,8 +147,7 @@
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
           justify-content: space-between;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
 }
 .uni-tip .uni-tip-content {
   font-size: 31rpx;
@@ -188,8 +184,7 @@
   line-height: 75rpx;
   background: -webkit-linear-gradient(217deg, #88e296 0%, #03be90 100%);
   background: linear-gradient(233deg, #88e296 0%, #03be90 100%);
-  -webkit-box-shadow: 0px 6px 31px 0px rgba(3, 190, 144, 0.3);
-          box-shadow: 0px 6px 31px 0px rgba(3, 190, 144, 0.3);
+  box-shadow: 0px 6px 31px 0px rgba(3, 190, 144, 0.3);
   border-radius: 38rpx;
   color: #FFFFFF;
   text-align: center;

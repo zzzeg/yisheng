@@ -203,7 +203,7 @@
                   '气虚': '../../static/image/img_qxtz.png',
                   '阴虚': '../../static/image/img_yxtz.png',
                   '气郁': '../../static/image/img_qytz.png',
-                  '痰湿': '../../static/image/img_tstz.png',
+                  '痰湿': 'https://coffer.bainuo.cn/mdt-pub/01/01246daa8ed1d17e0c21f7f43754c60f.png',
                   '血瘀': '../../static/image/img_xytz.png',
                   '阳虚': '../../static/image/img_yxtz(1).png',
                   '特稟': '../../static/image/img_tltz.png'

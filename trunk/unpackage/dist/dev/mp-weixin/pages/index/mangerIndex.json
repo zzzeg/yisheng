@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "健康管家主页",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "h-share-list": "/components/common/h-share-list",
+    "uni-load-more": "/components/uni-load-more/uni-load-more",
+    "uni-search-bar": "/components/uni-search-bar/uni-search-bar"
+  }
+}

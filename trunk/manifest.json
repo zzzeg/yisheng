@@ -57,9 +57,9 @@
     "quickapp" : {},
     /* 小程序特有相关 */
     "mp-weixin" : {
-        // "appid" : "wx8f0cdb6d9819747e",
+        "appid" : "wx8f0cdb6d9819747e",
         // "appid" : "wx6caba513a8315b6c",
-        "appid" : "wx5ff1fdafb7797fdf",
+        // "appid" : "wx5ff1fdafb7797fdf",
         "setting" : {
             "urlCheck" : false
         },
@@ -71,7 +71,7 @@
 		},
         "plugins": {
             // "live-player-plugin": {
-            //   "version": "1.0.16", 
+            //   "version": "1.0.12", 
             //   "provider": "wx2b03c6e691cd7370" 
             // }
         }
